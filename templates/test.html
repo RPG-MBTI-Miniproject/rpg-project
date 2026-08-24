@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>RPG MBTI - 모험 진행 중</title>
+</head>
+<body>
+    <!-- TODO: [최현욱] Frame 2 와이어프레임에 맞춘 UI/UX 퍼블리싱 (SPA 형태) -->
+    <div class="test-container">
+        <div class="header">
+            <!-- TODO: [이정욱] JS로 JWT에서 유저명 추출해서 여기에 텍스트 삽입하기 -->
+            <span id="welcome-msg">모험가님, 환영합니다!</span>
+            <button id="logout-btn">[로그아웃]</button>
+        </div>
+
+        <div class="progress-bar">
+            <!-- TODO: [최현욱] 진행도 바 UI 컴포넌트 개발 -->
+            진행도: Q. <span id="q-num">1</span> / 12
+        </div>
+
+        <div class="question-area">
+            <h3 id="question-text">여기에 질문 텍스트가 JS로 들어옵니다.</h3>
+        </div>
+
+        <div class="answer-buttons">
+            <button id="btn-a" class="answer-btn">(A) 첫 번째 선택지</button>
+            <button id="btn-b" class="answer-btn">(B) 두 번째 선택지</button>
+        </div>
+    </div>
+
+    <!-- TODO: [이정욱] 테스트 로직(문제 갈아끼우기 및 상태 저장) JS 파일 연결 -->
+    <script src="/static/js/test.js"></script>
+</body>
+</html>

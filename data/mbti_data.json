@@ -1,0 +1,19 @@
+// TODO: [이정욱] 16가지 MBTI에 맞는 RPG 직업 기획 및 데이터 세팅 (이후 영준님이 DB에 밀어넣을 예정)
+[
+  {
+    "mbti": "INTJ",
+    "name": "냉철한 마법사",
+    "title": "계획대로 완벽하게 타격한다",
+    "stats": {"atk": 8, "def": 3, "mag": 10},
+    "best_match": "ENFP",
+    "worst_match": "ESFJ"
+  },
+  {
+    "mbti": "ENFP",
+    "name": "자유로운 음유시인",
+    "title": "음악과 바람이 이끄는 대로",
+    "stats": {"atk": 4, "def": 4, "mag": 6},
+    "best_match": "INTJ",
+    "worst_match": "ISTJ"
+  }
+]

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>RPG MBTI - 로그인</title>
+    <!-- TODO: [최현욱] Tailwind CSS CDN 또는 Bootstrap 추가 및 공통 스타일 적용 -->
+</head>
+<body>
+    <!-- TODO: [최현욱] Frame 1 와이어프레임에 맞춘 UI/UX 퍼블리싱 -->
+    <!-- 아이디 입력(input), 비밀번호 입력(input), 로그인 버튼(button), 회원가입 링크(a) -->
+
+    <div class="login-container">
+        <h1>당신의 영혼에 깃든 RPG 직업은?</h1>
+        <form id="login-form">
+            <input type="text" id="userid" placeholder="아이디">
+            <input type="password" id="password" placeholder="비밀번호">
+            <button type="submit">여관 입장하기 (로그인)</button>
+        </form>
+        <a href="/signup">아직 길드에 가입하지 않으셨나요? [신규 모험가 등록]</a>
+    </div>
+
+    <!-- TODO: [이정욱] 로그인 AJAX 처리를 위한 JS 파일 연결 -->
+    <script src="/static/js/auth.js"></script>
+</body>
+</html>

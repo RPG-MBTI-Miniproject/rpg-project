@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>RPG MBTI - 결과 보고서</title>
+</head>
+<body>
+    <!-- TODO: [최현욱] Frame 3 와이어프레임 UI/UX 및 Jinja2 서버사이드 렌더링 연결 -->
+    <div class="result-container">
+        <h2>당신의 영혼에 깃든 RPG 직업은...</h2>
+        
+        <div class="character-card">
+            <!-- Jinja2 문법({{ }})을 사용하여 app.py에서 넘어온 데이터를 바인딩하세요 -->
+            <h3>"{{ my_class.title }}"</h3>
+            <h1>{{ my_class.name }} ({{ my_class.mbti }})</h1>
+            <!-- 일러스트 이미지, 육각 그래프 UI 등 추가 -->
+        </div>
+
+        <div class="chemistry-area">
+            <!-- 파티원 궁합 UI -->
+        </div>
+
+        <button onclick="location.href='/test'">테스트 다시하기</button>
+        <!-- TODO: [이정욱] 결과 링크 복사하는 기능(URL 클립보드 복사) JS 함수로 간단히 구현 -->
+        <button id="copy-link-btn">결과 링크 복사하기</button>
+    </div>
+</body>
+</html>
