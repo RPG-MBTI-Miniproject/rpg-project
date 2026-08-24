@@ -1,0 +1,29 @@
+/* TODO: [최현욱] 전체 페이지 공통 스타일 및 색상 변수 정의 */
+:root {
+    --bg-color: #1a1a2e;
+    --card-bg: #16213e;
+    --primary-color: #e94560;
+    --text-color: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Pretendard', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 480px;
+    padding: 20px;
+}

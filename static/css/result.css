@@ -1,0 +1,21 @@
+/* TODO: [최현욱] Frame 3 (result.html) 카드, 육각 그래프, 상성 박스 스타일링 */
+.result-card {
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+}
+
+.chemistry-box {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.best-match, .worst-match {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.05);
+}
