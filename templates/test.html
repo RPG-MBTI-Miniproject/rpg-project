@@ -5,17 +5,17 @@
     <meta charset="UTF-8">
     <title>RPG MBTI - 모험 진행 중</title>
     <!-- 공통 스타일 및 색상 변수 적용 -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <!-- test 전용 스타일 적용 -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='test.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/test.css') }}">
 </head>
 
 <body>
     <!-- TODO: [최현욱] Frame 2 와이어프레임에 맞춘 UI/UX 퍼블리싱 (SPA 형태) -->
     <div class="test-container">
         <div class="header">
-            <!-- TODO: [이정욱] JS로 JWT에서 유저명 추출해서 여기에 텍스트 삽입하기 -->
-            <span id="welcome-msg">모험가님, 환영합니다!</span>
+            <!-- 서버가 JWT에서 꺼낸 닉네임을 Jinja2로 바로 넣어준다 (JS 토큰 디코딩 불필요) -->
+            <span id="welcome-msg">{{ nickname }}님, 환영합니다!</span>
             <button class="logout-btn" onclick="logout()">[로그아웃]</button>
         </div>
 
