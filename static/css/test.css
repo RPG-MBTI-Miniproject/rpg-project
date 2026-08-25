@@ -83,7 +83,6 @@ body {
 }
 
 /* 진행도 바 UI 컴포넌트 */
-/**/
 .progress-bar {
     display: flex;
     flex-direction: column;
