@@ -29,7 +29,6 @@ def test():
 def result():
     # TODO: [최현욱] Jinja2 렌더링 테스트를 위해 가짜 데이터 넘겨보기
     # TODO: [영준] DB에서 결과 데이터 조회 후 템플릿으로 전달 (MBTI 계산 로직 포함)
-    mock_data = {"name": "냉철한 마법사", "mbti": "INTJ"}
     return render_template('result.html', my_class=mock_data)
 
 # ==========================================
