@@ -11,31 +11,31 @@
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </head>
 
-<body class="admin-auth-body">
+<body class="auth-body">
     <main>
         <section>
-            <div class="admin-auth-wrapper">
-                <form class="admin-auth-card reveal is-visible" id="signup-form" action="{{ url_for('signup') }}"
+            <div class="auth-wrapper">
+                <form class="auth-card reveal is-visible" id="signup-form" action="{{ url_for('signup') }}"
                     method="POST">
-                    <div class="admin-auth-header">
-                        <h2 class="admin-auth-title">회원가입</h2>
+                    <div class="auth-header">
+                        <h2 class="auth-title">회원가입</h2>
                     </div>
-                    <input type="text" name="username" placeholder="아이디" autofocus="" class="admin-auth-input" value=""
+                    <input type="text" name="username" placeholder="아이디" autofocus="" class="auth-input" value=""
                         required>
-                    <input type="password" id="password" name="password" placeholder="비밀번호" class="admin-auth-input"
+                    <input type="password" id="password" name="password" placeholder="비밀번호" class="auth-input"
                         value="" required>
                     <input type="password" id="confirm_password" name="confirm_password" placeholder="비밀번호 확인"
-                        class="admin-auth-input" value="" required>
-                    <input type="text" id="nickname" name="nickname" placeholder="닉네임" class="admin-auth-input" value=""
+                        class="auth-input" value="" required>
+                    <input type="text" id="nickname" name="nickname" placeholder="닉네임" class="auth-input" value=""
                         required>
-                    <button type="submit" class="admin-auth-submit">길드 등록</button>
+                    <button type="submit" class="auth-submit">길드 등록</button>
 
-                    <div id="error-message" class="admin-auth-error {% if not error_msg %}hidden{% endif %}">
+                    <div id="error-message" class="auth-error {% if not error_msg %}hidden{% endif %}">
                         {{ error_msg if error_msg else '' }}
                     </div>
 
-                    <div class="admin-auth-footer">
-                        <a href="{{ url_for('login') }}" class="admin-auth-link">로그인으로 돌아가기</a>
+                    <div class="auth-footer">
+                        <a href="{{ url_for('login') }}" class="auth-link">로그인으로 돌아가기</a>
                     </div>
                 </form>
             </div>

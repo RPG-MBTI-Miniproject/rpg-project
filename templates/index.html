@@ -11,28 +11,28 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}?v=3">
 </head>
 
-<body class="admin-auth-body">
+<body class="auth-body">
     <!-- TODO: [최현욱] Frame 1 와이어프레임에 맞춘 UI/UX 퍼블리싱 -->
     <!-- 아이디 입력(input), 비밀번호 입력(input), 로그인 버튼(button), 회원가입 링크(a) -->
     <main>
         <section>
-            <div class="admin-auth-wrapper">
-                <div class="admin-auth-main-logo">
+            <div class="auth-wrapper">
+                <div class="auth-main-logo">
                     <img src="{{ url_for('static', filename='images/main-logo.png') }}" alt="게임 로고">
                 </div>
-                <div class="admin-auth-top-header">
-                    <p class="admin-auth-subtitle">당신의 영혼에 깃든 RPG 직업은?</p>
+                <div class="auth-top-header">
+                    <p class="auth-subtitle">당신의 영혼에 깃든 RPG 직업은?</p>
                 </div>
-                <form class="admin-auth-card reveal is-visible" action="{{ url_for('login') }}" method="POST">
-                    <div class="admin-auth-header">
-                        <h2 class="admin-auth-title">로그인</h2>
+                <form class="auth-card reveal is-visible" action="{{ url_for('login') }}" method="POST">
+                    <div class="auth-header">
+                        <h2 class="auth-title">로그인</h2>
                     </div>
-                    <input type="text" name="username" placeholder="아이디" autofocus="" class="admin-auth-input" value="">
-                    <input type="password" name="password" placeholder="비밀번호" class="admin-auth-input" value="">
-                    <button type="submit" class="admin-auth-submit">여관 입장하기</button>
-                    <div class="admin-auth-footer">
+                    <input type="text" name="username" placeholder="아이디" autofocus="" class="auth-input" value="">
+                    <input type="password" name="password" placeholder="비밀번호" class="auth-input" value="">
+                    <button type="submit" class="auth-submit">여관 입장하기</button>
+                    <div class="auth-footer">
                         <p>길드에 가입하지 않으셨나요?</p>
-                        <a href="{{ url_for('signup') }}" class="admin-auth-link"> [신규 모험가 등록]</a>
+                        <a href="{{ url_for('signup') }}" class="auth-link"> [신규 모험가 등록]</a>
                     </div>
                 </form>
             </div>
