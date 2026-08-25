@@ -6,3 +6,4 @@ pyvenv.cfg
 CACHEDIR.TAG
 Lib
 Scripts
+docs/
