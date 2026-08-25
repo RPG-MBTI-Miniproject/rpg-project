@@ -2,9 +2,24 @@
 document.getElementById('login-form')?.addEventListener('submit', function(e) {
     e.preventDefault();
     // 1. ID/PW 값 가져오기
+    let userId = document.getElementById('userid').value;
+    let userPw = document.getElementById('password').value;
+
     // 2. fetch() 또는 $.ajax()를 사용해 '/api/login'으로 전송
-    // 3. 성공 시 서버에서 받은 JWT를 localStorage에 저장
-    // 4. 저장 직후 window.location.href = "/test" 로 이동
+    $.ajax({
+        type: "POST",
+        url: "/api/login",
+        
+        contentType: 'application/json',
+
+        data: JSON.stringify({ userId, userPw })                
+    })
+    .done(function(response) { 
+        // 3. 성공 시 서버에서 받은 JWT를 localStorage에 저장                
+        localStorage.setItem('JWT_TOKEN', response.token);
+        // 4. 저장 직후 window.location.href = "/test" 로 이동
+        window.location.href = "/test";
+    })        
 });
 
 // TODO: [이정욱] 회원가입 폼 제출 이벤트 제어 및 AJAX POST 요청
