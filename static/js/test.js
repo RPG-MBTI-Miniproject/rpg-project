@@ -1,28 +1,5 @@
 // TODO: [이정욱] 12개의 질문-답변 세트 Array 객체 구축
 const questions = [
-    {
-        q: "던전 보스방 문 앞에 도착했다. 당신의 행동은?",
-        btnA: { text: "문에 함정이 없는지부터 꼼꼼하게 살핀다", type: "S" },
-        btnB: { text: "일단 발로 차서 문을 열고 돌진한다", type: "N" }
-    },
-    // ... 총 12개 질문 채우기 (E/I, S/N, T/F, J/P 각각 3개씩)
-];
-
-// TODO: [이정욱] 상태 저장 변수
-let currentQ = 0;
-let scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
-
-// TODO: [이정욱] 버튼 클릭 시 점수 누적 및 다음 문제로 화면 갱신하는 함수 작성
-function nextQuestion(selectedType) {
-    // 1. 선택한 type 점수 +1
-    // 2. currentQ + 1
-    // 3. 만약 currentQ가 12에 도달했다면 최종 결과 배열을 '/api/submit'으로 AJAX POST (이때 헤더에 JWT 포함!)
-    // 4. 아니라면 DOM 조작을 통해 질문 텍스트와 버튼 텍스트 갈아끼우기 (SPA 로직)
-}
-
-// -----------------------------------  아래 수정한부분 ----------------------------------------
-// TODO: [이정욱] 12개의 질문-답변 세트 Array 객체 구축 
-const questions = [
     // =========================
     // E / I
     // =========================
@@ -201,7 +178,18 @@ let currentQ = 0;
 let scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
 
 // TODO: [이정욱] 버튼 클릭 시 점수 누적 및 다음 문제로 화면 갱신하는 함수 작성
-function nextQuestion(selectedType) {        
+
+// 질문 렌더링-> 버튼, 진행도 등 화면 표시 
+function renderQuestion() {
+    const question = questions[currentQ];
+
+    $("#q-num").text(currentQ + 1);
+    $("#question-text").text(question.q);
+    $("#btn-a").text(question.btnA.text);
+    $("#btn-b").text(question.btnB.text);
+}
+
+function nextQuestion(selectedType) {
     // 1. 선택한 mbti type 점수 +1
     scores[selectedType]++;
 
@@ -210,57 +198,7 @@ function nextQuestion(selectedType) {
 
     // 3. 만약 currentQ가 12에 도달했다면 최종 결과 배열을 '/api/submit'으로 AJAX POST (이때 헤더에 JWT 포함!)
     if (currentQ >= questions.length) {
-
-        let mbti = "";
-
-        mbti += scores.E > scores.I ? "E" : "I";
-        mbti += scores.S > scores.N ? "S" : "N";
-        mbti += scores.T > scores.F ? "T" : "F";
-        mbti += scores.J > scores.P ? "J" : "P";
-
-        const resultClass = class_stats.find(
-            item => item.mbti === mbti
-        );
-
-        console.log("점수:", scores);
-        console.log("MBTI:", mbti);
-        console.log("클래스:", resultClass);
-
-        // localStorage에서 JWT 가져오기
-        const token = localStorage.getItem("JWT_TOKEN");
-
-        // 결과를 서버로 전송
-        $.ajax({
-            type: "POST",
-            url: "/api/submit",
-
-            headers: {
-                "Authorization": "Bearer " + token
-            },
-
-            contentType: "application/json",
-
-            data: JSON.stringify({
-                mbti: mbti,
-                class_name: resultClass.class_name,
-                stats: resultClass.stats,
-                scores: scores
-            }),
-
-            // 결과 저장 분기
-            success: function (response) {
-                console.log("결과 저장 성공:", response);
-
-                // 결과 페이지로 이동
-                window.location.href = "/result";
-            },
-
-            error: function (xhr) {
-                console.log("결과 저장 실패:", xhr.responseText);
-                alert("결과 저장에 실패했습니다.");
-            }
-        });
-
+        submitResult();
         return;
     }
 
@@ -268,7 +206,137 @@ function nextQuestion(selectedType) {
     const question = questions[currentQ];
 
     // 5. 화면 변경
-    $("#question-text").text(question.q);
-    $("#btn-a").text(question.btnA.text);
-    $("#btn-b").text(question.btnB.text);
+    renderQuestion();
 }
+
+function submitResult() {
+    let mbti = "";
+
+    mbti += scores.E > scores.I ? "E" : "I";
+    mbti += scores.S > scores.N ? "S" : "N";
+    mbti += scores.T > scores.F ? "T" : "F";
+    mbti += scores.J > scores.P ? "J" : "P";
+
+    console.log("점수:", scores);
+    console.log("MBTI:", mbti);    
+
+    // localStorage에서 JWT 가져오기
+    const token = localStorage.getItem("JWT_TOKEN");
+
+    // 결과를 서버로 전송
+    $.ajax({
+        type: "POST",
+        url: "/api/submit",
+
+        headers: {
+            "Authorization": "Bearer " + token
+        },
+
+        contentType: "application/json",
+
+        data: JSON.stringify({
+            mbti: mbti,            
+            scores: scores
+        }),
+
+        // 결과 저장 분기
+        success: function (response) {
+            console.log("결과 저장 성공:", response);
+
+            // 결과 페이지로 이동
+            window.location.href = "/result";
+        },
+
+        error: function (xhr) {
+            console.log("결과 저장 실패:", xhr.responseText);
+            alert("결과 저장에 실패했습니다.");
+        }
+    });
+}
+
+const selectBtnA = document.getElementById("btn-a");
+selectBtnA.addEventListener("click", ()=>nextQuestion(questions[currentQ].btnA.type));
+
+const selectBtnB = document.getElementById("btn-b");
+selectBtnB.addEventListener("click", ()=>nextQuestion(questions[currentQ].btnB.type));
+
+renderQuestion();
+//
+// function nextQuestion(selectedType) {        
+//     // 1. 선택한 mbti type 점수 +1
+//     scores[selectedType]++;
+
+//     // 2. currentQ + 1
+//     currentQ++;
+
+//     // 3. 만약 currentQ가 12에 도달했다면 최종 결과 배열을 '/api/submit'으로 AJAX POST (이때 헤더에 JWT 포함!)
+//     if (currentQ >= questions.length) {
+
+//         let mbti = "";
+
+//         mbti += scores.E > scores.I ? "E" : "I";
+//         mbti += scores.S > scores.N ? "S" : "N";
+//         mbti += scores.T > scores.F ? "T" : "F";
+//         mbti += scores.J > scores.P ? "J" : "P";
+
+//         const resultClass = class_stats.find(
+//             item => item.mbti === mbti
+//         );
+
+//         console.log("점수:", scores);
+//         console.log("MBTI:", mbti);
+//         console.log("클래스:", resultClass);
+
+//         // localStorage에서 JWT 가져오기
+//         const token = localStorage.getItem("JWT_TOKEN");
+
+//         // 결과를 서버로 전송
+//         $.ajax({
+//             type: "POST",
+//             url: "/api/submit",
+
+//             headers: {
+//                 "Authorization": "Bearer " + token
+//             },
+
+//             contentType: "application/json",
+
+//             data: JSON.stringify({
+//                 mbti: mbti,
+//                 class_name: resultClass.class_name,
+//                 stats: resultClass.stats,
+//                 scores: scores
+//             }),
+
+//             // 결과 저장 분기
+//             success: function (response) {
+//                 console.log("결과 저장 성공:", response);
+
+//                 // 결과 페이지로 이동
+//                 window.location.href = "/result";
+//             },
+
+//             error: function (xhr) {
+//                 console.log("결과 저장 실패:", xhr.responseText);
+//                 alert("결과 저장에 실패했습니다.");
+//             }
+//         });
+
+//         return;
+//     }
+
+//     // 4. 다음 질문 객체 가져오기
+//     const question = questions[currentQ];
+
+//     // 5. 화면 변경
+//     $("#question-text").text(question.q);
+//     $("#btn-a").text(question.btnA.text);
+//     $("#btn-b").text(question.btnB.text);
+// }
+
+// const selectBtnA = document.getElementById("btn-a");
+// selectBtnA.addEventListener("click", ()=>nextQuestion(questions[currentQ].btnA.type));
+
+// const selectBtnB = document.getElementById("btn-b");
+// selectBtnB.addEventListener("click", ()=>nextQuestion(questions[currentQ].btnB.type));
+//
