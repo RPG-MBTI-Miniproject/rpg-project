@@ -1,5 +1,5 @@
 :root {
-    /* Common Color Variables */
+
     --bg-dark: #12101c;
     --bg-dark-gradient: radial-gradient(circle at 50% 20%, #1e1b4b 0%, #0a0c16 70%);
     --bg-card: rgba(26, 24, 42, 0.85);
