@@ -1,29 +1,80 @@
-/* TODO: [최현욱] 전체 페이지 공통 스타일 및 색상 변수 정의 */
 :root {
-    --bg-color: #1a1a2e;
-    --card-bg: #16213e;
-    --primary-color: #e94560;
-    --text-color: #ffffff;
+
+    --bg-dark: #12101c;
+    --bg-dark-gradient: radial-gradient(circle at 50% 20%, #1e1b4b 0%, #0a0c16 70%);
+    --bg-card: rgba(26, 24, 42, 0.85);
+    --bg-base: #ffffff;
+    --bg-subtle: #f9fafb;
+    --bg-muted: #f2f4f6;
+
+    /* Theme Colors */
+    --primary-gold: #ffd700;
+    --primary-gold-dark: #ff9900;
+    --brand-primary: #2563eb;
+    --brand-primary-dark: #1d4ed8;
+    --brand-primary-light: #eff6ff;
+    --accent-cyan: #00f2fe;
+    --accent-pink: #ff79c6;
+    --accent-orange: #ffb86c;
+
+    /* Status Colors */
+    --danger: #ef4444;
+    --danger-light: #fee2e2;
+    --warning: #fe9800;
+    --safe: #10b981;
+
+    /* Text Colors */
+    --text-main: #f8fafc;
+    --text-primary: #191f28;
+    --text-secondary: #333d4b;
+    --text-sub: #cbd5e1;
+    --text-tertiary: #6b7684;
+    --text-disabled: #b0b8c1;
+    --text-inverse: #ffffff;
+
+    /* Borders & Radius */
+    --border-default: #e5e8eb;
+    --border-dashed: rgba(255, 255, 255, 0.25);
+    --radius-sm: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-2xl: 24px;
+    --radius-full: 999px;
+
+    /* Typography & Spacing */
+    --font-sans: "Pretendard", "Noto Sans KR", -apple-system, sans-serif;
+    --font-heading: 'Cinzel', serif;
+
+    /* Transitions & Shadows */
+    --ease-fast: 0.15s ease;
+    --ease-normal: 0.3s ease;
+    --ease-slow: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    --shadow-card: 0 16px 40px rgba(0, 0, 0, 0.6);
 }
 
+/* Global Reset & Base Styles */
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-    font-family: 'Pretendard', sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: var(--font-sans);
     min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    -webkit-font-smoothing: antialiased;
 }
 
-.container {
+/* Common Background Particles & Containers */
+.bg-particles {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    max-width: 480px;
-    padding: 20px;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    background: var(--bg-dark-gradient);
 }

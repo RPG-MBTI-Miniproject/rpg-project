@@ -1,23 +1,32 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <title>RPG MBTI - 모험 진행 중</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="/static/css/test.css">
+    <!-- 공통 스타일 및 색상 변수 적용 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- test 전용 스타일 적용 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='test.css') }}">
 </head>
+
 <body>
     <!-- TODO: [최현욱] Frame 2 와이어프레임에 맞춘 UI/UX 퍼블리싱 (SPA 형태) -->
     <div class="test-container">
         <div class="header">
             <!-- TODO: [이정욱] JS로 JWT에서 유저명 추출해서 여기에 텍스트 삽입하기 -->
             <span id="welcome-msg">모험가님, 환영합니다!</span>
-            <button id="logout-btn">[로그아웃]</button>
+            <button class="logout-btn" onclick="logout()">[로그아웃]</button>
         </div>
 
         <div class="progress-bar">
             <!-- TODO: [최현욱] 진행도 바 UI 컴포넌트 개발 -->
-            진행도: Q. <span id="q-num">1</span> / 12
+            <div class="progress-text">
+                진행도: Q. <span id="q-num">1</span> / 12
+            </div>
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="progress-bar-fill" style="width: 8.33%;"></div>
+            </div>
         </div>
 
         <div class="question-area">
@@ -31,6 +40,11 @@
     </div>
 
     <!-- TODO: [이정욱] 테스트 로직(문제 갈아끼우기 및 상태 저장) JS 파일 연결 -->
-    <script src="/static/js/test.js"></script>
+    <script src="{{ url_for('static', filename='js/test.js') }}"></script>
 </body>
+
 </html>
+
+
+<!-- 피드백 : 현재의 웹 내용으로는 많이 빈약함.
+     이틀간의 계획 : 강사님의 피드백을 적극 이용하여 향후 확장성을 중심으로 완성도를 높인다. -->

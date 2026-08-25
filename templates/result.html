@@ -1,30 +1,180 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RPG MBTI - 결과 보고서</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/result.css">
+    <!-- Chart.js for hexagon/radar chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-    <!-- TODO: [최현욱] Frame 3 와이어프레임 UI/UX 및 Jinja2 서버사이드 렌더링 연결 -->
-    <div class="result-container">
-        <h2>당신의 영혼에 깃든 RPG 직업은...</h2>
-        
-        <div class="character-card">
-            <!-- Jinja2 문법({{ }})을 사용하여 app.py에서 넘어온 데이터를 바인딩하세요 -->
-            <h3>"{{ my_class.title }}"</h3>
-            <h1>{{ my_class.name }} ({{ my_class.mbti }})</h1>
-            <!-- 일러스트 이미지, 육각 그래프 UI 등 추가 -->
-        </div>
+    <div class="bg-particles"></div>
 
-        <div class="chemistry-area">
-            <!-- 파티원 궁합 UI -->
-        </div>
+    <!-- 헤더 바 (결과 보고서 / 로그아웃) -->
+    <header class="top-nav">
+        <h1 class="nav-logo">RPG MBTI</h1>
+        <div class="nav-title">결과 보고서</div>
+        <button class="logout-btn" onclick="logout()">로그아웃</button>
+    </header>
 
-        <button onclick="location.href='/test'">테스트 다시하기</button>
-        <!-- TODO: [이정욱] 결과 링크 복사하는 기능(URL 클립보드 복사) JS 함수로 간단히 구현 -->
-        <button id="copy-link-btn">결과 링크 복사하기</button>
-    </div>
+    <main class="result-container">
+        <h2 class="sub-heading">당신의 영혼에 깃든 RPG 직업은...</h2>
+
+        <!-- [ 최현욱 ] Frame 3 와이어프레임 UI/UX 및 Jinja2 서버사이드 렌더링 연결 -->
+        <!-- 직업 카드 (일러스트, 칭호, 직업명, MBTI) -->
+        <section class="character-card">
+            <div class="illustration-wrapper">
+                {% if my_class and my_class.image_url %}
+                <img src="{{ my_class.image_url }}" alt="{{ my_class.name }}" class="char-img">
+                {% else %}
+                <div class="illustration-placeholder">
+                    <span class="char-icon">🔮</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <h3 class="char-title">"{{ my_class.title if (my_class and my_class.title) else '계획대로 완벽하게 타격한다' }}"</h3>
+            <h1 class="char-name-mbti">{{ my_class.name if (my_class and my_class.name) else '냉철한 마법사' }} <span class="mbti-badge">({{ my_class.mbti if (my_class and my_class.mbti) else 'INTJ' }})</span></h1>
+        </section>
+
+        <!-- 능력치 육각 그래프 및 주요 스킬 / 특징 -->
+        <section class="stats-info-section">
+            <div class="chart-box">
+                <h4>[ 능력치 분석 ]</h4>
+                <div class="canvas-wrapper">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-item">
+                    <span class="info-label">▶ 주요 스킬</span>
+                    <span class="info-value">{{ my_class.skill if (my_class and my_class.skill) else '메테오' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">▶ 특징</span>
+                    <span class="info-value">{{ my_class.desc if (my_class and my_class.desc) else '뒤에서 지시함' }}</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 🤝 파티원 궁합 -->
+        <section class="chemistry-area">
+            <h3 class="section-title">🤝 파티원 궁합</h3>
+            <div class="chemistry-box">
+                <!-- 최고의 파티원 -->
+                <div class="chemistry-card best-match">
+                    <div class="match-badge best">💚 최고의 파티원</div>
+                    <div class="match-img-wrapper">
+                        {% if my_class and my_class.best_match and my_class.best_match.image_url %}
+                        <img src="{{ my_class.best_match.image_url }}" alt="{{ my_class.best_match.name }}">
+                        {% else %}
+                        <div class="match-placeholder">🛡️</div>
+                        {% endif %}
+                    </div>
+                    <h4 class="match-name">{{ my_class.best_match.name if (my_class and my_class.best_match and my_class.best_match.name) else '든든한 성기사' }}</h4>
+                    <span class="match-mbti">({{ my_class.best_match.mbti if (my_class and my_class.best_match and my_class.best_match.mbti) else 'ENFJ' }})</span>
+                </div>
+
+                <!-- 최악의 파티원 -->
+                <div class="chemistry-card worst-match">
+                    <div class="match-badge worst">💔 최악의 파티원</div>
+                    <div class="match-img-wrapper">
+                        {% if my_class and my_class.worst_match and my_class.worst_match.image_url %}
+                        <img src="{{ my_class.worst_match.image_url }}" alt="{{ my_class.worst_match.name }}">
+                        {% else %}
+                        <div class="match-placeholder">⚔️</div>
+                        {% endif %}
+                    </div>
+                    <h4 class="match-name">{{ my_class.worst_match.name if (my_class and my_class.worst_match and my_class.worst_match.name) else '막무가내 버서커' }}</h4>
+                    <span class="match-mbti">({{ my_class.worst_match.mbti if (my_class and my_class.worst_match and my_class.worst_match.mbti) else 'ESTP' }})</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 하단 액션 버튼 -->
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="location.href='/test'">🔄 테스트 다시하기</button>
+            <!-- TODO: [이정욱] 결과 링크 복사하는 기능(URL 클립보드 복사) JS 함수로 간단히 구현 -->
+            <button class="btn btn-primary" id="copy-link-btn">🔗 결과 링크 복사하기</button>
+        </div>
+    </main>
+
+    <!-- Jinja2 Safe Stats JSON Data Transfer -->
+    <script id="stats-data" type="application/json">
+        {{ (my_class.stats if (my_class and my_class.stats) else {'atk': 90, 'def': 40, 'mp': 100, 'spd': 70, 'int': 95, 'luk': 50}) | tojson }}
+    </script>
+
+    <!-- Radar Chart Initialization Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('radarChart');
+            if (ctx) {
+                let statsData = { atk: 90, def: 40, mp: 100, spd: 70, int: 95, luk: 50 };
+                try {
+                    const jsonElem = document.getElementById('stats-data');
+                    if (jsonElem) {
+                        statsData = Object.assign(statsData, JSON.parse(jsonElem.textContent));
+                    }
+                } catch (e) {
+                    console.error("Stats JSON parse error:", e);
+                }
+
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['공격력', '방어력', '마력', '민첩성', '지능', '운'],
+                        datasets: [{
+                            label: '능력치',
+                            data: [statsData.atk, statsData.def, statsData.mp, statsData.spd, statsData.int, statsData.luk],
+                            backgroundColor: 'rgba(255, 215, 0, 0.25)',
+                            borderColor: '#ffd700',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#00f2fe',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#00f2fe'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                angleLines: { color: 'rgba(255, 255, 255, 0.15)' },
+                                grid: { color: 'rgba(255, 255, 255, 0.15)' },
+                                pointLabels: { color: '#cbd5e1', font: { size: 11 } },
+                                ticks: { display: false },
+                                suggestMin: 0,
+                                suggestMax: 100
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+
+            const copyBtn = document.getElementById('copy-link-btn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(window.location.href)
+                        .then(() => alert('결과 링크가 클립보드에 복사되었습니다!'))
+                        .catch(() => alert('복사 실패!'));
+                });
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('token');
+            location.href = '/';
+        }
+    </script>
 </body>
+
 </html>
