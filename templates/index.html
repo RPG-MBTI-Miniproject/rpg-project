@@ -7,8 +7,8 @@
     <!-- Pretendard Font -->
     <link rel="stylesheet" as="style" crossorigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}?v=3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}?v=3">
 </head>
 
 <body class="auth-body">
@@ -23,7 +23,7 @@
                 <div class="auth-top-header">
                     <p class="auth-subtitle">당신의 영혼에 깃든 RPG 직업은?</p>
                 </div>
-                <form class="auth-card reveal is-visible" action="{{ url_for('login') }}" method="POST">
+                <form class="auth-card reveal is-visible" id="login-form">
                     <div class="auth-header">
                         <h2 class="auth-title">로그인</h2>
                     </div>

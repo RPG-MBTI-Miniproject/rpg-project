@@ -174,79 +174,131 @@ const questions = [
     }
 ];
 
-// TODO: [이정욱] 상태 저장 변수
+// ==========================================
+// app.py 계약 기준
+//   POST /api/submit  (JWT 필요)
+//     body   {answers: ["I","N","T","J"]}     ← 서버가 "".join(answers) 로 합침
+//     header Authorization: Bearer <토큰>
+// ==========================================
+
+const TOKEN_KEY = 'JWT_TOKEN';   // auth.js 와 같은 키
+
+// [이정욱] 상태 저장 변수
 let currentQ = 0;
 let scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
 
-// TODO: [이정욱] 버튼 클릭 시 점수 누적 및 다음 문제로 화면 갱신하는 함수 작성
-function nextQuestion(selectedType) {        
+// ------------------------------------------
+// 화면에 현재 질문 그리기 (진행도 포함)
+// ------------------------------------------
+function renderQuestion() {
+    const question = questions[currentQ];
+
+    document.getElementById('question-text').textContent = question.q;
+    document.getElementById('btn-a').textContent = question.btnA.text;
+    document.getElementById('btn-b').textContent = question.btnB.text;
+
+    document.getElementById('q-num').textContent = currentQ + 1;
+    const percent = ((currentQ + 1) / questions.length) * 100;
+    document.getElementById('progress-bar-fill').style.width = percent.toFixed(2) + '%';
+}
+
+// ------------------------------------------
+// [이정욱] 버튼 클릭 시 점수 누적 및 다음 문제로 화면 갱신
+// ------------------------------------------
+function nextQuestion(selectedType) {
     // 1. 선택한 mbti type 점수 +1
     scores[selectedType]++;
 
     // 2. currentQ + 1
     currentQ++;
 
-    // 3. 만약 currentQ가 12에 도달했다면 최종 결과 배열을 '/api/submit'으로 AJAX POST (이때 헤더에 JWT 포함!)
+    // 3. 12문항을 다 풀었으면 서버로 전송
     if (currentQ >= questions.length) {
-
-        let mbti = "";
-
-        mbti += scores.E > scores.I ? "E" : "I";
-        mbti += scores.S > scores.N ? "S" : "N";
-        mbti += scores.T > scores.F ? "T" : "F";
-        mbti += scores.J > scores.P ? "J" : "P";
-
-        const resultClass = class_stats.find(
-            item => item.mbti === mbti
-        );
-
-        console.log("점수:", scores);
-        console.log("MBTI:", mbti);
-        console.log("클래스:", resultClass);
-
-        // localStorage에서 JWT 가져오기
-        const token = localStorage.getItem("JWT_TOKEN");
-
-        // 결과를 서버로 전송
-        $.ajax({
-            type: "POST",
-            url: "/api/submit",
-
-            headers: {
-                "Authorization": "Bearer " + token
-            },
-
-            contentType: "application/json",
-
-            data: JSON.stringify({
-                mbti: mbti,
-                class_name: resultClass.class_name,
-                stats: resultClass.stats,
-                scores: scores
-            }),
-
-            // 결과 저장 분기
-            success: function (response) {
-                console.log("결과 저장 성공:", response);
-
-                // 결과 페이지로 이동
-                window.location.href = "/result";
-            },
-
-            error: function (xhr) {
-                console.log("결과 저장 실패:", xhr.responseText);
-                alert("결과 저장에 실패했습니다.");
-            }
-        });
-
+        submitResult();
         return;
     }
 
-    // 4. 다음 질문 객체 가져오기
-    const question = questions[currentQ];
-
-    // 5. 화면 변경
-    $("#question-text").text(question.q);
-    $("#btn-a").text(question.btnA.text);
-    $("#btn-b").text(question.btnB.text);
+    // 4. 아니라면 다음 질문으로 화면 갱신
+    renderQuestion();
 }
+
+// ------------------------------------------
+// 축별 승자를 모아 answers 배열 만들기
+// 축마다 문항이 3개(홀수)라 동점이 나오지 않는다
+// ------------------------------------------
+function buildAnswers() {
+    return [
+        scores.E > scores.I ? 'E' : 'I',
+        scores.S > scores.N ? 'S' : 'N',
+        scores.T > scores.F ? 'T' : 'F',
+        scores.J > scores.P ? 'J' : 'P'
+    ];
+}
+
+// ------------------------------------------
+// 결과를 '/api/submit' 으로 전송 (헤더에 JWT 포함)
+// ------------------------------------------
+async function submitResult() {
+    const answers = buildAnswers();
+
+    console.log('점수:', scores);
+    console.log('MBTI:', answers.join(''));
+
+    // 토큰이 있으면 헤더로 보내고, 없으면 서버가 쿠키로 인증한다
+    const token = localStorage.getItem(TOKEN_KEY);
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+
+    try {
+        const res = await fetch('/api/submit', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({ answers: answers })
+        });
+
+        if (res.status === 401) {
+            alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+            window.location.href = '/';
+            return;
+        }
+
+        const data = await res.json().catch(() => ({}));
+        if (data.result !== 'success') {
+            throw new Error(data.msg || ('HTTP ' + res.status));
+        }
+
+        window.location.href = '/result';
+    } catch (err) {
+        console.error('결과 저장 실패:', err);
+        alert('결과 저장에 실패했습니다. ' + err.message);
+    }
+}
+
+// ------------------------------------------
+// 로그아웃 (test.html 의 버튼이 호출)
+// localStorage 토큰과 서버가 심은 쿠키를 함께 정리
+// ------------------------------------------
+async function logout() {
+    localStorage.removeItem(TOKEN_KEY);
+    try {
+        await fetch('/api/logout', { method: 'POST' });
+    } catch (err) {
+        console.error('로그아웃 요청 실패:', err);
+    }
+    window.location.href = '/';
+}
+
+// ------------------------------------------
+// 페이지 로드 시작 처리
+// ------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+    // 로그인 여부는 서버가 /test 의 @jwt_required() 로 이미 막는다.
+    // 여기서 localStorage 만 보고 튕기면, 쿠키는 살아있는데 localStorage 만
+    // 비워진 사용자가 로그인 상태로 로그인 화면에 갇힌다.
+    document.getElementById('btn-a')
+        .addEventListener('click', () => nextQuestion(questions[currentQ].btnA.type));
+    document.getElementById('btn-b')
+        .addEventListener('click', () => nextQuestion(questions[currentQ].btnB.type));
+
+    renderQuestion();   // 1번 문제를 화면에 그린다
+});
