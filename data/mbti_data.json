@@ -1,19 +1,242 @@
-// TODO: [이정욱] 16가지 MBTI에 맞는 RPG 직업 기획 및 데이터 세팅 (이후 영준님이 DB에 밀어넣을 예정)
 [
-  {
-    "mbti": "INTJ",
-    "name": "냉철한 마법사",
-    "title": "계획대로 완벽하게 타격한다",
-    "stats": {"atk": 8, "def": 3, "mag": 10},
-    "best_match": "ENFP",
-    "worst_match": "ESFJ"
-  },
-  {
-    "mbti": "ENFP",
-    "name": "자유로운 음유시인",
-    "title": "음악과 바람이 이끄는 대로",
-    "stats": {"atk": 4, "def": 4, "mag": 6},
-    "best_match": "INTJ",
-    "worst_match": "ISTJ"
-  }
+    {
+        "mbti": "INTJ",
+        "class_name": "아크메이지",
+        "title": "계획된 주문으로 전장을 지배한다",
+        "stats": {
+            "STR": 1,
+            "DEX": 2,
+            "VIT": 2,
+            "MAG": 5,
+            "INT": 5,
+            "CHA": 2
+        },
+        "best_match": "ENFP",
+        "worst_match": "ESFJ"
+    },
+    {
+        "mbti": "INTP",
+        "class_name": "연금술사",
+        "title": "끝없는 탐구로 새로운 공식을 만들어낸다",
+        "stats": {
+            "STR": 1,
+            "DEX": 3,
+            "VIT": 2,
+            "MAG": 4,
+            "INT": 5,
+            "CHA": 1
+        },
+        "best_match": "ENTJ",
+        "worst_match": "ESFP"
+    },
+    {
+        "mbti": "ENTJ",
+        "class_name": "워로드",
+        "title": "압도적인 지휘력으로 승리를 설계한다",
+        "stats": {
+            "STR": 4,
+            "DEX": 3,
+            "VIT": 4,
+            "MAG": 1,
+            "INT": 5,
+            "CHA": 5
+        },
+        "best_match": "INTP",
+        "worst_match": "ISFP"
+    },
+    {
+        "mbti": "ENTP",
+        "class_name": "아케인 트릭스터",
+        "title": "예측할 수 없는 전략으로 적을 농락한다",
+        "stats": {
+            "STR": 2,
+            "DEX": 5,
+            "VIT": 2,
+            "MAG": 4,
+            "INT": 4,
+            "CHA": 4
+        },
+        "best_match": "INFJ",
+        "worst_match": "ISFJ"
+    },
+    {
+        "mbti": "INFJ",
+        "class_name": "오라클",
+        "title": "별의 계시를 따라 운명의 길을 밝힌다",
+        "stats": {
+            "STR": 1,
+            "DEX": 2,
+            "VIT": 3,
+            "MAG": 5,
+            "INT": 4,
+            "CHA": 4
+        },
+        "best_match": "ENTP",
+        "worst_match": "ESTP"
+    },
+    {
+        "mbti": "INFP",
+        "class_name": "드루이드",
+        "title": "자연과 교감하며 상처 입은 세계를 치유한다",
+        "stats": {
+            "STR": 2,
+            "DEX": 3,
+            "VIT": 4,
+            "MAG": 5,
+            "INT": 3,
+            "CHA": 3
+        },
+        "best_match": "ENFJ",
+        "worst_match": "ESTJ"
+    },
+    {
+        "mbti": "ENFJ",
+        "class_name": "성기사",
+        "title": "굳건한 신념으로 동료의 앞을 지킨다",
+        "stats": {
+            "STR": 4,
+            "DEX": 2,
+            "VIT": 5,
+            "MAG": 3,
+            "INT": 3,
+            "CHA": 5
+        },
+        "best_match": "INFP",
+        "worst_match": "ISTP"
+    },
+    {
+        "mbti": "ENFP",
+        "class_name": "바드",
+        "title": "노래와 열정으로 모험에 활기를 불어넣는다",
+        "stats": {
+            "STR": 2,
+            "DEX": 4,
+            "VIT": 2,
+            "MAG": 4,
+            "INT": 3,
+            "CHA": 5
+        },
+        "best_match": "INTJ",
+        "worst_match": "ISTJ"
+    },
+    {
+        "mbti": "ISTJ",
+        "class_name": "가디언",
+        "title": "철저한 원칙과 방패로 전선을 지킨다",
+        "stats": {
+            "STR": 4,
+            "DEX": 2,
+            "VIT": 5,
+            "MAG": 1,
+            "INT": 4,
+            "CHA": 2
+        },
+        "best_match": "ESFP",
+        "worst_match": "ENFP"
+    },
+    {
+        "mbti": "ISFJ",
+        "class_name": "클레릭",
+        "title": "헌신적인 치유로 모두의 생명을 지킨다",
+        "stats": {
+            "STR": 2,
+            "DEX": 2,
+            "VIT": 4,
+            "MAG": 4,
+            "INT": 3,
+            "CHA": 4
+        },
+        "best_match": "ESTP",
+        "worst_match": "ENTP"
+    },
+    {
+        "mbti": "ESTJ",
+        "class_name": "나이트",
+        "title": "질서와 책임감으로 전장의 선두에 선다",
+        "stats": {
+            "STR": 5,
+            "DEX": 3,
+            "VIT": 5,
+            "MAG": 1,
+            "INT": 3,
+            "CHA": 4
+        },
+        "best_match": "ISFP",
+        "worst_match": "INFP"
+    },
+    {
+        "mbti": "ESFJ",
+        "class_name": "프리스트",
+        "title": "따뜻한 축복으로 파티를 하나로 묶는다",
+        "stats": {
+            "STR": 1,
+            "DEX": 2,
+            "VIT": 3,
+            "MAG": 4,
+            "INT": 3,
+            "CHA": 5
+        },
+        "best_match": "ISTP",
+        "worst_match": "INTJ"
+    },
+    {
+        "mbti": "ISTP",
+        "class_name": "어쌔신",
+        "title": "냉정한 판단으로 적의 빈틈을 꿰뚫는다",
+        "stats": {
+            "STR": 3,
+            "DEX": 5,
+            "VIT": 3,
+            "MAG": 1,
+            "INT": 4,
+            "CHA": 1
+        },
+        "best_match": "ESFJ",
+        "worst_match": "ENFJ"
+    },
+    {
+        "mbti": "ISFP",
+        "class_name": "레인저",
+        "title": "자유로운 감각으로 자신만의 길을 개척한다",
+        "stats": {
+            "STR": 3,
+            "DEX": 5,
+            "VIT": 3,
+            "MAG": 2,
+            "INT": 3,
+            "CHA": 2
+        },
+        "best_match": "ESTJ",
+        "worst_match": "ENTJ"
+    },
+    {
+        "mbti": "ESTP",
+        "class_name": "버서커",
+        "title": "두려움 없이 돌진해 전세를 뒤집는다",
+        "stats": {
+            "STR": 5,
+            "DEX": 4,
+            "VIT": 5,
+            "MAG": 1,
+            "INT": 2,
+            "CHA": 3
+        },
+        "best_match": "ISFJ",
+        "worst_match": "INFJ"
+    },
+    {
+        "mbti": "ESFP",
+        "class_name": "몽크",
+        "title": "본능적인 움직임으로 전장을 누빈다",
+        "stats": {
+            "STR": 4,
+            "DEX": 5,
+            "VIT": 4,
+            "MAG": 2,
+            "INT": 2,
+            "CHA": 4
+        },
+        "best_match": "ISTJ",
+        "worst_match": "INTP"
+    }
 ]
