@@ -6,28 +6,31 @@
     <title>RPG MBTI - 신규 모험가 등록</title>
     <link rel="stylesheet" as="style" crossorigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}?v=3">
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </head>
 
 <body class="auth-body">
     <main>
         <section>
             <div class="auth-wrapper">
-                <form class="auth-card reveal is-visible" id="signup-form" action="{{ url_for('signup') }}"
-                    method="POST">
+                <form class="auth-card reveal is-visible" id="signup-form" method="POST">
                     <div class="auth-header">
                         <h2 class="auth-title">회원가입</h2>
                     </div>
-                    <input type="text" name="username" placeholder="아이디" autofocus="" class="auth-input" value=""
-                        required>
-                    <input type="password" id="password" name="password" placeholder="비밀번호" class="auth-input"
-                        value="" required>
-                    <input type="password" id="confirm_password" name="confirm_password" placeholder="비밀번호 확인"
+                    <label for="user-id">아이디 (<span>ID</span>)</label>
+                    <input type="text" id="user-id" name="username" placeholder="영문/숫자 조합 입력 . . ." autofocus=""
                         class="auth-input" value="" required>
-                    <input type="text" id="nickname" name="nickname" placeholder="닉네임" class="auth-input" value=""
-                        required>
+                    <label for="password">비밀번호 (<span>PW</span>)</label>
+                    <input type="password" id="password" name="password" placeholder="비밀번호 입력 . . ." class="auth-input"
+                        value="" required>
+                    <label for="confirm_password">비밀번호 확인</label>
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="비밀번호 다시 입력 . . ."
+                        class="auth-input" value="" required>
+                    <label for="nickname">모험가 이름 (<span>닉네임</span>)</label>
+                    <input type="text" id="nickname" name="nickname" placeholder="사용할 닉네임 입력 . . ." class="auth-input"
+                        value="" required>
                     <button type="submit" class="auth-submit">길드 등록</button>
 
                     <div id="error-message" class="auth-error {% if not error_msg %}hidden{% endif %}">
@@ -35,7 +38,7 @@
                     </div>
 
                     <div class="auth-footer">
-                        <a href="{{ url_for('login') }}" class="auth-link">로그인으로 돌아가기</a>
+                        <a href="/" class="auth-link">로그인으로 돌아가기</a>
                     </div>
                 </form>
             </div>

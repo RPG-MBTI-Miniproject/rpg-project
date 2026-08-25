@@ -5,9 +5,11 @@
     <meta charset="UTF-8">
     <title>RPG MBTI - 모험 진행 중</title>
     <!-- 공통 스타일 및 색상 변수 적용 -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <!-- test 전용 스타일 적용 -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='test.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/test.css') }}">
+    <!-- jQuery CDN (test.js의 AJAX 및 DOM 조작용) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>
@@ -15,8 +17,11 @@
     <div class="test-container">
         <div class="header">
             <!-- TODO: [이정욱] JS로 JWT에서 유저명 추출해서 여기에 텍스트 삽입하기 -->
-            <span id="welcome-msg">모험가님, 환영합니다!</span>
-            <button class="logout-btn" onclick="logout()">[로그아웃]</button>
+            <div class="header-left">
+                <button id="prev-btn" class="prev-btn" title="이전으로">◀</button>
+                <span class="welcome-msg">{{nickname}}님, 환영합니다!</span>
+            </div>
+            <a href="/" class="logout-btn">[로그아웃]</a>
         </div>
 
         <div class="progress-bar">
