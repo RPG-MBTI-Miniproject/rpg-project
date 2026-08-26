@@ -389,21 +389,20 @@ if (document.querySelector('#post-list')) {
         }
     });
 
-    // TODO 10. 모달 "취소"(#modal-cancel-btn) 클릭 시 → 모달 닫기
-    document.querySelector('#modal-cancel-btn').addEventListener('click', () => {
-        // 1. #write-modal 요소에 hidden 클래스 추가하여 모달 숨기기
-        document.querySelector('#write-modal').classList.add('hidden');
-
-        // 모달이 닫힐 때 발생했던 에러 메시지도 함께 비워주면 UI상 더 깔끔
-        const errorElement = document.querySelector('#modal-error');
-        if (errorElement) {
-            errorElement.textContent = '';
-            errorElement.classList.add('hidden');
-        }
-    });
     loadPosts();
 }
 
+// TODO 10. 모달 "취소"(#modal-cancel-btn) 클릭 시 → 모달 닫기
+// (목록/상세 화면 둘 다 write-modal을 공유하므로, 두 if 블록 밖에서 한 번만 등록)
+document.querySelector('#modal-cancel-btn')?.addEventListener('click', () => {
+    document.querySelector('#write-modal').classList.add('hidden');
+
+    const errorElement = document.querySelector('#modal-error');
+    if (errorElement) {
+        errorElement.textContent = '';
+        errorElement.classList.add('hidden');
+    }
+});
 
 // ==========================================
 // [상세 화면] community_detail.html 에서만 실행되는 부분
@@ -728,3 +727,4 @@ if (document.querySelector('#comment-list')) {
         });
     }
 }
+
