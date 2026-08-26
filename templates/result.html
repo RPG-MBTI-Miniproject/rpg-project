@@ -11,39 +11,35 @@
 </head>
 
 <body>
-    <div class="bg-particles"></div>
-
-    <!-- 헤더 바 (결과 보고서 / 로그아웃) -->
+    <!-- 헤더 바 (돌아가기 / 로그아웃) -->
     <header class="top-nav">
-        <div class="result-nav-bar">
-            <a href="{{ url_for('hub') }}" class="result-back-link">
-                <span class="result-back-icon">‹</span> 돌아가기
-            </a>
-            <button class="result-logout-btn" onclick="logout()">로그아웃</button>
-        </div>
+        <a href="{{ url_for('hub') }}" class="nav-back-link">
+            <span class="nav-back-icon">‹</span>
+            <span class="nav-back-text">돌아가기</span>
+        </a>
+        <button class="logout-btn" onclick="logout()">로그아웃</button>
     </header>
 
     <main class="result-container">
-        <h2 class="sub-heading">{{ nickname }}님의 영혼에 깃든 RPG 직업은...</h2>
+        <h2 class="sub-heading">당신의 영혼에 깃든 RPG 직업은...</h2>
 
         <!-- [ 최현욱 ] Frame 3 와이어프레임 UI/UX 및 Jinja2 서버사이드 렌더링 연결 -->
         <!-- 직업 카드 (일러스트, 칭호, 직업명, MBTI) -->
         <section class="character-card">
+            <!-- 1. 메인 내 직업 카드 -->
             <div class="illustration-wrapper">
-                <div class="illustration-placeholder">
-                    <span class="char-icon">🔮</span>
-                </div>
+                <img id="main-char-img"
+                    src="{{ url_for('static', filename='images/' + my_class.mbti.upper() + '.png') }}"
+                    alt="{{ my_class.class_name }}" class="char-img" onerror="this.src='/static/images/main-logo.png';">
             </div>
 
-            <h3 class="char-title">"{{ my_class.title }}"</h3>
-            <h1 class="char-name-mbti">{{ my_class.class_name }} <span class="mbti-badge">({{ my_class.mbti }})</span>
-            </h1>
+            <p class="char-title">“{{ my_class.title }}”</p>
+            <h1 class="char-name-mbti">{{ my_class.class_name }} ({{ my_class.mbti }})</h1>
         </section>
 
         <!-- 능력치 육각 그래프 및 주요 스킬 / 특징 -->
         <section class="stats-info-section">
             <div class="chart-box">
-                <h4>[ 능력치 분석 ]</h4>
                 <div class="canvas-wrapper">
                     <canvas id="radarChart"></canvas>
                 </div>
@@ -51,38 +47,58 @@
 
             <div class="info-box">
                 <div class="info-item">
-                    <span class="info-label">▶ 전투 유형</span>
-                    <span class="info-value">{{ my_class.mbti }}</span>
+                    <span class="info-label">대표 스킬</span>
+                    <span class="info-value-title">{{ my_class.title.split(' ')[0] if my_class.title else '마법' }}
+                        (Signature)</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">▶ 특징</span>
-                    <span class="info-value">{{ my_class.title }}</span>
+                    <span class="info-label">전투 스타일</span>
+                    <span class="info-value-desc">{{ my_class.title }}</span>
                 </div>
             </div>
         </section>
 
         <!-- 🤝 파티원 궁합 -->
         <section class="chemistry-area">
-            <h3 class="section-title">🤝 파티원 궁합</h3>
+            <div class="chemistry-divider"></div>
+            <h3 class="section-title">파티원 궁합</h3>
             <div class="chemistry-box">
-                <!-- 최고의 파티원 -->
+                <!-- 2. 최고의 파티원 카드 -->
                 <div class="chemistry-card best-match">
-                    <div class="match-badge best">💚 최고의 파티원</div>
-                    <div class="match-img-wrapper">
-                        <div class="match-placeholder">🛡️</div>
+                    <div class="card-top-header">
+                        <span class="card-label-title">최고의 파티원</span>
+                        <span class="status-emoji">💚</span>
                     </div>
-                    <h4 class="match-name">{{ best_match.class_name }}</h4>
-                    <span class="match-mbti">({{ best_match.mbti }})</span>
+                    <div class="match-img-wrapper">
+                        <img id="best-match-img"
+                            src="{{ url_for('static', filename='images/' + best_match.mbti.upper() + '.png') }}"
+                            alt="{{ best_match.class_name }}" class="match-img"
+                            onerror="this.src='/static/images/main-logo.png';;">
+                    </div>
+                    <div class="card-info-bottom">
+                        <span class="synergy-tag duo">환상의 듀오</span>
+                        <h4 class="match-name">{{ best_match.class_name }} <span class="mbti-text">({{ best_match.mbti
+                                }})</span></h4>
+                    </div>
                 </div>
 
-                <!-- 최악의 파티원 -->
+                <!-- 3. 최악의 파티원 카드 -->
                 <div class="chemistry-card worst-match">
-                    <div class="match-badge worst">💔 최악의 파티원</div>
-                    <div class="match-img-wrapper">
-                        <div class="match-placeholder">⚔️</div>
+                    <div class="card-top-header">
+                        <span class="card-label-title">최악의 파티원</span>
+                        <span class="status-emoji">💔</span>
                     </div>
-                    <h4 class="match-name">{{ worst_match.class_name }}</h4>
-                    <span class="match-mbti">({{ worst_match.mbti }})</span>
+                    <div class="match-img-wrapper">
+                        <img id="worst-match-img"
+                            src="{{ url_for('static', filename='images/' + worst_match.mbti.upper() + '.png') }}"
+                            alt="{{ worst_match.class_name }}" class="match-img"
+                            onerror="this.src='/static/images/main-logo.png';">
+                    </div>
+                    <div class="card-info-bottom">
+                        <span class="synergy-tag danger">충돌 주의</span>
+                        <h4 class="match-name">{{ worst_match.class_name }} <span class="mbti-text">({{ worst_match.mbti
+                                }})</span></h4>
+                    </div>
                 </div>
             </div>
         </section>
@@ -91,10 +107,12 @@
         <div class="action-buttons">
             <button class="btn btn-secondary" onclick="location.href='/test'">🔄 테스트 다시하기</button>
             <!-- TODO: [이정욱] 결과 링크 복사하는 기능(URL 클립보드 복사) JS 함수로 간단히 구현 -->
-            <button class="btn btn-primary" id="copy-link-btn">🔗 결과 링크 복사하기</button>
+            <button class="btn btn-primary" id="copy-link-btn">🔗 결과 링크 복사</button>
         </div>
+
+        <!-- 친구의 궁합 보러가기 -->
         <div class="search-friend">
-            <label for="search-friend-result">🙍‍♂️ 친구와의 궁합 보러가기 (<span>닉네임</span>)</label>
+            <label for="search-friend-result">친구의 궁합 보기 (<span>닉네임 입력</span>)</label>
 
             <form class="search-form" type="submit">
                 <input type="text" name="search-friend-result" id="search-friend-result" placeholder="친구의 닉네임을 입력하세요">
@@ -102,62 +120,56 @@
                 <button type="submit" class="btn btn-primary" id="search-friend-btn">궁합 보기</button>
             </form>
         </div>
-        <!-- 친구와의 궁합 결과 카드 (JS에서 검색 성공 시 표시: #friend-synergy-section) -->
-        <!-- 작동 확인이 필요하다면 display none 삭제-->
+
+        <!-- 4. 친구와의 궁합 (JS가 제어할 자리) -->
         <div class="friend-synergy-container" id="friend-synergy-section" style="display: none;">
+            <div class="chemistry-divider"></div>
             <h3 class="synergy-main-title">
-                나와 <span id="target-friend-name" style="color: var(--accent-cyan);">[친구 닉네임]</span>님의 궁합
+                나와 <span id="target-friend-name" class="highlight-name"></span>님의 궁합
             </h3>
             <div class="friend-card-grid">
-                <!-- 1. 내가 바라본 친구 -->
-                <div class="friend-match-card">
+                <!-- 내가 보는 친구 -->
+                <div class="chemistry-card friend-match-card">
                     <div class="card-top-header">
                         <span class="card-label-title">내가 보는 친구</span>
                         <span class="status-emoji" id="me-to-friend-emoji">💚</span>
                     </div>
-                    <div class="match-img-box" id="friend-char-img-box">
-                        <!-- TODO: [JS] 친구 캐릭터 일러스트(img) 또는 이모지 삽입 -->
-                        <div class="match-placeholder" id="friend-char-icon">🛡️</div>
+                    <div class="match-img-wrapper" id="friend-char-img-box">
+                        <img id="friend-char-img" src="{{ url_for('static', filename='images/main-logo.png') }}"
+                            alt="친구 캐릭터" class="match-img" onerror="this.src='/static/images/main-logo.png';">
                     </div>
                     <div class="card-info-bottom">
-                        <span class="synergy-tag duo" id="me-to-friend-tag">[시너지 태그]</span>
-                        <h4 class="partner-title">
-                            <span id="friend-class-name">[친구 직업명]</span>
-                            <span class="mbti-text" id="friend-mbti-text">([친구 MBTI])</span>
+                        <span class="synergy-tag duo" id="me-to-friend-tag">환상의 듀오</span>
+                        <h4 class="match-name">
+                            <span id="friend-class-name"></span>
+                            <span class="mbti-text" id="friend-mbti-text"></span>
                         </h4>
-                        <p class="partner-desc" id="me-to-friend-desc">
-                            여기에 내가 보는 친구의 궁합 설명 텍스트가 JS로 들어옵니다.
-                        </p>
+                        <p class="partner-desc" id="me-to-friend-desc"></p>
                     </div>
                 </div>
 
-                <!-- 2. 친구가 바라본 나 -->
-                <div class="friend-match-card">
+                <!-- 친구가 보는 나 -->
+                <div class="chemistry-card friend-match-card">
                     <div class="card-top-header">
                         <span class="card-label-title">친구가 보는 나</span>
                         <span class="status-emoji" id="friend-to-me-emoji">🔮</span>
                     </div>
-                    <div class="match-img-box" id="my-char-img-box">
-                        <!-- TODO: [JS] 내 캐릭터 일러스트(img) 또는 이모지 삽입 -->
-                        <div class="match-placeholder" id="my-char-icon">🧙‍♂️</div>
+                    <div class="match-img-wrapper" id="my-char-img-box">
+                        <img id="me-char-img"
+                            src="{{ url_for('static', filename='images/' + my_class.mbti.upper() + '.png') }}"
+                            alt="내 캐릭터" class="match-img" onerror="this.src='/static/images/main-logo.png';">
                     </div>
                     <div class="card-info-bottom">
-                        <span class="synergy-tag brain" id="friend-to-me-tag">[시너지 태그]</span>
-                        <h4 class="partner-title">
-                            <span id="my-class-name">[내 직업명]</span>
-                            <span class="mbti-text" id="my-mbti-text">([내 MBTI])</span>
+                        <span class="synergy-tag duo" id="friend-to-me-tag">든든한 동료</span>
+                        <h4 class="match-name">
+                            <span id="my-class-name"></span>
+                            <span class="mbti-text" id="my-mbti-text"></span>
                         </h4>
-                        <p class="partner-desc" id="friend-to-me-desc">
-                            여기에 친구가 보는 나의 궁합 설명 텍스트가 JS로 들어옵니다.
-                        </p>
+                        <p class="partner-desc" id="friend-to-me-desc"></p>
                     </div>
                 </div>
             </div>
         </div>
-
-
-
-
     </main>
 
     <!-- Jinja2 Safe Stats JSON Data Transfer -->
@@ -190,11 +202,12 @@
                         datasets: [{
                             label: '능력치',
                             data: [statsData.STR, statsData.DEX, statsData.VIT, statsData.MAG, statsData.INT, statsData.CHA],
-                            backgroundColor: 'rgba(143, 124, 255, 0.25)',
+                            backgroundColor: 'rgba(143, 124, 255, 0.35)',
                             borderColor: '#8F7CFF',
                             borderWidth: 2,
                             pointBackgroundColor: '#8F7CFF',
-                            pointBorderColor: '#fff'
+                            pointBorderColor: '#fff',
+                            pointRadius: 3
                         }]
                     },
                     options: {
@@ -204,7 +217,7 @@
                             r: {
                                 angleLines: { color: '#EAEAFF' },
                                 grid: { color: '#EAEAFF' },
-                                pointLabels: { color: '#6B6E85', font: { size: 11 } },
+                                pointLabels: { color: '#6B6E85', font: { size: 10, weight: '700' } },
                                 ticks: { display: false, stepSize: 1 },
                                 min: 0,
                                 max: 5
