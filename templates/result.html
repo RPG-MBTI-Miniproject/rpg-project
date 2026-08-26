@@ -92,9 +92,11 @@
         </div>
         <div class="search-friend">
             <label for="search-friend-result">🙍‍♂️ 친구와의 궁합 보러가기 (<span>닉네임</span>)</label>
-            <form class="search-form" type="submit">
+            
+            <form class="search-form" type="submit"> 
                 <input type="text" name="search-friend-result" id="search-friend-result" placeholder="친구의 닉네임을 입력하세요">
-                <button class="btn btn-primary" id="search-friend-btn">궁합 보기</button>
+                <!-- 0827 00:10 ljw => type="submit" 추가 -->
+                <button type="submit" class="btn btn-primary" id="search-friend-btn">궁합 보기</button>
             </form>
         </div>
         <!-- 친구와의 궁합 결과 카드 (JS에서 검색 성공 시 표시: #friend-synergy-section) -->
