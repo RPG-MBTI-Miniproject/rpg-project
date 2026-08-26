@@ -8,7 +8,8 @@
      <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
      <link rel="stylesheet" href="{{ url_for('static', filename='css/community.css') }}">
 
-
+     <!-- Live Server용 -->
+     <link rel="stylesheet" href="../static/css/community.css">
 </head>
 
 <body class="community-body">
@@ -38,14 +39,16 @@
                               class="community-nav-logo" onerror="this.style.display='none'">
                     </a>
                </div>
-               <h1 class="community-nav-title">커뮤니티</h1>
-               <div class="community-nav-right">
-                    <button class="community-nav-logout" onclick="logout()">로그아웃</button>
-               </div>
           </div>
      </header>
 
      <main class="community-container">
+          <!-- 상단 헤더 영역 (이미지 시안: 커뮤니티 타이틀 & 로그아웃 버튼) -->
+          <div class="community-header">
+               <h1 class="community-title"><span class="sparkle-icon">✨</span> 커뮤니티</h1>
+               <button class="community-logout-btn" onclick="logout()">로그아웃</button>
+          </div>
+
           <!-- TODO: [HTML/CSS] 검색 영역
              - select id="search-target" : option value="all|title|content|nickname" 4개
              - input id="search-input" : placeholder "2글자 이상 입력"
@@ -53,16 +56,19 @@
              - button id="write-btn" : 글쓰기 버튼 (모달 열기용) -->
           <div class="board-toolbar">
                <div class="search-box">
-                    <select id="search-target" class="search-target">
-                         <option value="all">전체</option>
-                         <option value="title">제목</option>
-                         <option value="content">내용</option>
-                         <option value="nickname">작성자</option>
-                    </select>
-                    <input type="text" id="search-input" class="search-input" placeholder="2글자 이상 입력">
-                    <button type="button" id="search-btn" class="search-btn">검색</button>
+                    <div class="select-wrapper">
+                         <select id="search-target" class="search-target">
+                              <option value="all">전체</option>
+                              <option value="title">제목</option>
+                              <option value="content">내용</option>
+                              <option value="nickname">작성자</option>
+                         </select>
+                    </div>
+                    <div class="search-input-wrapper">
+                         <input type="text" id="search-input" class="search-input" placeholder="2글자 이상 입력 . . .">
+                         <button type="button" id="search-btn" class="search-btn" title="검색">🔍</button>
+                    </div>
                </div>
-               <button type="button" id="write-btn" class="write-btn">+ 글쓰기</button>
           </div>
 
           <!-- TODO: [HTML/CSS] 정렬 탭
@@ -79,7 +85,11 @@
              내용을 채워넣습니다. 직접 더미 데이터를 넣지 마세요. -->
           <div id="post-list" class="post-list"></div>
           <div id="empty-msg" class="empty-msg hidden">검색 결과가 없습니다. (유사도 70% 이상 일치하는 글 없음)</div>
-          <div id="pagination" class="pagination"></div>
+
+          <div class="bottom-actions">
+               <div id="pagination" class="pagination"></div>
+               <button type="button" id="write-btn" class="write-btn">＋ 글쓰기</button>
+          </div>
 
      </main>
 
