@@ -9,3 +9,232 @@
      .hub-card:hover      살짝 떠오르는 hover 효과 정도 추천
      .hub-icon, .hub-card-title, .hub-card-desc
    ========================================== */
+
+/* 로그인 화면(auth.css)과 동일한 다크 배경 테마 */
+.hub-body {
+  background-color: var(--bg-dark, #12101c);
+  font-family: var(--font-sans, 'Pretendard', sans-serif);
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  color: var(--text-main, #f8fafc);
+}
+
+/* 상단 네비게이션 */
+.top-nav {
+  width: 100%;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(18, 16, 28, 0.8);
+  backdrop-filter: blur(10px);
+}
+
+.hub-nav-bar {
+  max-width: 1100px;
+  margin: 0 auto;
+  height: 140px;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hub-nav-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.hub-nav-logo {
+  max-height: 100px;
+  width: auto;
+}
+
+.hub-nav-title {
+  flex: 1;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.hub-nav-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 첫 번째 이미지 스타일의 둥근 모서리 로그아웃 버튼 */
+.hub-nav-logout {
+  border: 1.5px solid #a77b47;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #8a5a2b 0%, #683e16 100%);
+  color: #fff9f0;
+  padding: 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.hub-nav-logout:hover {
+  background: linear-gradient(135deg, #a38362 0%, #88613f 100%);
+  color: #ffffff;
+  border-color: #ffec81;
+  box-shadow: 0 6px 20px rgba(164, 109, 55, 0.5);
+  transform: translateY(-2px);
+}
+
+/* 메인 컨테이너 */
+.hub-container {
+  flex: 1;
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+  margin-top: 70px;
+  padding: 1.5rem 1.5rem 3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2.5rem;
+}
+
+/* 환영 문구 및 서브타이틀 (auth-subtitle 골드 스타일 계승) */
+.hub-welcome-area {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hub-subtitle {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--primary-gold, #ffd700);
+  margin: 0;
+  margin-top: 80px;
+  letter-spacing: 0.5px;
+}
+
+.hub-welcome-msg {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+/* 2열 카드 그리드 */
+.hub-menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  width: 100%;
+  margin-top: 40px;
+}
+
+/* 개별 카드 */
+.hub-card {
+  background: linear-gradient(145deg, #f7efe0 0%, #ecdcc0 50%, #dec8a4 100%);
+  border: 2px solid #b38b59;
+  border-radius: 20px;
+
+  outline: 1.5px dashed rgba(120, 80, 40, 0.35);
+  outline-offset: -12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), inset 0 0 50px rgba(160, 115, 65, 0.22);
+
+  padding: 3.2rem 2.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #2c1d11;
+  position: relative;
+}
+
+.hub-card:hover {
+  transform: translateY(-8px);
+  border-color: #ffd700;
+  outline-color: rgba(180, 120, 50, 0.6);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 160, 80, 0.35), inset 0 0 50px rgba(160, 115, 65, 0.3);
+}
+
+/* 카드 아이콘 */
+.hub-icon-wrapper {
+  margin-bottom: 1.25rem;
+  transition: transform 0.3s ease;
+}
+
+.hub-card:hover .hub-icon-wrapper {
+  transform: scale(1.08) rotate(3deg);
+}
+
+.hub-icon>img {
+  width: 110px;
+  height: 110px;
+  filter: drop-shadow(0 6px 12px rgba(90, 55, 25, 0.25));
+}
+
+/* 카드 텍스트 (깊이 있는 고서적 잉크 & 세피아 톤) */
+.hub-card-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #2b1c10;
+  margin: 0 0 0.75rem 0;
+  letter-spacing: -0.5px;
+}
+
+.hub-card-desc {
+  font-size: 0.95rem;
+  color: #5d4834;
+  margin: 0 0 2rem 0;
+  line-height: 1.6;
+  flex: 1;
+  word-break: keep-all;
+  font-weight: 500;
+}
+
+/* 버튼 액션 (가죽/양피지 지도에 어울리는 앤틱 레더 & 골드 버튼) */
+.hub-card-action {
+  width: 100%;
+}
+
+.hub-btn {
+  display: block;
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border: 1.5px solid #a77b47;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #8a5a2b 0%, #683e16 100%);
+  color: #fff9f0;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  box-sizing: border-box;
+  box-shadow: 0 4px 14px rgba(100, 60, 20, 0.35);
+  transition: all 0.2s ease;
+  letter-spacing: 0.5px;
+}
+
+.hub-btn:hover {
+  background: linear-gradient(135deg, #a46d37 0%, #7e4b1e 100%);
+  color: #ffffff;
+  border-color: #ffd700;
+  box-shadow: 0 6px 20px rgba(164, 109, 55, 0.5);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 640px) {
+  .hub-container {
+    padding: 2rem 1rem;
+  }
+
+  .hub-menu {
+    grid-template-columns: 1fr;
+  }
+}
