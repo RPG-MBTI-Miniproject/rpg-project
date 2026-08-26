@@ -26,11 +26,11 @@
         <!-- [ 최현욱 ] Frame 3 와이어프레임 UI/UX 및 Jinja2 서버사이드 렌더링 연결 -->
         <!-- 직업 카드 (일러스트, 칭호, 직업명, MBTI) -->
         <section class="character-card">
+            <!-- 1. 메인 내 직업 카드 -->
             <div class="illustration-wrapper">
                 <img id="main-char-img"
-                    src="{{ url_for('static', filename='images/' + my_class.mbti.lower() + '.png') }}"
-                    alt="{{ my_class.class_name }}" class="char-img"
-                    onerror="this.src='{{ url_for('static', filename='images/' + my_class.mbti.upper() + '.png') }}'; this.onerror=function(){this.src='/static/images/main-logo.png';};">
+                    src="{{ url_for('static', filename='images/' + my_class.mbti.upper() + '.png') }}"
+                    alt="{{ my_class.class_name }}" class="char-img" onerror="this.src='/static/images/main-logo.png';">
             </div>
 
             <p class="char-title">“{{ my_class.title }}”</p>
@@ -48,7 +48,8 @@
             <div class="info-box">
                 <div class="info-item">
                     <span class="info-label">대표 스킬</span>
-                    <span class="info-value-title">{{ my_class.title.split(' ')[0] if my_class.title else '마법' }} (Signature)</span>
+                    <span class="info-value-title">{{ my_class.title.split(' ')[0] if my_class.title else '마법' }}
+                        (Signature)</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">전투 스타일</span>
@@ -62,41 +63,41 @@
             <div class="chemistry-divider"></div>
             <h3 class="section-title">파티원 궁합</h3>
             <div class="chemistry-box">
-                <!-- 최고의 파티원 -->
+                <!-- 2. 최고의 파티원 카드 -->
                 <div class="chemistry-card best-match">
                     <div class="card-top-header">
                         <span class="card-label-title">최고의 파티원</span>
                         <span class="status-emoji">💚</span>
                     </div>
                     <div class="match-img-wrapper">
-                        <img id="best-match-img" 
-                            src="{{ url_for('static', filename='images/' + best_match.mbti.lower() + '.png') }}" 
-                            alt="{{ best_match.class_name }}" 
-                            class="match-img"
-                            onerror="this.src='{{ url_for('static', filename='images/' + best_match.mbti.upper() + '.png') }}'; this.onerror=function(){this.src='/static/images/main-logo.png';};">
+                        <img id="best-match-img"
+                            src="{{ url_for('static', filename='images/' + best_match.mbti.upper() + '.png') }}"
+                            alt="{{ best_match.class_name }}" class="match-img"
+                            onerror="this.src='/static/images/main-logo.png';;">
                     </div>
                     <div class="card-info-bottom">
                         <span class="synergy-tag duo">환상의 듀오</span>
-                        <h4 class="match-name">{{ best_match.class_name }} <span class="mbti-text">({{ best_match.mbti }})</span></h4>
+                        <h4 class="match-name">{{ best_match.class_name }} <span class="mbti-text">({{ best_match.mbti
+                                }})</span></h4>
                     </div>
                 </div>
 
-                <!-- 최악의 파티원 -->
+                <!-- 3. 최악의 파티원 카드 -->
                 <div class="chemistry-card worst-match">
                     <div class="card-top-header">
                         <span class="card-label-title">최악의 파티원</span>
                         <span class="status-emoji">💔</span>
                     </div>
                     <div class="match-img-wrapper">
-                        <img id="worst-match-img" 
-                            src="{{ url_for('static', filename='images/' + worst_match.mbti.lower() + '.png') }}" 
-                            alt="{{ worst_match.class_name }}" 
-                            class="match-img"
-                            onerror="this.src='{{ url_for('static', filename='images/' + worst_match.mbti.upper() + '.png') }}'; this.onerror=function(){this.src='/static/images/main-logo.png';};">
+                        <img id="worst-match-img"
+                            src="{{ url_for('static', filename='images/' + worst_match.mbti.upper() + '.png') }}"
+                            alt="{{ worst_match.class_name }}" class="match-img"
+                            onerror="this.src='/static/images/main-logo.png';">
                     </div>
                     <div class="card-info-bottom">
                         <span class="synergy-tag danger">충돌 주의</span>
-                        <h4 class="match-name">{{ worst_match.class_name }} <span class="mbti-text">({{ worst_match.mbti }})</span></h4>
+                        <h4 class="match-name">{{ worst_match.class_name }} <span class="mbti-text">({{ worst_match.mbti
+                                }})</span></h4>
                     </div>
                 </div>
             </div>
@@ -120,46 +121,49 @@
             </form>
         </div>
 
-        <!-- 친구와의 궁합 결과 카드 (JS에서 검색 성공 시 표시: #friend-synergy-section) -->
-        <div class="friend-synergy-container" id="friend-synergy-section">
+        <!-- 4. 친구와의 궁합 (JS가 제어할 자리) -->
+        <div class="friend-synergy-container" id="friend-synergy-section" style="display: none;">
             <div class="chemistry-divider"></div>
             <h3 class="synergy-main-title">
-                나와 <span id="target-friend-name" class="highlight-name">[친구 닉네임]</span>님의 궁합
+                나와 <span id="target-friend-name" class="highlight-name"></span>님의 궁합
             </h3>
             <div class="friend-card-grid">
-                <!-- 1. 내가 바라본 친구 -->
+                <!-- 내가 보는 친구 -->
                 <div class="chemistry-card friend-match-card">
                     <div class="card-top-header">
                         <span class="card-label-title">내가 보는 친구</span>
                         <span class="status-emoji" id="me-to-friend-emoji">💚</span>
                     </div>
                     <div class="match-img-wrapper" id="friend-char-img-box">
-                        <img id="friend-char-img" src="/static/images/main-logo.png" alt="친구 캐릭터" class="match-img">
+                        <img id="friend-char-img" src="{{ url_for('static', filename='images/main-logo.png') }}"
+                            alt="친구 캐릭터" class="match-img" onerror="this.src='/static/images/main-logo.png';">
                     </div>
                     <div class="card-info-bottom">
                         <span class="synergy-tag duo" id="me-to-friend-tag">환상의 듀오</span>
                         <h4 class="match-name">
-                            <span id="friend-class-name">[친구 직업명]</span>
-                            <span class="mbti-text" id="friend-mbti-text">([친구 MBTI])</span>
+                            <span id="friend-class-name"></span>
+                            <span class="mbti-text" id="friend-mbti-text"></span>
                         </h4>
                         <p class="partner-desc" id="me-to-friend-desc"></p>
                     </div>
                 </div>
 
-                <!-- 2. 친구가 바라본 나 -->
+                <!-- 친구가 보는 나 -->
                 <div class="chemistry-card friend-match-card">
                     <div class="card-top-header">
                         <span class="card-label-title">친구가 보는 나</span>
                         <span class="status-emoji" id="friend-to-me-emoji">🔮</span>
                     </div>
                     <div class="match-img-wrapper" id="my-char-img-box">
-                        <img id="me-char-img" src="/static/images/main-logo.png" alt="내 캐릭터" class="match-img">
+                        <img id="me-char-img"
+                            src="{{ url_for('static', filename='images/' + my_class.mbti.upper() + '.png') }}"
+                            alt="내 캐릭터" class="match-img" onerror="this.src='/static/images/main-logo.png';">
                     </div>
                     <div class="card-info-bottom">
                         <span class="synergy-tag duo" id="friend-to-me-tag">든든한 동료</span>
                         <h4 class="match-name">
-                            <span id="my-class-name">[내 직업명]</span>
-                            <span class="mbti-text" id="my-mbti-text">([내 MBTI])</span>
+                            <span id="my-class-name"></span>
+                            <span class="mbti-text" id="my-mbti-text"></span>
                         </h4>
                         <p class="partner-desc" id="friend-to-me-desc"></p>
                     </div>
