@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG MBTI - 쪽지함</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dm.css') }}">
+</head>
+
+<body class="dm-body">
+    <!-- ==========================================
+         DM 대화 목록 화면
+         내가 주고받은 상대 목록을 보여주고, 누르면 그 사람과의 대화창으로 간다.
+         [나가기] 는 허브(/home)로.
+         ========================================== -->
+
+    <header class="top-nav">
+        <div class="dm-nav-bar">
+            <a href="{{ url_for('hub') }}" class="dm-back-link">
+                <span class="dm-back-icon">‹</span> 돌아가기
+            </a>
+            <a href="{{ url_for('hub') }}" class="dm-exit-btn">나가기</a>
+        </div>
+    </header>
+
+    <main class="dm-container">
+        <h2 class="dm-page-title">✉️ 쪽지함</h2>
+        <p class="dm-page-sub">{{ nickname }}님이 주고받은 쪽지입니다.</p>
+
+        <!-- 목록은 dm.js 가 /api/dm/rooms 결과로 채웁니다 -->
+        <div id="dm-room-list" class="dm-room-list">
+            <div class="dm-empty">
+                <div class="dm-empty-text">불러오는 중...</div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/dm.js') }}"></script>
+</body>
+
+</html>

@@ -113,6 +113,24 @@ async function apiFetch(url, options = {}) {
 // ------------------------------------------
 
 
+// ------------------------------------------
+// 로그아웃
+// community.html / community_detail.html 의 헤더 버튼이 onclick="logout()" 으로
+// 이 함수를 부르는데, 두 화면은 community.js 만 로드합니다.
+// 여기에 없으면 ReferenceError 가 나서 버튼이 아무 반응도 하지 않습니다.
+// (hub.html / result.html / test.js 에 있는 것과 동작이 같습니다)
+// ------------------------------------------
+async function logout() {
+    localStorage.removeItem('JWT_TOKEN');
+    try {
+        await fetch('/api/logout', { method: 'POST' });
+    } catch (e) {
+        console.error('로그아웃 요청 실패:', e);
+    }
+    location.href = '/';
+}
+
+
 // ==========================================
 // [목록 화면] community.html 에서만 실행되는 부분
 // 상세 화면(community_detail.html)에는 #post-list 요소가 없으므로
@@ -568,6 +586,8 @@ if (document.querySelector('#comment-list')) {
             // 권한 조건 확인
             const canEdit = comment.author_id === VIEWER_ID;
             const canDelete = (comment.author_id === VIEWER_ID) || (POST_AUTHOR_ID === VIEWER_ID);
+            // 내 댓글에는 DM 을 띄우지 않는다 (자기 자신에게 쪽지를 보내게 되므로)
+            const canDm = (comment.author_id !== VIEWER_ID) && !!comment.author_nickname;
 
             // 댓글 DOM 요소 생성 (createElement 사용 권장)
             const commentEl = document.createElement('div');
@@ -582,6 +602,7 @@ if (document.querySelector('#comment-list')) {
                 <div class="comment-actions">
                     <span class="edit-btn ${canEdit ? '' : 'disabled'}">수정</span>
                     <span class="delete-btn ${canDelete ? '' : 'disabled'}">삭제</span>
+                    ${canDm ? `<a class="dm-btn" href="/dm/${encodeURIComponent(comment.author_nickname)}">✈ DM</a>` : ''}
                 </div>
             `;
 

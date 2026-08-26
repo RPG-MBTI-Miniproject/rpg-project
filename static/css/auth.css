@@ -4,6 +4,7 @@
     background: linear-gradient(90deg, #F0EFFF 0%, #E6F0FF 50%, #EAFBF7 100%);
     font-family: 'Inter', var(--font-sans), sans-serif;
     min-height: 100vh;
+    min-height: 100dvh;   /* iOS 주소창 높이 보정 (구형은 위 줄 사용) */
     display: flex;
     justify-content: center;
     align-items: center;
