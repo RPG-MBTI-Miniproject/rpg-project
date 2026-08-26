@@ -398,6 +398,8 @@ if (document.querySelector('#post-list')) {
     });
     loadPosts();
 }
+
+if (document.querySelector('#comment-list')) {
 // ==========================================
 // [상세 화면] community_detail.html 에서만 실행되는 부분
 // 이 화면엔 아래 전역 변수가 이미 선언되어 있음 (community_detail.html 참고):
@@ -443,3 +445,4 @@ if (document.querySelector('#post-list')) {
 // TODO 17. 댓글 "삭제" 클릭 시
 //   confirm() 확인 후 DELETE /api/community/comments/{comment.id}
 //   → 성공하면 loadComments() 재호출
+}
