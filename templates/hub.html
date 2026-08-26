@@ -7,9 +7,6 @@
     <title>RPG MBTI - 메뉴</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/hub.css') }}">
-    <!-- Live Server 확인용 상대 경로 -->
-    <link rel="stylesheet" href="../static/css/style.css">
-    <link rel="stylesheet" href="../static/css/hub.css">
 </head>
 
 <body class="hub-body">
@@ -27,7 +24,7 @@
         <!-- TODO: [HTML/CSS] 로고 / "메뉴" 타이틀 / [로그아웃] 버튼 -->
         <div class="hub-nav-bar">
             <div class="hub-nav-left">
-                <a href="{{ url_for('index') }}">
+                <a href="{{ url_for('home') }}">
                     <img src="{{url_for('static', filename='images/hub-top-logo.png')}}" alt="로고" class="hub-nav-logo"
                         onerror="this.style.display='none'">
                 </a>

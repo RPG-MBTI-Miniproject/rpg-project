@@ -39,7 +39,7 @@ loginForm?.addEventListener('submit', async function (e) {
             //    SSR 페이지(/result)용 쿠키는 서버가 직접 심어준다
             localStorage.setItem(TOKEN_KEY, data.access_token);
             // 4. 저장 직후 테스트 화면으로 이동
-            window.location.href = '/';
+            window.location.href = '/home';
         } else {
             alert(data.msg || '아이디 또는 비밀번호가 올바르지 않습니다.');
         }
