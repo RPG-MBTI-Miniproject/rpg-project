@@ -529,7 +529,7 @@ if (document.querySelector('#comment-list')) {
                 location.href = '/community';
             } catch (error) {
                 console.error('게시글 삭제 실패:', error);
-                alert('게시글 삭제 중 오류가 발생했습니다:',error.message);
+                alert(`게시글 삭제 중 오류가 발생했습니다: ${error.message}`);
             }
         });
     }
@@ -647,7 +647,7 @@ if (document.querySelector('#comment-list')) {
 
                     } catch (error) {
                         console.error('댓글 삭제 실패:', error);
-                        alert('댓글 삭제 실패:',error.message);
+                        alert(`댓글 삭제 중 오류가 발생했습니다: ${error.message}`);
                     }
                 });
             }
@@ -670,6 +670,7 @@ if (document.querySelector('#comment-list')) {
             }
         } catch (error) {
             console.error("댓글을 불러오는 중 오류 발생:", error);
+            alert(`댓글을 불러오는 중 오류가 발생했습니다: ${error.message}`);
         }
 
     }
