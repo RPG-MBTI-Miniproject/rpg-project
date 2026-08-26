@@ -23,7 +23,7 @@
     <header class="top-nav">
         <!-- TODO: [HTML/CSS] 로고 / "메뉴" 타이틀 / [로그아웃] 버튼 -->
         <div class="hub-nav-bar">
-            <a href="{{ url_for('community') }}" class="back-link">◀</a>
+            <a href="{{ url_for('home') }}" class="back-link" title="뒤로가기">‹</a>
             <button class="hub-nav-logout" onclick="logout()">로그아웃</button>
         </div>
     </header>
@@ -46,7 +46,8 @@
                     이미 테스트를 완료하셨습니다.<br>
                     언제든지 다시 테스트하여 새로운 직업을 찾아보세요!
                     {% else %}
-                    완료 여부에 따라 문구 변경
+                    첫 방문을 환영합니다.<br>
+                    테스트를 진행하고 나만의 직업을 찾아보세요!
                     {% endif %}
                 </p>
                 <div class="hub-card-action">
