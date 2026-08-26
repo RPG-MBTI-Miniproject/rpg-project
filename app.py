@@ -508,7 +508,7 @@ def api_community_delete(post_id):
 
     user_id = get_jwt_identity()
 
-    if post['author_id'] != user_id():
+    if post['author_id'] != user_id:
         return jsonify({"result": "fail", "msg": "해당 게시물의 작성자가 아닙니다."}), 403
 
     db.posts.delete_one({"_id": oid})

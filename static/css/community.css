@@ -49,6 +49,8 @@
 
 /* 상단 바 */
 .top-nav {
+    display: flex;
+    justify-content: center;
     width: 100%;
     border-bottom: 1px solid var(--border-soft);
     background: rgba(255, 255, 255, 0.6);
@@ -57,7 +59,9 @@
 
 /* 헤더 — 돌아가기(좌) / 로그아웃(우) */
 .community-nav-bar {
+    width: 100%;
     max-width: 1400px;
+    box-sizing: border-box;
     margin: 0 auto;
     padding: 20px 32px;
     display: flex;
@@ -469,6 +473,193 @@
     background: var(--aurora-bg);
     min-height: 100vh;
     padding: 32px 24px 48px;
+}
+
+/* ============ 상세 화면: Figma 반영 ============ */
+/* ============ 상세 화면: Figma 반영 ============ */
+/* ============ 상세 화면: Figma 반영 ============ */
+/* ============ 상세 화면: Figma 반영 ============ */
+/* ============ 상세 화면: Figma 반영 ============ */
+.community-detail-bg {
+    background: var(--aurora-bg);
+    min-height: 100vh;
+    padding: 32px 24px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+}
+.community-detail-bg > * {
+    width: 100%;
+    max-width: 1000px;
+}
+
+/* ---- Post Content Card (제목+본문+캐릭터카드+버튼을 하나의 큰 흰 카드로) ---- */
+.post-content-card {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 32px;
+    background: rgba(255, 255, 255, 0.91);
+    border: 1.5px solid #EAEAFF;
+    box-shadow: 0 8px 24px rgba(111, 107, 153, 0.12);
+    border-radius: 28px;
+}
+
+.post-body-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+}
+.post-body-card .post-title { font-size: 26px; font-weight: 800; color: var(--text-primary); margin: 0; }
+.post-body-card .post-meta { font-size: 14px; color: var(--text-muted); margin: 0 0 10px; }
+.post-body-divider { height: 0; border-top: 1px solid var(--border-soft); }
+.post-body-card .post-content { font-size: 16px; line-height: 160%; color: var(--text-primary); white-space: pre-wrap; margin: 0; }
+
+/* ---- Embedded Character Section ---- */
+.character-embed {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 24px;
+    background: #FFFFFF;
+    border: 1px solid #EAEAFF;
+    border-radius: 20px;
+}
+.character-embed-label { font-size: 14px; font-weight: 700; color: var(--accent); margin: 0; }
+
+/* character-card 등은 result.css(다크 테마)를 상속받으므로, .community-detail-bg 안에서만 덮어씀
+   → /result 페이지는 원래 다크 테마 그대로 유지됨 */
+.community-detail-bg .character-card { background: none; border: none; box-shadow: none; padding: 0; width: 100%; text-align: center; }
+.community-detail-bg .illustration-wrapper,
+.community-detail-bg .illustration-placeholder {
+    width: 100%;
+    height: 200px;
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #dbe4ff, #e8f0ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.community-detail-bg .char-icon { font-size: 64px; }
+.community-detail-bg .char-title { font-size: 14px; font-weight: 600; color: var(--text-muted); margin: 12px 0 4px; }
+.community-detail-bg .char-name-mbti { font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0; }
+.community-detail-bg .mbti-badge { font-size: 16px; font-weight: 600; color: var(--accent-strong); }
+
+.community-detail-bg .stats-info-section {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    display: flex;
+    gap: 16px;
+}
+.community-detail-bg .chart-box,
+.community-detail-bg .info-box {
+    flex: 1;
+    box-sizing: border-box;
+    background: #FFFFFF;
+    border: 1px solid #EAEAFF;
+    border-radius: 16px;
+    padding: 16px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.community-detail-bg .chart-box h4,
+.community-detail-bg .info-box h4 { font-size: 13px; font-weight: 700; color: var(--text-muted); margin: 0; text-align: center; }
+.community-detail-bg .canvas-wrapper { height: 140px; }
+.community-detail-bg .info-item { display: flex; flex-direction: column; gap: 2px; }
+.community-detail-bg .info-label { font-size: 12px; color: var(--text-muted); }
+.community-detail-bg .info-value { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+
+.community-detail-bg .chemistry-area {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+.community-detail-bg .chemistry-box {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+}
+.community-detail-bg .chemistry-card {
+    flex: 1;
+    box-sizing: border-box;
+    background: #FFFFFF;
+    border: 1px solid #EAEAFF;
+    box-shadow: 0 8px 24px rgba(111, 107, 153, 0.12);
+    border-radius: 16px;
+    padding: 16px;
+    margin: 0;
+}
+.community-detail-bg .match-badge { display: inline-block; font-size: 13px; font-weight: 800; margin-bottom: 8px; }
+.community-detail-bg .match-badge.best { color: #4CAF50; }
+.community-detail-bg .match-badge.worst { color: #FF5252; }
+.community-detail-bg .match-img-wrapper {
+    height: 90px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #eef1ff, #f5f3ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+.community-detail-bg .match-placeholder { font-size: 32px; }
+.community-detail-bg .match-name { font-size: 13px; font-weight: 800; color: var(--text-primary); margin: 0; }
+.community-detail-bg .match-mbti { font-size: 12px; color: var(--text-muted); }
+
+.no-character-msg { text-align: center; color: var(--text-muted); font-size: 13px; padding: 24px 0; }
+
+/* ---- 수정/삭제 버튼 ---- */
+.post-owner-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.post-owner-actions button {
+    padding: 8px 16px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer;
+    border: 1.5px solid var(--accent); background: transparent; color: var(--accent);
+}
+.post-owner-actions button.danger { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ---- Comments Card ---- */
+.comment-section {
+    box-sizing: border-box; padding: 24px;
+    background: rgba(255, 255, 255, 0.91); border: 1.5px solid #EAEAFF;
+    box-shadow: 0 8px 24px rgba(111, 107, 153, 0.12); border-radius: 24px;
+}
+.comment-title { font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0 0 16px; }
+.comment-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid #EAEAFF; gap: 12px;
+}
+.comment-row:last-child { border-bottom: none; }
+.comment-author { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.comment-content { font-size: 14px; color: var(--text-primary); margin-left: 8px; }
+.comment-actions span { font-size: 12px; margin-left: 8px; cursor: pointer; }
+.comment-actions span.danger { color: #FF383C; }
+.comment-actions span.disabled { color: #E6E6E6; pointer-events: none; }
+.comment-input-row { display: flex; gap: 8px; margin-top: 16px; }
+.comment-input-row input {
+    flex: 1; padding: 10px 14px; border: 1px solid var(--border-soft);
+    border-radius: 10px; font-size: 14px; outline: none;
+}
+.comment-input-row button {
+    padding: 10px 18px; border-radius: 10px; border: none;
+    background: var(--accent); color: #fff; font-weight: 600; cursor: pointer;
 }
 
 /* [공용 네비게이션]
