@@ -91,17 +91,68 @@
             <button class="btn btn-primary" id="copy-link-btn">🔗 결과 링크 복사하기</button>
         </div>
         <div class="search-friend">
-            <label for="search-friend-result">🙍‍♂️ 친구의 궁합 보러가기 (<span>닉네임</span>)</label>
+            <label for="search-friend-result">🙍‍♂️ 친구와의 궁합 보러가기 (<span>닉네임</span>)</label>
             <form class="search-form" type="submit">
                 <input type="text" name="search-friend-result" id="search-friend-result" placeholder="친구의 닉네임을 입력하세요">
                 <button class="btn btn-primary" id="search-friend-btn">궁합 보기</button>
             </form>
         </div>
-        <div class="friend-card">
-            <div class="friend-mbti">
-                <p></p>
+        <!-- 친구와의 궁합 결과 카드 (JS에서 검색 성공 시 표시: #friend-synergy-section) -->
+        <!-- 작동 확인이 필요하다면 display none 삭제-->
+        <div class="friend-synergy-container" id="friend-synergy-section" style="display: none;">
+            <h3 class="synergy-main-title">
+                나와 <span id="target-friend-name" style="color: var(--accent-cyan);">[친구 닉네임]</span>님의 궁합
+            </h3>
+            <div class="friend-card-grid">
+                <!-- 1. 내가 바라본 친구 -->
+                <div class="friend-match-card">
+                    <div class="card-top-header">
+                        <span class="card-label-title">내가 보는 친구</span>
+                        <span class="status-emoji" id="me-to-friend-emoji">💚</span>
+                    </div>
+                    <div class="match-img-box" id="friend-char-img-box">
+                        <!-- TODO: [JS] 친구 캐릭터 일러스트(img) 또는 이모지 삽입 -->
+                        <div class="match-placeholder" id="friend-char-icon">🛡️</div>
+                    </div>
+                    <div class="card-info-bottom">
+                        <span class="synergy-tag duo" id="me-to-friend-tag">[시너지 태그]</span>
+                        <h4 class="partner-title">
+                            <span id="friend-class-name">[친구 직업명]</span>
+                            <span class="mbti-text" id="friend-mbti-text">([친구 MBTI])</span>
+                        </h4>
+                        <p class="partner-desc" id="me-to-friend-desc">
+                            여기에 내가 보는 친구의 궁합 설명 텍스트가 JS로 들어옵니다.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 2. 친구가 바라본 나 -->
+                <div class="friend-match-card">
+                    <div class="card-top-header">
+                        <span class="card-label-title">친구가 보는 나</span>
+                        <span class="status-emoji" id="friend-to-me-emoji">🔮</span>
+                    </div>
+                    <div class="match-img-box" id="my-char-img-box">
+                        <!-- TODO: [JS] 내 캐릭터 일러스트(img) 또는 이모지 삽입 -->
+                        <div class="match-placeholder" id="my-char-icon">🧙‍♂️</div>
+                    </div>
+                    <div class="card-info-bottom">
+                        <span class="synergy-tag brain" id="friend-to-me-tag">[시너지 태그]</span>
+                        <h4 class="partner-title">
+                            <span id="my-class-name">[내 직업명]</span>
+                            <span class="mbti-text" id="my-mbti-text">([내 MBTI])</span>
+                        </h4>
+                        <p class="partner-desc" id="friend-to-me-desc">
+                            여기에 친구가 보는 나의 궁합 설명 텍스트가 JS로 들어옵니다.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
+
+
+
+
     </main>
 
     <!-- Jinja2 Safe Stats JSON Data Transfer -->
