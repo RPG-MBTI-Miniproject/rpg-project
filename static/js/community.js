@@ -84,7 +84,7 @@ async function apiFetch(url, options = {}) {
     if (res.status === 401) {
         alert("401 Error. 로그인 페이지로 이동합니다.");
         window.location.href = '/';
-        return;
+        throw new Error('로그인이 필요합니다.');
     }
 
     // 2-B. 응답 JSON 파싱    
@@ -149,6 +149,9 @@ if (document.querySelector('#post-list')) {
         // 4. 제목 입력창으로 포커스 이동
         titleInput.focus();
     }
+
+    document.querySelector('#write-btn')?.addEventListener('click', writeStart);
+
     // TODO 4. 정렬 버튼(.sort-btn) 클릭 이벤트
     //   - 클릭된 버튼에 active 클래스, 나머지는 제거
     //   - 상태의 sort 값 갱신, page를 1로 리셋
@@ -176,30 +179,7 @@ if (document.querySelector('#post-list')) {
     // 3. 각 버튼에 클릭 이벤트 등록
     sortButtons.forEach(button => {
         button.addEventListener('click', handleSort);
-    });
-    // function handelSort() {
-    //     const sortButtons = document.querySelectorAll('.sort-btn');
-
-    //     sortButtons.forEach(button => {
-    //         button.addEventListener('click', function (e) {
-    //             // 1. 모든 버튼에서 active 클래스 제거
-    //             sortButtons.forEach(btn => btn.classList.remove('active'));
-
-    //             // 2. 클릭된 버튼에만 active 클래스 추가 (e.currentTarget 활용)
-    //             e.currentTarget.classList.add('active');
-
-    //             // 3. 클릭된 버튼의 data-sort 속성값 가져와서 상태 갱신
-    //             const selectedSort = e.currentTarget.dataset.sort;
-    //             communityStatus.sort = selectedSort;
-
-    //             // 4. 페이지 번호 1로 리셋
-    //             communityStatus.page = 1;
-
-    //             // 5. 게시글 목록 다시 불러오기
-    //             loadPosts();
-    //         });
-    //     });
-    // }    
+    });    
 
     // TODO 5. 검색 버튼(#search-btn) 클릭 이벤트
     //   - #search-input 값을 trim
@@ -213,8 +193,8 @@ if (document.querySelector('#post-list')) {
         const searchTarget = document.querySelector('#search-target').value;
 
         // 글자 수 검사
-        if (searchInput.length < MIN_LEN) {
-            alert(`"${MIN_LEN} 글자 이상 입력해 주세요."`);
+        if (searchInput.length > 0 && searchInput.length < MIN_LEN) {
+            alert(`${MIN_LEN}글자 이상 입력해 주세요.`);
             return;
         }
 
@@ -281,6 +261,40 @@ if (document.querySelector('#post-list')) {
     //   #pagination 을 비우고, 1부터 totalPages까지 버튼 생성
     //   현재 page와 같은 버튼엔 active 클래스
     //   버튼 클릭 시: 상태의 page 갱신 후 목록 다시 불러오기
+    function renderPagination(page, totalPages) {
+        const paginationEl = document.querySelector('#pagination');
+        paginationEl.innerHTML = ''; // 1. #pagination 비우기
+
+        // 만약 전체 페이지가 0이거나 1 미만이면 버튼을 그리지 않고 종료
+        if (!totalPages || totalPages < 1) {
+            return;
+        }
+
+        // 2. 1부터 totalPages까지 순회하며 버튼 생성
+        for (let i = 1; i <= totalPages; i++) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'page-btn';
+            btn.textContent = i;
+
+            // 3. 현재 page와 같으면 active 클래스 추가
+            if (i === page) {
+                btn.classList.add('active');
+            }
+
+            // 4. 버튼 클릭 시: 상태의 page 갱신 후 목록 다시 불러오기
+            btn.addEventListener('click', function () {
+                // 이미 선택된 현재 페이지를 누른 경우 무시
+                if (communityStatus.page === i) return;
+
+                communityStatus.page = i; // 상태 page 갱신
+                loadPosts();              // 목록 다시 불러오기
+            });
+
+            // 생성한 버튼을 #pagination에 추가
+            paginationEl.appendChild(btn);
+        }
+    }
 
     // TODO 8. 목록 불러오는 함수 만들기 (예: loadPosts())
     //   - 현재 상태값들로 쿼리스트링 만들어서 GET /api/community/posts 호출
@@ -288,9 +302,44 @@ if (document.querySelector('#post-list')) {
     //   - 응답의 no_results가 true면: #post-list 비우고 #pagination 비우고
     //     #empty-msg 의 hidden 클래스 제거
     //   - 아니면: #empty-msg에 hidden 클래스 추가하고, renderPosts + renderPagination 호출
-    //   - 페이지 처음 로드될 때 한 번 자동으로 호출되어야 함 (스크립트 맨 아래에서 실행)
-    function loadPosts() {
+    //   - 페이지 처음 로드될 때 한 번 자동으로 호출되어야 함 (스크립트 맨 아래에서 실행)    
+    async function loadPosts() {
+        try {
+            // 1. 현재 상태값들로 쿼리스트링 생성
+            const params = new URLSearchParams({
+                sort: communityStatus.sort,
+                target: communityStatus.target,
+                page: communityStatus.page
+            });
 
+            // q(검색어)가 빈 문자열이 아닌 경우에만 쿼리에 포함
+            if (communityStatus.q.trim() !== '') {
+                params.append('q', communityStatus.q.trim());
+            }
+
+            // 2. GET API 호출
+            const data = await apiFetch(`/api/community/posts?${params.toString()}`);
+
+            const postListEl = document.querySelector('#post-list');
+            const paginationEl = document.querySelector('#pagination');
+            const emptyMsgEl = document.querySelector('#empty-msg');
+
+            // 3. 응답에 따른 UI 분기 처리
+            if (data.no_results) {
+                // 검색 결과가 없는 경우
+                if (postListEl) postListEl.innerHTML = '';
+                if (paginationEl) paginationEl.innerHTML = '';
+                if (emptyMsgEl) emptyMsgEl.classList.remove('hidden');
+            } else {
+                // 검색 결과가 정상적으로 있는 경우
+                if (emptyMsgEl) emptyMsgEl.classList.add('hidden');
+
+                renderPosts(data.posts);
+                renderPagination(data.page, data.total_pages);
+            }
+        } catch (error) {
+            console.error('게시글 목록 불러오기 실패:', error);
+        }
     }
 
     // TODO 9. 모달 "등록/저장"(#modal-submit-btn) 클릭 이벤트
@@ -298,10 +347,56 @@ if (document.querySelector('#post-list')) {
     //   - 둘 중 하나라도 MIN_LEN 미만이면 #modal-error 에 안내 문구 넣고 hidden 제거, 멈추기
     //   - 통과하면 POST /api/community/posts 호출 (title, content)
     //   - 성공하면 모달 닫고(hidden 클래스 다시 추가) 목록 새로고침(loadPosts 재호출)
-    //   - 실패하면 #modal-error 에 서버가 준 msg 표시
+    //   - 실패하면 #modal-error 에 서버가 준 msg 표시    
+    document.querySelector('#modal-submit-btn').addEventListener('click', async () => {
+        const titleInput = document.querySelector('#post-title-input');
+        const contentInput = document.querySelector('#post-content-input');
+        const errorElement = document.querySelector('#modal-error');
+
+        // 1. 값 수집 및 trim
+        const title = titleInput.value.trim();
+        const content = contentInput.value.trim();
+
+        // 2. 유효성 검사 (MIN_LEN 미만 확인)
+        if (title.length < MIN_LEN || content.length < MIN_LEN) {
+            errorElement.textContent = `제목과 내용은 최소 ${MIN_LEN}자 이상 입력해주세요.`;
+            errorElement.classList.remove('hidden');
+            return;
+        }
+
+        // 검사 통과 시 기존 에러 메시지 감추기
+        errorElement.classList.add('hidden');
+
+        try {
+            // 3. POST /api/community/posts 호출
+            await apiFetch('/api/community/posts', {
+                method: 'POST',
+                body: JSON.stringify({ title, content })
+            });
+
+            // 4. 성공 시 모달 닫기 및 목록 새로고침
+            document.querySelector('#write-modal').classList.add('hidden');
+            loadPosts();
+        } catch (error) {
+            // 5. 실패 시 #modal-error에 서버 에러 메시지 표시
+            errorElement.textContent = error.message;
+            errorElement.classList.remove('hidden');
+        }
+    });
 
     // TODO 10. 모달 "취소"(#modal-cancel-btn) 클릭 시 → 모달 닫기
+    document.querySelector('#modal-cancel-btn').addEventListener('click', () => {
+        // 1. #write-modal 요소에 hidden 클래스 추가하여 모달 숨기기
+        document.querySelector('#write-modal').classList.add('hidden');
 
+        // 모달이 닫힐 때 발생했던 에러 메시지도 함께 비워주면 UI상 더 깔끔
+        const errorElement = document.querySelector('#modal-error');
+        if (errorElement) {
+            errorElement.textContent = '';
+            errorElement.classList.add('hidden');
+        }
+    });
+    loadPosts();
 }
 // ==========================================
 // [상세 화면] community_detail.html 에서만 실행되는 부분
