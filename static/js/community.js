@@ -119,61 +119,78 @@ async function apiFetch(url, options = {}) {
 // 아래 블록 전체를 "#post-list가 있을 때만" 실행되게 감싸주세요.
 // (안 그러면 상세 화면에서 null 참조 에러가 남)
 // ==========================================
+if (document.querySelector('#post-list')) {
+    // TODO 2. 상태 변수 만들기
+    //   현재 정렬(sort), 검색 대상(target), 검색어(q), 현재 페이지(page)를
+    //   객체 하나로 묶어서 관리하면 편함. 초기값: newest / all / '' / 1
+    let communityStatus = {
+        sort: 'newest',
+        target: 'all',
+        q: '',
+        page: 1
+    }
 
-// TODO 2. 상태 변수 만들기
-//   현재 정렬(sort), 검색 대상(target), 검색어(q), 현재 페이지(page)를
-//   객체 하나로 묶어서 관리하면 편함. 초기값: newest / all / '' / 1
-let communityStatus = {
+
+    // TODO 3. "글쓰기" 버튼(#write-btn) 클릭 시 → #write-modal 의 hidden 클래스 제거
+    //   모달 안 입력창(#post-title-input, #post-content-input)은 비워서 시작
+    function writeStart() {
+        // 1. 모달 표시
+        const modalElement = document.querySelector('#write-modal');
+        modalElement.classList.remove('hidden');
+
+        // 2. 입력창 요소 찾기
+        const titleInput = document.querySelector('#post-title-input');
+        const contentInput = document.querySelector('#post-content-input');
+
+        // 3. 값 초기화
+        titleInput.value = '';
+        contentInput.value = '';
+
+        // 4. 제목 입력창으로 포커스 이동
+        titleInput.focus();
+    }
+    // TODO 4. 정렬 버튼(.sort-btn) 클릭 이벤트
+    //   - 클릭된 버튼에 active 클래스, 나머지는 제거
+    //   - 상태의 sort 값 갱신, page를 1로 리셋
+    //   - 목록 다시 불러오기
+    
+
+    // TODO 5. 검색 버튼(#search-btn) 클릭 이벤트
+    //   - #search-input 값을 trim
+    //   - 입력했는데 MIN_LEN(2)글자 미만이면 alert로 안내하고 멈추기 (서버까지 보내지 말 것)
+    //   - #search-target 의 선택값도 같이 상태에 저장
+    //   - page를 1로 리셋하고 목록 다시 불러오기
+    //   (선택) input에서 Enter 키 눌러도 검색되게 하면 UX 좋음
+
+    // TODO 6. 게시글 목록 그리는 함수 만들기 (예: renderPosts(posts))
+    //   #post-list 를 비우고, posts 배열을 순회하며 한 줄씩 요소를 만들어 추가
+    //   각 줄은 클릭하면 `/community/{post.id}` 로 이동해야 함
+    //     (a 태그로 만들어서 href="/community/" + post.id 하는 게 제일 간단)
+    //   보여줄 정보: title, author_nickname, comment_count, created_at(날짜만 보기 좋게 포맷)
+
+    // TODO 7. 페이지네이션 그리는 함수 만들기 (예: renderPagination(page, totalPages))
+    //   #pagination 을 비우고, 1부터 totalPages까지 버튼 생성
+    //   현재 page와 같은 버튼엔 active 클래스
+    //   버튼 클릭 시: 상태의 page 갱신 후 목록 다시 불러오기
+
+    // TODO 8. 목록 불러오는 함수 만들기 (예: loadPosts())
+    //   - 현재 상태값들로 쿼리스트링 만들어서 GET /api/community/posts 호출
+    //     (q가 빈 문자열이면 쿼리에 아예 안 넣는 게 깔끔)
+    //   - 응답의 no_results가 true면: #post-list 비우고 #pagination 비우고
+    //     #empty-msg 의 hidden 클래스 제거
+    //   - 아니면: #empty-msg에 hidden 클래스 추가하고, renderPosts + renderPagination 호출
+    //   - 페이지 처음 로드될 때 한 번 자동으로 호출되어야 함 (스크립트 맨 아래에서 실행)
+
+    // TODO 9. 모달 "등록/저장"(#modal-submit-btn) 클릭 이벤트
+    //   - #post-title-input, #post-content-input 값을 trim
+    //   - 둘 중 하나라도 MIN_LEN 미만이면 #modal-error 에 안내 문구 넣고 hidden 제거, 멈추기
+    //   - 통과하면 POST /api/community/posts 호출 (title, content)
+    //   - 성공하면 모달 닫고(hidden 클래스 다시 추가) 목록 새로고침(loadPosts 재호출)
+    //   - 실패하면 #modal-error 에 서버가 준 msg 표시
+
+    // TODO 10. 모달 "취소"(#modal-cancel-btn) 클릭 시 → 모달 닫기
 
 }
-
-
-// TODO 3. "글쓰기" 버튼(#write-btn) 클릭 시 → #write-modal 의 hidden 클래스 제거
-//   모달 안 입력창(#post-title-input, #post-content-input)은 비워서 시작
-function writeStart() {
-
-}
-// TODO 4. 정렬 버튼(.sort-btn) 클릭 이벤트
-//   - 클릭된 버튼에 active 클래스, 나머지는 제거
-//   - 상태의 sort 값 갱신, page를 1로 리셋
-//   - 목록 다시 불러오기
-
-// TODO 5. 검색 버튼(#search-btn) 클릭 이벤트
-//   - #search-input 값을 trim
-//   - 입력했는데 MIN_LEN(2)글자 미만이면 alert로 안내하고 멈추기 (서버까지 보내지 말 것)
-//   - #search-target 의 선택값도 같이 상태에 저장
-//   - page를 1로 리셋하고 목록 다시 불러오기
-//   (선택) input에서 Enter 키 눌러도 검색되게 하면 UX 좋음
-
-// TODO 6. 게시글 목록 그리는 함수 만들기 (예: renderPosts(posts))
-//   #post-list 를 비우고, posts 배열을 순회하며 한 줄씩 요소를 만들어 추가
-//   각 줄은 클릭하면 `/community/{post.id}` 로 이동해야 함
-//     (a 태그로 만들어서 href="/community/" + post.id 하는 게 제일 간단)
-//   보여줄 정보: title, author_nickname, comment_count, created_at(날짜만 보기 좋게 포맷)
-
-// TODO 7. 페이지네이션 그리는 함수 만들기 (예: renderPagination(page, totalPages))
-//   #pagination 을 비우고, 1부터 totalPages까지 버튼 생성
-//   현재 page와 같은 버튼엔 active 클래스
-//   버튼 클릭 시: 상태의 page 갱신 후 목록 다시 불러오기
-
-// TODO 8. 목록 불러오는 함수 만들기 (예: loadPosts())
-//   - 현재 상태값들로 쿼리스트링 만들어서 GET /api/community/posts 호출
-//     (q가 빈 문자열이면 쿼리에 아예 안 넣는 게 깔끔)
-//   - 응답의 no_results가 true면: #post-list 비우고 #pagination 비우고
-//     #empty-msg 의 hidden 클래스 제거
-//   - 아니면: #empty-msg에 hidden 클래스 추가하고, renderPosts + renderPagination 호출
-//   - 페이지 처음 로드될 때 한 번 자동으로 호출되어야 함 (스크립트 맨 아래에서 실행)
-
-// TODO 9. 모달 "등록/저장"(#modal-submit-btn) 클릭 이벤트
-//   - #post-title-input, #post-content-input 값을 trim
-//   - 둘 중 하나라도 MIN_LEN 미만이면 #modal-error 에 안내 문구 넣고 hidden 제거, 멈추기
-//   - 통과하면 POST /api/community/posts 호출 (title, content)
-//   - 성공하면 모달 닫고(hidden 클래스 다시 추가) 목록 새로고침(loadPosts 재호출)
-//   - 실패하면 #modal-error 에 서버가 준 msg 표시
-
-// TODO 10. 모달 "취소"(#modal-cancel-btn) 클릭 시 → 모달 닫기
-
-
 // ==========================================
 // [상세 화면] community_detail.html 에서만 실행되는 부분
 // 이 화면엔 아래 전역 변수가 이미 선언되어 있음 (community_detail.html 참고):
