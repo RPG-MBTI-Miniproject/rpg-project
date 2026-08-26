@@ -258,13 +258,48 @@
                 });
             }
 
+            // navigator.clipboard 는 HTTPS 또는 localhost 에서만 존재합니다.
+            // EC2 를 http 로 서비스하면 undefined 라서, 예전 방식(execCommand)으로 대체합니다.
+            async function copyText(text) {
+                if (navigator.clipboard && window.isSecureContext) {
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        return true;
+                    } catch (e) {
+                        // 권한 거부 등 — 아래 예전 방식으로 넘어감
+                    }
+                }
+
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.setAttribute('readonly', '');
+                ta.style.position = 'fixed';   // 화면이 스크롤되지 않게
+                ta.style.top = '-1000px';
+                document.body.appendChild(ta);
+                ta.select();
+                ta.setSelectionRange(0, ta.value.length);   // iOS 대응
+
+                let ok = false;
+                try {
+                    ok = document.execCommand('copy');
+                } catch (e) {
+                    ok = false;
+                }
+                document.body.removeChild(ta);
+                return ok;
+            }
+
             const copyBtn = document.getElementById('copy-link-btn');
             if (copyBtn) {
-                copyBtn.addEventListener('click', () => {
+                copyBtn.addEventListener('click', async () => {
                     const shareUrl = window.location.origin + '/result/' + encodeURIComponent("{{ nickname }}");
-                    navigator.clipboard.writeText(shareUrl)
-                        .then(() => alert('결과 링크가 클립보드에 복사되었습니다!'))
-                        .catch(() => alert('복사 실패!'));
+                    const ok = await copyText(shareUrl);
+                    if (ok) {
+                        alert('결과 링크가 클립보드에 복사되었습니다!');
+                    } else {
+                        // 복사조차 안 되면 주소라도 보여줘서 직접 복사할 수 있게 한다
+                        prompt('아래 주소를 복사하세요 (Ctrl+C)', shareUrl);
+                    }
                 });
             }
         });
