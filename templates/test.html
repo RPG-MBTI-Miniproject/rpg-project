@@ -15,12 +15,11 @@
     <!-- TODO: [최현욱] Frame 2 와이어프레임에 맞춘 UI/UX 퍼블리싱 (SPA 형태) -->
     <div class="test-container">
         <div class="header">
-            <!-- TODO: [이정욱] JS로 JWT에서 유저명 추출해서 여기에 텍스트 삽입하기 -->
             <div class="header-left">
                 <button id="prev-btn" class="prev-btn" title="이전으로">◀</button><!-- 이전 버튼 -->
-                <span class="welcome-msg">{{nickname}}님, 환영합니다!</span>
+                <span class="welcome-msg">{{ nickname }}님, 환영합니다!</span>
             </div>
-            <a href="/" class="logout-btn">[로그아웃]</a>
+            <button class="logout-btn" onclick="logout()">[로그아웃]</button>
         </div>
 
         <div class="progress-bar">
@@ -48,7 +47,6 @@
 </body>
 
 </html>
-
 
 <!-- 피드백 : 현재의 웹 내용으로는 많이 빈약함.
      이틀간의 계획 : 강사님의 피드백을 적극 이용하여 향후 확장성을 중심으로 완성도를 높인다. -->
