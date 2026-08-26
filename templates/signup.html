@@ -15,6 +15,9 @@
     <main>
         <section>
             <div class="auth-wrapper">
+                <div class="auth-main-logo">
+                    <img src="{{ url_for('static', filename='images/main-logo.png') }}" alt="게임 로고">
+                </div>
                 <form class="auth-card reveal is-visible" id="signup-form">
                     <div class="auth-header">
                         <h2 class="auth-title">회원가입</h2>
@@ -31,7 +34,7 @@
                     <label for="nickname">모험가 이름 (<span>닉네임</span>)</label>
                     <input type="text" id="nickname" name="nickname" placeholder="사용할 닉네임 입력 . . ." class="auth-input"
                         value="" required>
-                    <button type="submit" class="auth-submit">길드 등록</button>
+                    <button type="submit" class="auth-submit">길드&nbsp;<span class="another-color">등록</span></button>
 
                     <div id="error-message" class="auth-error {% if not error_msg %}hidden{% endif %}">
                         {{ error_msg if error_msg else '' }}
