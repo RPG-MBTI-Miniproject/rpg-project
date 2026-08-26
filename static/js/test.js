@@ -372,6 +372,10 @@ async function searchFriendCompatibility() {
             'friend-mbti-text'
         ).textContent = `(${data.friend.mbti})`;
 
+        // 친구 MBTI에 맞는 이미지 표시 260827 0353 add
+        document.getElementById('friend-char-img').src =
+            `/static/images/${data.friend.mbti}.png`;
+
         document.getElementById(
             'me-to-friend-emoji'
         ).textContent =
