@@ -408,46 +408,131 @@ if (document.querySelector('#post-list')) {
 // ==========================================
 if (document.querySelector('#comment-list')) {
 
-    // 1. 모드 관리 변수 (false: 새글 쓰기 / true: 수정)
-    let isEditMode = false;
-
     // TODO 11. "수정"(#edit-post-btn) 버튼 — is_author일 때만 화면에 존재함
     //   클릭 시 #write-modal 열고, 입력창에 POST_TITLE / POST_CONTENT 로 미리 채워넣기
     //   "저장" 눌렀을 때는 (목록 화면과 다르게) POST가 아니라
     //   PUT /api/community/posts/{POST_ID} 로 보내야 함 — 여기서 모드 구분이 필요함
     //   (힌트: "지금 모달이 새글쓰기 모드인지 수정 모드인지"를 기억하는 변수 하나 두면 편함)
+
+    // 1. 모드 관리 변수 (false: 새글 쓰기 / true: 수정)    
+    let isEditMode = false;
+
     const editPostBtn = document.querySelector('#edit-post-btn');
 
     if (editPostBtn) {
         editPostBtn.addEventListener('click', () => {
-            // 1. 수정 모드로 전환
             isEditMode = true;
 
-            // 2. #write-modal 열기 (hidden 클래스 제거)
-            document.querySelector('#write-modal').classList.remove('hidden');
+            document.querySelector('#write-modal')?.classList.remove('hidden');
 
-            // 3. 입력창에 POST_TITLE, POST_CONTENT 값 채우기
-            let titleInput = document.querySelector('#post-title-input');
-            let contentInput = document.querySelector('#post-content-input');
-            titleInput.value = POST_TITLE;
-            contentInput.value = POST_CONTENT;            
+            const titleInput =
+                document.querySelector('#post-title-input');
 
-            let url = '';
-            let method = '';
-            
-            if (isEditMode) {
+            const contentInput =
+                document.querySelector('#post-content-input');
 
+            if (titleInput) {
+                titleInput.value = POST_TITLE;
+            }
 
+            if (contentInput) {
+                contentInput.value = POST_CONTENT;
             }
         });
-    } else {
-
     }
 
+    const modalSubmitBtn = document.querySelector('#modal-submit-btn');
+
+    if (modalSubmitBtn) {
+        modalSubmitBtn.addEventListener('click', async () => {
+
+            if (!isEditMode) return;
+
+            const title = document
+                .querySelector('#post-title-input')
+                ?.value.trim();
+
+            const content = document
+                .querySelector('#post-content-input')
+                ?.value.trim();
+
+            const errorElement =
+                document.querySelector('#modal-error');
+
+            // 최소 글자 수 검사
+            if (
+                !title ||
+                !content ||
+                title.length < MIN_LEN ||
+                content.length < MIN_LEN
+            ) {
+                if (errorElement) {
+                    errorElement.textContent = `제목과 내용은 최소 ${MIN_LEN}자 이상 입력해주세요.`;
+                    errorElement.classList.remove('hidden');
+                }
+
+                return;
+            }
+
+            if (errorElement) {
+                errorElement.classList.add('hidden');
+            }
+
+            try {
+                await apiFetch(
+                    `/api/community/posts/${POST_ID}`,
+                    {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            title,
+                            content
+                        })
+                    }
+                );
+
+                isEditMode = false;
+
+                document.querySelector('#write-modal')
+                    ?.classList.add('hidden');
+
+                location.reload();
+
+            } catch (error) {
+                console.error('글 수정 실패:', error);
+
+                if (errorElement) {
+                    errorElement.textContent = error.message;
+                    errorElement.classList.remove('hidden');
+                }
+            }
+        });
+    }
 
     // TODO 12. "삭제"(#delete-post-btn) 버튼
     //   confirm()으로 한 번 물어보고, 확인되면 DELETE /api/community/posts/{POST_ID}
     //   성공하면 location.href = '/community' 로 목록으로 돌려보내기
+
+    const deletePostBtn = document.querySelector('#delete-post-btn');
+
+    if (deletePostBtn) {
+        deletePostBtn.addEventListener('click', async () => {
+            // 1. confirm()으로 사용자 의사 확인
+            if (!confirm('정말 이 게시글을 삭제하시겠습니까?')) {
+                return; // 취소를 누르면 진행하지 않고 중단
+            }
+
+            try {
+                // 2. DELETE /api/community/posts/{POST_ID} 요청
+                await apiFetch(`/api/community/posts/${POST_ID}`, { method: 'DELETE' })
+
+                // 3. 성공 시 목록 페이지로 이동
+                location.href = '/community';
+            } catch (error) {
+                console.error('게시글 삭제 실패:', error);
+                alert('게시글 삭제 중 오류가 발생했습니다.');
+            }
+        });
+    }
 
     // TODO 13. 댓글 목록 그리는 함수 만들기 (예: renderComments(comments))
     //   #comment-count 에 comments.length 넣기
@@ -460,10 +545,84 @@ if (document.querySelector('#comment-list')) {
     //                    OR POST_AUTHOR_ID === VIEWER_ID  일 때 클릭 가능
     //   권한 없는 버튼은 클릭이 안 되게 이벤트 자체를 안 붙이거나 disabled 클래스 처리할 것
     //   (CSS의 .comment-actions span.disabled 참고 — 흐리게 표시)
+    function renderComments(comments) {
+        // 1. #comment-count에 댓글 수 반영
+        const countEl = document.querySelector('#comment-count');
+        if (countEl) {
+            countEl.textContent = comments ? comments.length : 0;
+        }
+
+        // 2. #comment-list 요소 찾기 및 비우기
+        const commentListEl = document.querySelector('#comment-list');
+        if (!commentListEl) return;
+        commentListEl.innerHTML = '';
+
+        if (!comments || comments.length === 0) return;
+
+        // 3. 댓글 순회하며 요소 생성
+        comments.forEach(comment => {
+            // 권한 조건 확인
+            const canEdit = comment.author_id === VIEWER_ID;
+            const canDelete = (comment.author_id === VIEWER_ID) || (POST_AUTHOR_ID === VIEWER_ID);
+
+            // 댓글 DOM 요소 생성 (createElement 사용 권장)
+            const commentEl = document.createElement('div');
+            commentEl.className = 'comment-item';
+
+            // 댓글 뼈대 HTML 작성
+            commentEl.innerHTML = `
+                <div class="comment-header">
+                    <span class="comment-author">${comment.author_nickname || '익명'}</span>
+                </div>
+                <div class="comment-body">${comment.content}</div>
+                <div class="comment-actions">
+                    <span class="edit-btn ${canEdit ? '' : 'disabled'}">수정</span>
+                    <span class="delete-btn ${canDelete ? '' : 'disabled'}">삭제</span>
+                </div>
+            `;
+
+            // 권한이 있는 경우에만 클릭 이벤트 등록
+            if (canEdit) {
+                const editBtn = commentEl.querySelector('.edit-btn');
+                editBtn.addEventListener('click', () => {
+                    // TODO 16에서 수정 로직 연결 예정
+                });
+            }
+
+            if (canDelete) {
+                const deleteBtn = commentEl.querySelector('.delete-btn');
+                deleteBtn.addEventListener('click', () => {
+                    // TODO 17에서 삭제 로직 연결 예정
+                });
+            }
+
+            commentListEl.appendChild(commentEl);
+        });
+    }
 
     // TODO 14. 댓글 불러오는 함수 (예: loadComments())
     //   GET /api/community/posts/{POST_ID}/comments 호출 → renderComments 호출
     //   페이지 로드 시 자동 실행되어야 함
+    async function loadComments() {
+        try {
+            // 1. 공통 fetch 헬퍼(apiFetch)를 통해 댓글 목록 GET 요청
+            const data = await apiFetch(`/api/community/posts/${POST_ID}/comments`);
+
+            // 2. 응답받은 comments 데이터로 화면 그리기
+            if (data && data.result === "success") {
+                renderComments(data.comments);
+            }
+        } catch (error) {
+            console.error("댓글을 불러오는 중 오류 발생:", error);
+        }
+
+    }
+
+    // 3. 페이지 로드 시 자동 실행 (DOM 콘텐츠가 모두 로드되었을 때 실행)
+    document.addEventListener("DOMContentLoaded", () => {
+        loadComments();
+    });
+
 
     // TODO 15. 댓글 등록(#comment-submit-btn) 클릭 이벤트
     //   - #comment-input 값 trim, 비어있으면 alert 후 멈추기
