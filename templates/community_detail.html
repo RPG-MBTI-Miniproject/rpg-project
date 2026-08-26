@@ -8,9 +8,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/result.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/community.css') }}">
-
-    <!-- live server -->
-    <link rel="stylesheet" href="../static/css/community.css">
 </head>
 
 <body class="community-detail-body">
@@ -26,17 +23,18 @@
                  class 이름과 이중 중괄호 변수 자리는 유지해주세요.
          ========================================== -->
 
+
     <header class="top-nav">
         <!-- TODO: [HTML/CSS] 로고 / "게시글" 타이틀 / [로그아웃] 버튼 -->
-    </header>
-    <div class="top-nav-next">
-        <div class="detail-left">
-            <a href="{{ url_for('community') }}" class="back-link">◀</a>
-            <span class="community-detail-subtitle">커뮤니티 게시글</span>
+        <div class="community-nav-bar">
+            <a href="{{ url_for('community') }}" class="community-back-link">
+                <span class="community-back-icon">‹</span> 돌아가기
+            </a>
+            <button class="community-nav-logout" onclick="logout()">로그아웃</button>
         </div>
-        <button class="community-detail-logout" onclick="logout()">로그아웃</button>
-    </div>
-    <main class="result-container">
+    </header>
+
+    <main class="result-container community-detail-container">
         <!-- TODO: [HTML/CSS] 목록으로 돌아가는 링크
              href="{ url_for('community') }" 는 유지, 텍스트/아이콘만 자유 -->
         <!-- TODO: [HTML/CSS] 게시글 본문 카드
@@ -48,18 +46,20 @@
              is_author 조건부 블록 안에는:
                - button id="edit-post-btn"
                - button id="delete-post-btn" -->
-        <div class="post-title">
-            <h1>{{ post.title }}</h1>
-
-        </div>
-        <div class="post-meta">
-            <span>{{ post.author_nickname }} · </span>
-            <span id="post-date"></span>
-        </div>
         <section class="post-body-card">
+            <h1 class="post-title">{{ post.title }}</h1>
+            <p class="post-meta">{{ post.author_nickname }} · <span id="post-date"></span></p>
+            <div class="post-body-divider"></div>
             <div class="post-content">
                 <p>{{ post.content }}</p>
             </div>
+
+            {% if is_author %}
+            <div class="post-owner-actions">
+                <button type="button" id="edit-post-btn" class="post-btn edit-btn">수정</button>
+                <button type="button" id="delete-post-btn" class="post-btn delete-btn">삭제</button>
+            </div>
+            {% endif %}
         </section>
 
         <!-- ==========================================
@@ -67,67 +67,66 @@
              글쓴이의 캐릭터 카드 (result.html 섹션 재사용, 백엔드가 값 채워줌)
              ========================================== -->
         {% if character %}
-        <section class="character-card">
-            <div class="illustration-wrapper">
-                <div class="illustration-placeholder">
-                    <span class="char-icon">🔮</span>
-                </div>
-            </div>
-            <h3 class="char-title">"{{ character.my_class.title }}"</h3>
-            <h1 class="char-name-mbti">{{ character.my_class.class_name }} <span class="mbti-badge">({{
-                    character.my_class.mbti }})</span></h1>
-        </section>
+        <div class="character-embed">
+            <p class="character-embed-label">🛡️ 글쓴이의 성향 프로필</p>
 
-        <section class="stats-info-section">
-            <div class="chart-box">
-                <h4>[ 능력치 분석 ]</h4>
-                <div class="canvas-wrapper">
-                    <canvas id="radarChart"></canvas>
+            <section class="character-card">
+                <div class="illustration-wrapper">
+                    <div class="illustration-placeholder">
+                        <span class="char-icon">🔮</span>
+                    </div>
                 </div>
-            </div>
-            <div class="info-box">
-                <div class="info-item">
-                    <span class="info-label">▶ 전투 유형</span>
-                    <span class="info-value">{{ character.my_class.mbti }}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">▶ 특징</span>
-                    <span class="info-value">{{ character.my_class.title }}</span>
-                </div>
-            </div>
-        </section>
+                <h3 class="char-title">"{{ character.my_class.title }}"</h3>
+                <h2 class="char-name-mbti">{{ character.my_class.class_name }} <span class="mbti-badge">({{
+                        character.my_class.mbti }})</span></h2>
+            </section>
 
-        <section class="chemistry-area">
-            <h3 class="section-title">🤝 파티원 궁합</h3>
-            <div class="chemistry-box">
-                <div class="chemistry-card best-match">
-                    <div class="match-badge best">💚 최고의 파티원</div>
-                    <div class="match-img-wrapper">
-                        <div class="match-placeholder">🛡️</div>
+            <section class="stats-info-section">
+                <div class="chart-box">
+                    <h4>능력치 레이더</h4>
+                    <div class="canvas-wrapper">
+                        <canvas id="radarChart"></canvas>
                     </div>
-                    <h4 class="match-name">{{ character.best_match.class_name }}</h4>
-                    <span class="match-mbti">({{ character.best_match.mbti }})</span>
                 </div>
-                <div class="chemistry-card worst-match">
-                    <div class="match-badge worst">💔 최악의 파티원</div>
-                    <div class="match-img-wrapper">
-                        <div class="match-placeholder">⚔️</div>
+                <div class="info-box">
+                    <h4>전투 유형/특징</h4>
+                    <div class="info-item">
+                        <span class="info-label">▶ 전투 유형</span>
+                        <span class="info-value">{{ character.my_class.mbti }}</span>
                     </div>
-                    <h4 class="match-name">{{ character.worst_match.class_name }}</h4>
-                    <span class="match-mbti">({{ character.worst_match.mbti }})</span>
+                    <div class="info-item">
+                        <span class="info-label">▶ 특징</span>
+                        <span class="info-value">{{ character.my_class.title }}</span>
+                    </div>
                 </div>
-            </div>
-        </section>
-        {% if is_author %}
-        <div class="post-actions">
-            <button type="button" id="edit-post-btn" class="post-btn edit-btn">수정</button>
-            <button type="button" id="delete-post-btn" class="post-btn delete-btn">삭제</button>
+            </section>
+
+            <section class="chemistry-area">
+                <h3 class="section-title">🤝 파티원 궁합</h3>
+                <div class="chemistry-box">
+                    <div class="chemistry-card best-match">
+                        <div class="match-badge best">💚 최고의 파티원</div>
+                        <div class="match-img-wrapper">
+                            <div class="match-placeholder">🛡️</div>
+                        </div>
+                        <h4 class="match-name">{{ character.best_match.class_name }}</h4>
+                        <span class="match-mbti">({{ character.best_match.mbti }})</span>
+                    </div>
+                    <div class="chemistry-card worst-match">
+                        <div class="match-badge worst">💔 최악의 파티원</div>
+                        <div class="match-img-wrapper">
+                            <div class="match-placeholder">⚔️</div>
+                        </div>
+                        <h4 class="match-name">{{ character.worst_match.class_name }}</h4>
+                        <span class="match-mbti">({{ character.worst_match.mbti }})</span>
+                    </div>
+                </div>
+            </section>
+
+            <script id="stats-data" type="application/json">
+                {{ character.my_class.stats | tojson }}
+            </script>
         </div>
-        {% endif %}
-
-        <script id="stats-data" type="application/json">
-            {{ character.my_class.stats | tojson }}
-        </script>
         {% else %}
         <p class="no-character-msg">아직 성향 테스트를 진행하지 않은 모험가입니다.</p>
         {% endif %}
@@ -140,6 +139,12 @@
                - input id="comment-input"
                - button id="comment-submit-btn" -->
         <section class="comment-section">
+            <h3 class="comment-title">댓글 <span id="comment-count">0</span></h3>
+            <div id="comment-list" class="comment-list"></div>
+            <div class="comment-input-row">
+                <input type="text" id="comment-input" placeholder="댓글을 입력하세요">
+                <button type="button" id="comment-submit-btn">등록</button>
+            </div>
         </section>
     </main>
 
@@ -148,8 +153,22 @@
          (id="write-modal", "modal-title", "post-title-input", "post-content-input",
           "modal-error", "modal-cancel-btn", "modal-submit-btn") -->
     <div id="write-modal" class="modal-backdrop hidden">
+        <div class="modal-box">
+            <h3 id="modal-title" class="modal-title">글 수정</h3>
+            <div id="modal-error" class="modal-error hidden"></div>
+            <div class="modal-form-group">
+                <input type="text" id="post-title-input" class="modal-input" placeholder="제목 (2글자 이상)">
+                <textarea id="post-content-input" class="modal-textarea" rows="6"
+                    placeholder="내용을 입력하세요 (2글자 이상)"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="modal-cancel-btn" class="modal-btn cancel-btn">취소</button>
+                <button type="button" id="modal-submit-btn" class="modal-btn submit-btn">저장</button>
+            </div>
+        </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // David가 서버에서 내려주는 값 (건드리지 않아도 됨) — JS 로직 담당 동료가 사용
         const POST_ID = "{{ post.id }}";
@@ -158,8 +177,56 @@
         const POST_TITLE = {{ post.title | tojson }};
         const POST_CONTENT = {{ post.content | tojson }};
         const POST_CREATED_AT = "{{ post.created_at }}";
+
+        const dateElem = document.getElementById('post-date');
+        if (dateElem && POST_CREATED_AT) {
+            dateElem.textContent = new Date(POST_CREATED_AT).toLocaleDateString('ko-KR');
+        }
+
+        {% if character %}
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('radarChart');
+            if (ctx && window.Chart) {
+                let statsData = { STR: 0, DEX: 0, VIT: 0, MAG: 0, INT: 0, CHA: 0 };
+                try {
+                    const jsonElem = document.getElementById('stats-data');
+                    if (jsonElem) statsData = Object.assign(statsData, JSON.parse(jsonElem.textContent));
+                } catch (e) {
+                    console.error('Stats JSON parse error:', e);
+                }
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['힘', '민첩', '체력', '마력', '지능', '매력'],
+                        datasets: [{
+                            label: '능력치',
+                            data: [statsData.STR, statsData.DEX, statsData.VIT, statsData.MAG, statsData.INT, statsData.CHA],
+                            backgroundColor: 'rgba(143, 124, 255, 0.25)',
+                            borderColor: '#8F7CFF',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#8F7CFF',
+                            pointBorderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                angleLines: { color: '#EAEAFF' },
+                                grid: { color: '#EAEAFF' },
+                                pointLabels: { color: '#6B6E85', font: { size: 11 } },
+                                ticks: { display: false, stepSize: 1 },
+                                min: 0, max: 5
+                            }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+        });
+        {% endif %}
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ url_for('static', filename='js/community.js') }}"></script>
 </body>
 
