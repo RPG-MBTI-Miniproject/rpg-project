@@ -8,8 +8,6 @@
      <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
      <link rel="stylesheet" href="{{ url_for('static', filename='css/community.css') }}">
 
-     <!-- Live Server용 -->
-     <link rel="stylesheet" href="../static/css/community.css">
 </head>
 
 <body class="community-body">
@@ -30,15 +28,11 @@
          ========================================== -->
 
      <header class="top-nav">
-          <!-- TODO: [HTML/CSS] 로고, "커뮤니티" 타이틀, [메뉴로]/[로그아웃] 링크 배치
-             참고용 기존 헤더 패턴: hub.html, test.html 의 <header class="top-nav"> 구조 재사용 권장 -->
           <div class="community-nav-bar">
-               <div class="community-nav-left">
-                    <a href="{{ url_for('home') }}">
-                         <img src="{{url_for('static', filename='images/hub-top-icon.png')}}" alt="로고"
-                              class="community-nav-logo" onerror="this.style.display='none'">
-                    </a>
-               </div>
+               <a href="{{ url_for('hub') }}" class="community-back-link">
+                    <span class="community-back-icon">‹</span> 돌아가기
+               </a>
+               <button class="community-nav-logout" onclick="logout()">로그아웃</button>
           </div>
      </header>
 
@@ -46,7 +40,6 @@
           <!-- 상단 헤더 영역 (이미지 시안: 커뮤니티 타이틀 & 로그아웃 버튼) -->
           <div class="community-header">
                <h1 class="community-title"><span class="sparkle-icon">✨</span> 커뮤니티</h1>
-               <button class="community-logout-btn" onclick="logout()">로그아웃</button>
           </div>
 
           <!-- TODO: [HTML/CSS] 검색 영역
@@ -86,10 +79,10 @@
           <div id="post-list" class="post-list"></div>
           <div id="empty-msg" class="empty-msg hidden">검색 결과가 없습니다. (유사도 70% 이상 일치하는 글 없음)</div>
 
-          <div class="bottom-actions">
-               <div id="pagination" class="pagination"></div>
+          <div class="list-actions-row">
                <button type="button" id="write-btn" class="write-btn">＋ 글쓰기</button>
           </div>
+          <div id="pagination" class="pagination"></div>
 
      </main>
 
