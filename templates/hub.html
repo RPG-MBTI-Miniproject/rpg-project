@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RPG MBTI - 메뉴</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/hub.css') }}">
+    <!-- Live Server 확인용 상대 경로 -->
+    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="../static/css/hub.css">
 </head>
-<body>
+
+<body class="hub-body">
     <!-- ==========================================
          [담당: HTML/CSS 동료] 로그인 직후 허브(메뉴) 화면
          3분기: 로그아웃 / 성향 테스트 / 커뮤니티
@@ -20,17 +25,72 @@
 
     <header class="top-nav">
         <!-- TODO: [HTML/CSS] 로고 / "메뉴" 타이틀 / [로그아웃] 버튼 -->
+        <div class="hub-nav-bar">
+            <div class="hub-nav-left">
+                <a href="{{ url_for('index') }}">
+                    <img src="{{url_for('static', filename='images/hub-top-logo.png')}}" alt="로고" class="hub-nav-logo"
+                        onerror="this.style.display='none'">
+                </a>
+            </div>
+            <h1 class="hub-nav-title">메뉴</h1>
+            <div class="hub-nav-right">
+                <button class="hub-nav-logout" onclick="logout()">로그아웃</button>
+            </div>
+        </div>
     </header>
 
     <main class="hub-container">
         <!-- TODO: [HTML/CSS] 환영 문구 + 서브타이틀
              예: "{{ nickname }}님, 어서오세요." -->
+        <div class="hub-welcome-area">
+            <h2 class="hub-welcome-msg">{{ nickname }}님, RPG 테스트에 오신것을 환영합니다!</h2>
+            <p class="hub-subtitle">【 테스트 결과를 확인하고, 커뮤니티를 통해 소통해보세요! 】</p>
+        </div>
 
         <!-- TODO: [HTML/CSS] 카드 2개
              - href="{{ url_for('test') }}" : 성향 테스트로 이동
                {% if test_done %} 완료 문구 {% else %} 미완료 문구 {% endif %}
              - href="{{ url_for('community') }}" : 커뮤니티로 이동 -->
         <div class="hub-menu">
+            <!-- 1. 성향 테스트 카드 -->
+            <div class="hub-card">
+                <div class="hub-icon-wrapper">
+                    <span class="hub-icon">
+                        <img src="{{url_for('static', filename='images/hub-test-icon.png')}}" alt="테스트 아이콘">
+                    </span>
+                </div>
+                <h3 class="hub-card-title">성향 테스트</h3>
+                <p class="hub-card-desc">
+                    {% if test_done %}
+                    이미 테스트를 완료하셨습니다.<br><br>
+                    언제든지 다시 테스트하여<br>
+                    새로운 직업을 찾아보세요!
+                    {% else %}
+                    12가지 흥미진진한 질문으로<br><br>
+                    당신의 영혼에 깃든<br>
+                    RPG 직업을 알아보세요!
+                    {% endif %}
+                </p>
+                <div class="hub-card-action">
+                    <a href="{{ url_for('test') }}" class="hub-btn">테스트 시작하기</a>
+                </div>
+            </div>
+
+            <!-- 2. 커뮤니티 카드 -->
+            <div class="hub-card">
+                <div class="hub-icon-wrapper">
+                    <span class="hub-icon">
+                        <img src="{{url_for('static', filename='images/hub-community-icon.png')}}" alt="커뮤니티 아이콘">
+                    </span>
+                </div>
+                <h3 class="hub-card-title">커뮤니티</h3>
+                <p class="hub-card-desc"></br>모험가들의 게시판</br></br></br>
+                    RPG를 사랑하는 사람들의 소통공간입니다.</br>
+                    본인의 추천 직업 외에도 다양한 게임에서 이룬 업적을</br>공유해 보세요</p>
+                <div class="hub-card-action">
+                    <a href="{{ url_for('community') }}" class="hub-btn">게시판 가기</a>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -48,4 +108,5 @@
         }
     </script>
 </body>
+
 </html>
