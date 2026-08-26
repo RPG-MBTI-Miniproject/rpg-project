@@ -529,7 +529,7 @@ if (document.querySelector('#comment-list')) {
                 location.href = '/community';
             } catch (error) {
                 console.error('게시글 삭제 실패:', error);
-                alert('게시글 삭제 중 오류가 발생했습니다.');
+                alert('게시글 삭제 중 오류가 발생했습니다.',error.message);
             }
         });
     }
@@ -582,17 +582,72 @@ if (document.querySelector('#comment-list')) {
             `;
 
             // 권한이 있는 경우에만 클릭 이벤트 등록
+            // TODO 16. 댓글 "수정" 클릭 시
+            // prompt() 등으로 새 내용 입력받아서
+            // PUT /api/community/comments/{comment.id} 호출 → 성공하면 loadComments() 재호출
+            // 권한이 있는 경우에만 클릭 이벤트 등록
             if (canEdit) {
                 const editBtn = commentEl.querySelector('.edit-btn');
-                editBtn.addEventListener('click', () => {
-                    // TODO 16에서 수정 로직 연결 예정
+                editBtn.addEventListener('click', async () => {
+                    // TODO 16 수정 로직 연결 // 
+                    // 1. prompt로 새로운 댓글 내용 입력받기 (기존 내용을 기본값으로 선언)
+                    const newContent = prompt('댓글을 수정하세요:', comment.content);
+
+                    // 2. 취소 버튼을 누른 경우 처리 중단
+                    if (newContent === null) return;
+
+                    // 공백 제거 후 빈 값인지 체크
+                    const trimmedContent = newContent.trim();
+                    if (!trimmedContent) {
+                        alert('수정할 내용을 입력해 주세요!');
+                        return;
+                    }
+
+                    try {
+                        // 3. PUT /api/community/comments/{comment.id} 호출
+                        const data = await apiFetch(`/api/community/comments/${comment.id}`, {
+                            method: 'PUT',
+                            body: JSON.stringify({ content: trimmedContent })
+                        });
+
+                        // 4. 성공 시 댓글 목록 다시 불러오기
+                        if (data && data.result === 'success') {
+                            loadComments();
+                        }
+
+                    } catch (error) {
+                        console.error('댓글 수정 실패:', error);
+                    }
                 });
             }
-
+            // TODO 17. 댓글 "삭제" 클릭 시
+            //   confirm() 확인 후 DELETE /api/community/comments/{comment.id}
+            //   → 성공하면 loadComments() 재호출
             if (canDelete) {
                 const deleteBtn = commentEl.querySelector('.delete-btn');
-                deleteBtn.addEventListener('click', () => {
-                    // TODO 17에서 삭제 로직 연결 예정
+                deleteBtn.addEventListener('click', async () => {
+                    // TODO 17 삭제 로직 연결 //
+                    // 1. [직접 작성] confirm()으로 삭제 의사 물어보기
+                    //    - 취소를 누르면(!confirm(...)) 함수 종료(return)
+                    if (!confirm('정말 이 댓글을 삭제하시겠습니까?')) {
+                        return;
+                    }
+
+                    try {
+                        // 2. [직접 작성] apiFetch를 사용해 DELETE 요청 보내기
+                        //    - URL: `/api/community/comments/${comment.id}`
+                        //    - method: 'DELETE'
+                        const data = await apiFetch(`/api/community/comments/${comment.id}`, { method: 'DELETE' });
+
+                        // 3. [직접 작성] 성공 시 댓글 목록 다시 불러오기
+                        //    - loadComments() 호출
+                        if (data.result === "success") {
+                            loadComments();
+                        }
+
+                    } catch (error) {
+                        console.error('댓글 삭제 실패:', error);
+                    }
                 });
             }
 
@@ -656,7 +711,7 @@ if (document.querySelector('#comment-list')) {
                 //    - loadComments() 호출하여 목록 새로고침
                 if (data.result === "success") {
                     const inputValue = document.querySelector('#comment-input');
-                    inputValue.value = '';                    
+                    inputValue.value = '';
                     loadComments();
                 }
 
@@ -665,13 +720,4 @@ if (document.querySelector('#comment-list')) {
             }
         });
     }
-
-
-    // TODO 16. 댓글 "수정" 클릭 시
-    //   prompt() 등으로 새 내용 입력받아서
-    //   PUT /api/community/comments/{comment.id} 호출 → 성공하면 loadComments() 재호출
-
-    // TODO 17. 댓글 "삭제" 클릭 시
-    //   confirm() 확인 후 DELETE /api/community/comments/{comment.id}
-    //   → 성공하면 loadComments() 재호출
 }
