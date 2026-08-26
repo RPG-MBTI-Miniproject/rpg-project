@@ -314,19 +314,184 @@ async function logout() {
 }
 
 // ------------------------------------------
+// 친구 닉네임 검색 → 궁합 조회 0827 00:28 add (ljw)
+// ------------------------------------------
+async function searchFriendCompatibility() {
+
+    // 1. 친구 닉네임 입력창 가져오기
+    const friendInput =
+        document.getElementById('search-friend-result');
+
+    if (!friendInput) return;
+
+    const nickname = friendInput.value.trim();
+
+    // 2. 빈 값 검사
+    if (!nickname) {
+        alert('친구의 닉네임을 입력해주세요.');
+        friendInput.focus();
+        return;
+    }
+
+    try {
+        // 3. 서버에 친구 궁합 요청
+        const res = await fetch(
+            `/api/compatibility?nickname=${encodeURIComponent(nickname)}`
+        );
+
+        // 로그인 만료
+        if (res.status === 401) {
+            alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+            location.href = '/';
+            return;
+        }
+
+        const data = await res.json().catch(() => ({}));
+
+        // 서버에서 실패 응답
+        if (!res.ok || data.result !== 'success') {
+            throw new Error(
+                data.msg ||
+                `궁합 정보를 불러오지 못했습니다. (HTTP ${res.status})`
+            );
+        }
+        // 4. 친구 닉네임
+        document.getElementById(
+            'target-friend-name'
+        ).textContent = data.friend.nickname;
+
+        // ==================================
+        // 내가 보는 친구
+        // ==================================
+
+        document.getElementById(
+            'friend-class-name'
+        ).textContent = data.friend.class_name;
+
+        document.getElementById(
+            'friend-mbti-text'
+        ).textContent = `(${data.friend.mbti})`;
+
+        document.getElementById(
+            'me-to-friend-emoji'
+        ).textContent =
+            data.compatibility.me_to_friend.emoji;
+
+        document.getElementById(
+            'me-to-friend-tag'
+        ).textContent =
+            data.compatibility.me_to_friend.tag;
+
+        document.getElementById(
+            'me-to-friend-desc'
+        ).textContent =
+            data.compatibility.me_to_friend.description;
+
+
+        // ==================================
+        // 친구가 보는 나
+        // ==================================
+
+        document.getElementById(
+            'my-class-name'
+        ).textContent = data.me.class_name;
+
+        document.getElementById(
+            'my-mbti-text'
+        ).textContent = `(${data.me.mbti})`;
+
+        document.getElementById(
+            'friend-to-me-emoji'
+        ).textContent =
+            data.compatibility.friend_to_me.emoji;
+
+        document.getElementById(
+            'friend-to-me-tag'
+        ).textContent =
+            data.compatibility.friend_to_me.tag;
+
+        document.getElementById(
+            'friend-to-me-desc'
+        ).textContent =
+            data.compatibility.friend_to_me.description;
+
+
+        // 5. 숨겨져 있던 궁합 결과 화면 표시
+        const resultSection =
+            document.getElementById('friend-synergy-section');
+
+        if (resultSection) {
+            resultSection.style.display = 'block';
+        }
+
+    } catch (error) {
+        console.error('친구 궁합 조회 실패:', error);
+
+        alert(`궁합 조회 실패: ${error.message}`);
+    }
+}
+
+// ------------------------------------------
 // 페이지 로드 시작 처리
 // ------------------------------------------
+// 0827 00:39 ljw 추가: 결과 화면에는 a,b 버튼이 없으므로 이벤트 연결 아래와 같이 수정
 document.addEventListener('DOMContentLoaded', () => {
-    // 로그인 여부는 서버가 /test 의 @jwt_required() 로 이미 막는다.
-    // 여기서 localStorage 만 보고 튕기면, 쿠키는 살아있는데 localStorage 만
-    // 비워진 사용자가 로그인 상태로 로그인 화면에 갇힌다.
-    document.getElementById('btn-a')
-        .addEventListener('click', () => nextQuestion(questions[currentQ].btnA.type));
-    document.getElementById('btn-b')
-        .addEventListener('click', () => nextQuestion(questions[currentQ].btnB.type));
 
-    document.getElementById('prev-btn')
-        ?.addEventListener('click', prevQuestion);
+    const btnA = document.getElementById('btn-a');
+    const btnB = document.getElementById('btn-b');
 
-    renderQuestion();   // 1번 문제를 화면에 그린다
+    // test.html일 때만 실행
+    if (btnA && btnB) {
+
+        btnA.addEventListener('click', () => {
+            nextQuestion(
+                questions[currentQ].btnA.type
+            );
+        });
+
+        btnB.addEventListener('click', () => {
+            nextQuestion(
+                questions[currentQ].btnB.type
+            );
+        });
+
+        document.getElementById('prev-btn')
+            ?.addEventListener('click', prevQuestion);
+
+        renderQuestion();
+    }
+
+    const friendSearchBtn =
+        document.getElementById('search-friend-btn');
+
+    if (friendSearchBtn) {
+
+        const friendSearchForm =
+            friendSearchBtn.closest('form');
+
+        friendSearchForm?.addEventListener(
+            'submit',
+            async (e) => {
+
+                e.preventDefault();
+
+                await searchFriendCompatibility();
+            }
+        );
+    }
 });
+// 0827 00:39 ljw 주석 처리 : 결과 화면에는 a,b 버튼이 없으므로 이벤트 연결 수정
+// document.addEventListener('DOMContentLoaded', () => {
+//     // 로그인 여부는 서버가 /test 의 @jwt_required() 로 이미 막는다.
+//     // 여기서 localStorage 만 보고 튕기면, 쿠키는 살아있는데 localStorage 만
+//     // 비워진 사용자가 로그인 상태로 로그인 화면에 갇힌다.
+//     document.getElementById('btn-a')
+//         .addEventListener('click', () => nextQuestion(questions[currentQ].btnA.type));
+//     document.getElementById('btn-b')
+//         .addEventListener('click', () => nextQuestion(questions[currentQ].btnB.type));
+
+//     document.getElementById('prev-btn')
+//         ?.addEventListener('click', prevQuestion);
+
+//     renderQuestion();   // 1번 문제를 화면에 그린다
+// });
