@@ -154,7 +154,7 @@ if (document.querySelector('#post-list')) {
     //   - 상태의 sort 값 갱신, page를 1로 리셋
     //   - 목록 다시 불러오기
     function sortExecution() {
-        const sortButtons = document.querySelectorAll(.sort - btn);
+        const sortButtons = document.querySelectorAll('.sort-btn');
 
         sortButtons.forEach(button => {
             button.addEventListener('click', function (e) {
@@ -184,6 +184,7 @@ if (document.querySelector('#post-list')) {
     //   - page를 1로 리셋하고 목록 다시 불러오기
     //   (선택) input에서 Enter 키 눌러도 검색되게 하면 UX 좋음
 
+
     // TODO 6. 게시글 목록 그리는 함수 만들기 (예: renderPosts(posts))
     //   #post-list 를 비우고, posts 배열을 순회하며 한 줄씩 요소를 만들어 추가
     //   각 줄은 클릭하면 `/community/{post.id}` 로 이동해야 함
@@ -203,7 +204,7 @@ if (document.querySelector('#post-list')) {
     //   - 아니면: #empty-msg에 hidden 클래스 추가하고, renderPosts + renderPagination 호출
     //   - 페이지 처음 로드될 때 한 번 자동으로 호출되어야 함 (스크립트 맨 아래에서 실행)
     function loadPosts(){
-        
+
     }
 
     // TODO 9. 모달 "등록/저장"(#modal-submit-btn) 클릭 이벤트
