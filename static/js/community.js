@@ -66,6 +66,40 @@ const MIN_LEN = 2;   // 검색어 / 제목 / 내용 최소 글자 수 (프론트
 //     (throw할 때 메시지는 서버가 준 msg를 그대로 써서 이유가 보이게 할 것 — 예전에
 //      우리가 겪었던 "Bearer null" 사건처럼, 실패 이유를 숨기면 디버깅 지옥이 됨)
 //   - 성공하면 파싱한 JSON을 return
+async function apiFetch(url, options = {}) {
+
+    // 0. 헤더 설정
+    const config = {
+        ...options, // 기존 options 내용 복사(...: 전개 연산자)
+        headers: {
+            'Content-Type': 'application/json', // 기본 헤더 설정 
+            ...options.headers                  // 사용자가 전달한 헤더가 있다면 덮어쓰기!
+        }
+    };
+
+    // 1. fetch 함수 호출
+    const res = await fetch(url, config);
+
+    // 2-A. 응답 status가 401인 경우 
+    if (res.status === 401) {
+        alert("401 Error. 로그인 페이지로 이동합니다.");
+        window.location.href = '/';
+        return;
+    }
+
+    // 2-B. 응답 JSON 파싱
+    const data = await res.json();
+
+    // 3. 에러 검사
+    if (data.result === 'fail' || res.ok === false) {
+        // data.msg가 없으면 오른쪽의 기본 메시지를 사용
+        const errorMessage = data.msg || ' 요청 처리 중 에러가 발생했습니다.';
+        throw new Error(errorMessage);
+    }
+
+    // 4. 성공하면 JSON 반환
+    return data;
+}
 // ------------------------------------------
 
 
@@ -79,10 +113,16 @@ const MIN_LEN = 2;   // 검색어 / 제목 / 내용 최소 글자 수 (프론트
 // TODO 2. 상태 변수 만들기
 //   현재 정렬(sort), 검색 대상(target), 검색어(q), 현재 페이지(page)를
 //   객체 하나로 묶어서 관리하면 편함. 초기값: newest / all / '' / 1
+let communityStatus = {
+
+}
+
 
 // TODO 3. "글쓰기" 버튼(#write-btn) 클릭 시 → #write-modal 의 hidden 클래스 제거
 //   모달 안 입력창(#post-title-input, #post-content-input)은 비워서 시작
+function writeStart() {
 
+}
 // TODO 4. 정렬 버튼(.sort-btn) 클릭 이벤트
 //   - 클릭된 버튼에 active 클래스, 나머지는 제거
 //   - 상태의 sort 값 갱신, page를 1로 리셋
