@@ -1,163 +1,284 @@
 /* Frame 2 - Test / Quiz Layout Styles */
 body {
-    background-color: #12101c;
-    color: #e2e8f0;
-    font-family: 'Pretendard', -apple-system, sans-serif;
+    /* 피그마 Aurora 그라데이션 */
+    background: linear-gradient(90deg, #F0EFFF 0%, #E6F0FF 50%, #EAFBF7 100%);
+    font-family: 'Inter', var(--font-sans), 'Pretendard', sans-serif;
     min-height: 100vh;
     margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+    color: #2C2C3E;
+}
+
+.test-wrapper {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    justify-content: center;
 }
 
 .test-container {
     width: 100%;
-    max-width: 720px;
-    margin: 2rem auto;
-    padding: 2.5rem 2rem;
-    background: rgba(26, 24, 42, 0.85);
-    border: 1px dashed rgba(255, 255, 255, 0.25);
-    border-radius: 16px;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+    background: #FFFFFF;
+    border: 1px solid rgba(78, 31, 110, 0.25);
+    box-shadow: 7px 7px 39px rgba(78, 31, 110, 0.25);
+    border-radius: 40px;
+    padding: 28px 26px 32px 26px;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 18px;
+    box-sizing: border-box;
+    position: relative;
 }
 
+/* Header Nav */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 1rem;
-    border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+    width: 100%;
+    padding-bottom: 8px;
 }
 
 /* 헤더용 이전 버튼 스타일 */
 .prev-btn {
-    padding: 0.35rem 0.75rem;
-    background: rgba(30, 27, 50, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    color: #94a3b8;
-    font-size: 0.90rem;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 1px solid #EAEAFF;
+    box-shadow: 0 4px 14px rgba(111, 107, 153, 0.12);
+    color: #2C2C3E;
+    font-size: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
+    line-height: 0;
+    padding-bottom: 2px;
+    outline: none;
 }
 
-.prev-btn:hover {
-    color: #00f2fe;
-    border-color: #00f2fe;
-    background: rgba(45, 40, 75, 0.95);
+.prev-btn:hover:not(:disabled) {
+    background: #F5F3FF;
+    border-color: #8F7CFF;
+    color: #8F7CFF;
+    transform: scale(1.08);
 }
 
-/* 1번 문항일 때 숨김 처리 */
-.prev-btn.hidden {
-    display: none;
+.prev-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
 }
-
 
 .welcome-msg {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #ffd700;
+    font-size: 19px;
+    font-weight: 700;
+    color: #2C2C3E;
+    text-align: center;
+    margin: 0;
 }
 
 .logout-btn {
-    background: transparent;
+    background: #4E1F62;
     border: none;
-    color: #94a3b8;
-    font-size: 0.95rem;
+    border-radius: 8px;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 8px 16px;
     cursor: pointer;
-    transition: color 0.2s ease;
-    text-decoration: none;
+    transition: all 0.2s ease;
+    outline: none;
 }
 
 .logout-btn:hover {
-    color: #ef4444;
+    background: #3b144d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(78, 31, 98, 0.3);
 }
 
-/* 진행도 바 UI 컴포넌트 */
-.progress-bar {
+/* Progress Area */
+.progress-area {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
 }
 
-.progress-text {
-    font-size: 1.05rem;
-    color: #cbd5e1;
-    font-weight: 500;
+.progress-badge {
+    background: #FFFFFF;
+    border: 1px solid #EAEAFF;
+    box-shadow: 0 4px 14px rgba(111, 107, 153, 0.12);
+    border-radius: 20px;
+    padding: 5px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #8F7CFF;
+}
+
+.progress-bar-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
 }
 
 .progress-bar-track {
-    width: 100%;
-    height: 24px;
-    background: rgba(15, 14, 25, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 6px;
+    width: 260px;
+    height: 8px;
+    background: #E1E1F3;
+    border-radius: 4px;
     overflow: hidden;
-    padding: 3px;
 }
 
 .progress-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #3b82f6 0%, #00f2fe 100%);
-    border-radius: 3px;
-    transition: width 0.4s ease;
-    box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+    background: #8F7CFF;
+    border-radius: 4px;
+    transition: width 0.3s ease;
 }
 
+/* Character / Dungeon Area */
+.character-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 2px 0;
+}
+
+.character-img {
+    width: 165px;
+    height: 165px;
+    object-fit: contain;
+    filter: drop-shadow(0 6px 18px rgba(78, 31, 110, 0.15));
+}
+
+/* Question Card */
 .question-area {
-    position: relative;
-    padding: 1.25rem 0 0.5rem 0;
-    min-height: 90px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #EAEAFF;
+    box-shadow: 0px 8px 24px rgba(111, 107, 153, 0.12);
+    border-radius: 24px;
+    padding: 22px 24px;
+    text-align: center;
     display: flex;
     align-items: center;
+    justify-content: center;
+    min-height: 76px;
+    box-sizing: border-box;
 }
 
 .question-text {
-    font-size: 1.25rem;
-    font-weight: 700;
-    line-height: 1.6;
-    color: #f8fafc;
+    font-size: 20px;
+    font-weight: 800;
+    color: #2C2C3E;
+    line-height: 1.45;
     word-break: keep-all;
-    width: 100%;
+    margin: 0;
 }
 
+/* Selection Options */
 .answer-buttons {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 14px;
+    width: 100%;
 }
 
 .answer-btn {
     width: 100%;
-    padding: 1.25rem 1.5rem;
-    background: rgba(18, 16, 28, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 12px;
-    color: #f1f5f9;
-    font-size: 1.05rem;
-    font-weight: 500;
+    padding: 18px 20px;
+    background: #FFFFFF;
+    border: 1.5px solid #4E1F6E;
+    border-radius: 20px;
+    color: #2C2C3E;
+    font-size: 16px;
+    font-weight: 600;
     text-align: left;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
     font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 4px 14px rgba(78, 31, 110, 0.06);
+    box-sizing: border-box;
+    line-height: 1.4;
+    word-break: keep-all;
+}
+
+/* A, B 인덱스 핀 (가상 요소로 처리하여 JS 안전성 100% 보장) */
+.answer-btn#btn-a::before {
+    content: 'A';
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border: 1.5px solid #4E1F6E;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 15px;
+    color: #4E1F6E;
+    background: #FFFFFF;
+    box-sizing: border-box;
+}
+
+.answer-btn#btn-b::before {
+    content: 'B';
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border: 1.5px solid #4E1F6E;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 15px;
+    color: #4E1F6E;
+    background: #FFFFFF;
+    box-sizing: border-box;
 }
 
 .answer-btn:hover {
-    background: rgba(35, 31, 55, 0.9);
-    border-color: #00f2fe;
+    background: #FAF9FF;
+    border-color: #8F7CFF;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 242, 254, 0.2);
+    box-shadow: 0 8px 22px rgba(143, 124, 255, 0.22);
+}
+
+.answer-btn:hover::before {
+    border-color: #8F7CFF;
+    color: #8F7CFF;
 }
 
 .answer-btn:active {
-    transform: translateY(0);
+    transform: scale(0.99);
+}
+
+/* Footer Alert */
+.footer-alert {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6B6E85;
+    margin-top: 6px;
+    text-align: center;
+}
+
+.sparkle-icon {
+    color: #8F7CFF;
+    font-size: 14px;
 }
