@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG MBTI - {{ partner_nickname }}님과의 쪽지</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dm.css') }}">
+</head>
+
+<body class="dm-body">
+    <!-- ==========================================
+         DM 대화창
+         메시지는 전부 MongoDB(dm_messages)에 쌓이고,
+         새 메시지는 SSE(/api/dm/stream)로 밀어서 받습니다.
+         스트림이 막히면 dm.js 가 알아서 2초 폴링으로 바꿉니다.
+         [나가기] 는 허브(/home)로.
+         ========================================== -->
+
+    <header class="top-nav">
+        <div class="dm-nav-bar">
+            <a href="{{ url_for('dm_list') }}" class="dm-back-link">
+                <span class="dm-back-icon">‹</span> 쪽지함
+            </a>
+            <a href="{{ url_for('hub') }}" class="dm-exit-btn">나가기</a>
+        </div>
+    </header>
+
+    <main class="dm-container">
+        <div class="dm-chat-card">
+            <div class="dm-chat-header">
+                <span class="dm-chat-partner">{{ partner_nickname }}</span>
+                {% if partner_class_name %}
+                <span class="dm-chat-partner-class">{{ partner_class_name }} ({{ partner_mbti }})</span>
+                {% endif %}
+                <span id="dm-status" class="dm-chat-status">연결 중</span>
+            </div>
+
+            <!-- 메시지는 dm.js 가 채웁니다 -->
+            <div id="dm-message-list" class="dm-message-list"></div>
+
+            <div class="dm-input-row">
+                <input type="text" id="dm-input" class="dm-input" placeholder="쪽지를 입력하세요" maxlength="1000"
+                    autocomplete="off">
+                <button type="button" id="dm-send-btn" class="dm-send-btn">전송</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 서버 -> 클라이언트 값 전달 (community.html 의 CURRENT_USER_ID 와 같은 방식)
+        const DM_PARTNER_NICKNAME = {{ partner_nickname | tojson }};
+        const DM_VIEWER_ID = {{ viewer_id | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/dm.js') }}"></script>
+</body>
+
+</html>

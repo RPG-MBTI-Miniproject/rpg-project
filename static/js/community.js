@@ -568,6 +568,8 @@ if (document.querySelector('#comment-list')) {
             // 권한 조건 확인
             const canEdit = comment.author_id === VIEWER_ID;
             const canDelete = (comment.author_id === VIEWER_ID) || (POST_AUTHOR_ID === VIEWER_ID);
+            // 내 댓글에는 DM 을 띄우지 않는다 (자기 자신에게 쪽지를 보내게 되므로)
+            const canDm = (comment.author_id !== VIEWER_ID) && !!comment.author_nickname;
 
             // 댓글 DOM 요소 생성 (createElement 사용 권장)
             const commentEl = document.createElement('div');
@@ -582,6 +584,7 @@ if (document.querySelector('#comment-list')) {
                 <div class="comment-actions">
                     <span class="edit-btn ${canEdit ? '' : 'disabled'}">수정</span>
                     <span class="delete-btn ${canDelete ? '' : 'disabled'}">삭제</span>
+                    ${canDm ? `<a class="dm-btn" href="/dm/${encodeURIComponent(comment.author_nickname)}">✈ DM</a>` : ''}
                 </div>
             `;
 

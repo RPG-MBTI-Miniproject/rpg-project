@@ -14,6 +14,11 @@
 .modal-backdrop {
    position: fixed;
    /* 모달은 화면 전체를 덮어야 하므로 fixed 유지 필수 */
+   /* inset 은 Safari 14.1 부터라, 구형 iOS 를 위해 네 방향을 따로 적어둡니다 */
+   top: 0;
+   right: 0;
+   bottom: 0;
+   left: 0;
    inset: 0;
    display: flex;
    align-items: center;
@@ -38,23 +43,25 @@
 }
 
 .community-body {
-   background: var(--aurora-bg);
-   font-family: var(--font-sans, 'Pretendard', sans-serif);
-   min-height: 100vh;
-   margin: 0;
-   display: flex;
-   flex-direction: column;
-   color: var(--text-primary);
+    background: var(--aurora-bg);
+    font-family: var(--font-sans, 'Pretendard', sans-serif);
+    min-height: 100vh;
+    min-height: 100dvh;   /* iOS 주소창 높이 보정 (구형은 위 줄 사용) */
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    color: var(--text-primary);
 }
 
 /* 상단 바 */
 .top-nav {
-   display: flex;
-   justify-content: center;
-   width: 100%;
-   border-bottom: 1px solid var(--border-soft);
-   background: rgba(255, 255, 255, 0.6);
-   backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    border-bottom: 1px solid var(--border-soft);
+    background: rgba(255, 255, 255, 0.6);
+    -webkit-backdrop-filter: blur(10px);   /* Safari 는 18 이전까지 이 접두사가 있어야 흐림 효과가 먹습니다 */
+    backdrop-filter: blur(10px);
 }
 
 /* 헤더 — 돌아가기(좌) / 로그아웃(우) */
@@ -420,8 +427,9 @@
 
 /* ================= 글쓰기/수정 모달 ================= */
 .modal-backdrop {
-   background: rgba(30, 27, 75, 0.35);
-   backdrop-filter: blur(6px);
+    background: rgba(30, 27, 75, 0.35);
+    -webkit-backdrop-filter: blur(6px);   /* Safari 18 이전 */
+    backdrop-filter: blur(6px);
 }
 
 .modal-box {
@@ -598,97 +606,43 @@
 }
 
 .post-owner-actions button {
-   padding: 0.5rem 1.2rem;
-   border-radius: 10px;
-   font-size: 0.9rem;
-   font-weight: 600;
-   cursor: pointer;
-   border: 1.5px solid var(--accent);
-   background: transparent;
-   color: var(--accent-strong);
-   transition: all 0.2s ease;
+    padding: 0.5rem 1.2rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid var(--accent);
+    background: transparent;
+    color: var(--accent-strong);
+    transition: all 0.2s ease;
 }
+.post-owner-actions button:hover { background: rgba(124, 111, 242, 0.08); }
+.post-owner-actions button.danger { background: var(--accent); border-color: var(--accent); color: #fff; }
+.post-owner-actions button.danger:hover { background: var(--accent-strong); }
 
-.post-owner-actions button:hover {
-   background: rgba(124, 111, 242, 0.08);
+.no-character-msg { text-align: center; color: var(--text-muted); font-size: 13px; padding: 24px 0; }
+
+/* 댓글
+   community.js 의 renderComments() 가 만드는 실제 구조에 맞춘 이름입니다.
+     .comment-item > .comment-header(.comment-author) + .comment-body + .comment-actions
+   (예전에는 .comment-row / .comment-content 로 적혀 있어서 규칙이 하나도 안 먹었습니다) */
+.comment-section { margin-top: 24px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 24px; padding: 28px; }
+.comment-list { display: flex; flex-direction: column; }
+.comment-item {
+    padding: 12px 0;
+    border-top: 1px solid var(--border-soft);
 }
+.comment-author { font-size: 13px; font-weight: 700; color: var(--text-primary); margin: 0; }
+.comment-body { font-size: 13px; color: var(--text-secondary); margin: 4px 0 0; white-space: pre-wrap; }
 
-.post-owner-actions button.danger {
-   background: var(--accent);
-   border-color: var(--accent);
-   color: #fff;
-}
+.comment-actions { display: flex; gap: 8px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+.comment-actions span { cursor: pointer; color: var(--text-muted); }
+.comment-actions span:hover { color: var(--accent-strong); }
+.comment-actions span.disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+/* JS가 붙이는 클래스는 .danger 가 아니라 .delete-btn 입니다 */
+.comment-actions span.delete-btn:hover { color: var(--danger); }
 
-.post-owner-actions button.danger:hover {
-   background: var(--accent-strong);
-}
-
-.community-detail-logout {
-   background: #ffffff;
-   border: 1.5px solid #a78bfa;
-   border-radius: 9999px;
-   color: #8b5cf6;
-   padding: 0.5rem 1.4rem;
-   font-size: 0.92rem;
-   font-weight: 600;
-   cursor: pointer;
-   transition: all 0.2s ease;
-}
-
-.community-detail-logout:hover {
-   background: #f5f3ff;
-   border-color: #7c3aed;
-   color: #7c3aed;
-   transform: translateY(-1px);
-}
-
-.comment-author {
-   font-size: 13px;
-   font-weight: 700;
-   color: var(--text-primary);
-   margin: 0;
-}
-
-.comment-content {
-   font-size: 13px;
-   color: var(--text-secondary);
-   margin: 4px 0 0;
-   white-space: pre-wrap;
-}
-
-.comment-actions {
-   display: flex;
-   gap: 8px;
-   font-size: 12px;
-   white-space: nowrap;
-   flex-shrink: 0;
-}
-
-.comment-actions span {
-   cursor: pointer;
-   color: var(--text-muted);
-}
-
-.comment-actions span:hover {
-   color: var(--accent-strong);
-}
-
-.comment-actions span.disabled {
-   opacity: 0.35;
-   cursor: not-allowed;
-   pointer-events: none;
-}
-
-.comment-actions span.danger:hover {
-   color: var(--danger);
-}
-
-.comment-input-row {
-   display: flex;
-   gap: 8px;
-   margin-top: 16px;
-}
-
+.comment-input-row { display: flex; gap: 8px; margin-top: 16px; }
 .comment-input-row input {
    flex: 1;
    background: #fbfbff;
@@ -720,27 +674,18 @@
 
 
 .result-container {
-   flex: 1;
-   max-width: 1000px;
-   margin: 0 auto;
-   width: 100%;
-   display: flex;
-   flex-direction: column;
-   gap: 1.5rem;
-   padding: 2rem 2rem;
-
-   background-color: white;
-   box-shadow: 0 20px 60px rgba(139, 92, 246, 0.12);
-   color: black;
-   border-radius: 10px;
-   margin-top: 20px;
+    background: linear-gradient(90deg, #F0EFFF 0%, #E6F0FF 50%, #EAFBF7 100%);
+    min-height: 100vh;
+    min-height: 100dvh;   /* iOS 주소창 높이 보정 (구형은 위 줄 사용) */
+    padding: 32px 24px 48px;
 }
 
 /* community.css에 추가 */
 .community-detail-bg {
-   background: var(--aurora-bg);
-   min-height: 100vh;
-   padding: 32px 24px 48px;
+    background: var(--aurora-bg);
+    min-height: 100vh;
+    min-height: 100dvh;   /* iOS 주소창 높이 보정 (구형은 위 줄 사용) */
+    padding: 32px 24px 48px;
 }
 
 /* ============ 상세 화면: Figma 반영 ============ */
@@ -749,13 +694,14 @@
 /* ============ 상세 화면: Figma 반영 ============ */
 /* ============ 상세 화면: Figma 반영 ============ */
 .community-detail-bg {
-   background: var(--aurora-bg);
-   min-height: 100vh;
-   padding: 32px 24px 48px;
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   gap: 28px;
+    background: var(--aurora-bg);
+    min-height: 100vh;
+    min-height: 100dvh;   /* iOS 주소창 높이 보정 (구형은 위 줄 사용) */
+    padding: 32px 24px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
 }
 
 .community-detail-bg>* {
@@ -777,9 +723,195 @@
 }
 
 .post-body-card {
-   margin-top: -15px;
-   padding-bottom: 15px;
-   border-bottom: 1px solid rgb(155, 155, 155);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+}
+.post-body-card .post-title { font-size: 26px; font-weight: 800; color: var(--text-primary); margin: 0; }
+.post-body-card .post-meta { font-size: 14px; color: var(--text-muted); margin: 0 0 10px; }
+.post-body-divider { height: 0; border-top: 1px solid var(--border-soft); }
+.post-body-card .post-content { font-size: 16px; line-height: 160%; color: var(--text-primary); white-space: pre-wrap; margin: 0; }
+
+/* ---- Embedded Character Section ---- */
+.character-embed {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 24px;
+    background: #FFFFFF;
+    border: 1px solid #EAEAFF;
+    border-radius: 20px;
+}
+.character-embed-label { font-size: 14px; font-weight: 700; color: var(--accent); margin: 0; }
+
+/* character-card 등은 result.css(다크 테마)를 상속받으므로, .community-detail-bg 안에서만 덮어씀
+   → /result 페이지는 원래 다크 테마 그대로 유지됨 */
+.community-detail-bg .character-card { background: none; border: none; box-shadow: none; padding: 0; width: 100%; text-align: center; }
+.community-detail-bg .illustration-wrapper,
+.community-detail-bg .illustration-placeholder {
+    width: 100%;
+    height: 200px;
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #dbe4ff, #e8f0ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.community-detail-bg .char-icon { font-size: 64px; }
+.community-detail-bg .char-title { font-size: 14px; font-weight: 600; color: var(--text-muted); margin: 12px 0 4px; }
+.community-detail-bg .char-name-mbti { font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0; }
+.community-detail-bg .mbti-badge { font-size: 16px; font-weight: 600; color: var(--accent-strong); }
+
+.community-detail-bg .stats-info-section {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    display: flex;
+    gap: 16px;
+}
+.community-detail-bg .chart-box,
+.community-detail-bg .info-box {
+    flex: 1;
+    box-sizing: border-box;
+    background: #FFFFFF;
+    border: 1px solid #EAEAFF;
+    border-radius: 16px;
+    padding: 16px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.community-detail-bg .chart-box h4,
+.community-detail-bg .info-box h4 { font-size: 13px; font-weight: 700; color: var(--text-muted); margin: 0; text-align: center; }
+.community-detail-bg .canvas-wrapper { height: 140px; }
+.community-detail-bg .info-item { display: flex; flex-direction: column; gap: 2px; }
+.community-detail-bg .info-label { font-size: 12px; color: var(--text-muted); }
+.community-detail-bg .info-value { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+
+.community-detail-bg .chemistry-area {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+.community-detail-bg .chemistry-box {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+}
+.community-detail-bg .chemistry-card {
+    flex: 1;
+    box-sizing: border-box;
+    background: #FFFFFF;
+    border: 1px solid #EAEAFF;
+    box-shadow: 0 8px 24px rgba(111, 107, 153, 0.12);
+    border-radius: 16px;
+    padding: 16px;
+    margin: 0;
+}
+.community-detail-bg .match-badge { display: inline-block; font-size: 13px; font-weight: 800; margin-bottom: 8px; }
+.community-detail-bg .match-badge.best { color: #4CAF50; }
+.community-detail-bg .match-badge.worst { color: #FF5252; }
+.community-detail-bg .match-img-wrapper {
+    height: 90px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #eef1ff, #f5f3ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+.community-detail-bg .match-placeholder { font-size: 32px; }
+.community-detail-bg .match-name { font-size: 13px; font-weight: 800; color: var(--text-primary); margin: 0; }
+.community-detail-bg .match-mbti { font-size: 12px; color: var(--text-muted); }
+
+.no-character-msg { text-align: center; color: var(--text-muted); font-size: 13px; padding: 24px 0; }
+
+/* ---- 수정/삭제 버튼 ---- */
+.post-owner-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.post-owner-actions button {
+    padding: 8px 16px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer;
+    border: 1.5px solid var(--accent); background: transparent; color: var(--accent);
+}
+.post-owner-actions button.danger { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ---- DM 버튼 ----
+   남의 글에서는 [수정][삭제] 자리에, 남의 댓글에서는 [삭제] 옆에 붙습니다.
+   글쪽은 버튼 크기로, 댓글쪽은 텍스트 크기로 각각 주변에 맞춥니다. */
+.post-owner-actions .dm-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 8px 16px; border-radius: 10px; font-size: 14px; font-weight: 700;
+    text-decoration: none; cursor: pointer;
+    border: 1.5px solid var(--accent); background: transparent; color: var(--accent);
+    transition: all 0.2s ease;
+}
+.post-owner-actions .dm-btn:hover {
+    background: var(--accent); color: #fff; transform: translateY(-2px);
+}
+.comment-actions .dm-btn {
+    font-size: 12px; font-weight: 700; margin-left: 8px;
+    text-decoration: none; cursor: pointer; color: var(--accent);
+}
+.comment-actions .dm-btn:hover { color: var(--accent-strong); }
+
+/* ---- Comments Card ---- */
+.comment-section {
+    box-sizing: border-box; padding: 24px;
+    background: rgba(255, 255, 255, 0.91); border: 1.5px solid #EAEAFF;
+    box-shadow: 0 8px 24px rgba(111, 107, 153, 0.12); border-radius: 24px;
+}
+.comment-title { font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0 0 16px; }
+
+/* 닉네임과 [수정][삭제][DM] 을 같은 줄에 두고, 내용은 그 아래 줄에 깔립니다.
+   .comment-actions 가 DOM 상 .comment-body 다음에 오기 때문에 grid 영역으로 자리를 잡습니다.
+     닉네임 .................... [수정][삭제][✈ DM]
+     댓글 내용                                        */
+.comment-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+        "header actions"
+        "body   body";
+    align-items: center;
+    column-gap: 12px;
+    padding: 12px 0;
+    border-top: none;
+    border-bottom: 1px solid #EAEAFF;
+}
+.comment-item:last-child { border-bottom: none; }
+.comment-header { grid-area: header; min-width: 0; }
+.comment-body {
+    grid-area: body;
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: var(--text-primary);
+    white-space: pre-wrap;
+    overflow-wrap: break-word;   /* 긴 단어가 칸을 뚫고 나가지 않게 */
+}
+.comment-author { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.comment-actions { grid-area: actions; align-items: center; }
+.comment-actions span { font-size: 12px; cursor: pointer; }
+.comment-actions span.delete-btn { color: #FF383C; }
+.comment-actions span.disabled { color: #E6E6E6; pointer-events: none; }
+.comment-input-row { display: flex; gap: 8px; margin-top: 16px; }
+.comment-input-row input {
+    flex: 1; padding: 10px 14px; border: 1px solid var(--border-soft);
+    border-radius: 10px; font-size: 14px; outline: none;
 }
 
 .character-card {
