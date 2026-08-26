@@ -108,7 +108,10 @@
                     <div class="chemistry-card best-match">
                         <div class="match-badge best">💚 최고의 파티원</div>
                         <div class="match-img-wrapper">
-                            <div class="match-placeholder">🛡️</div>
+                            <img id="best-match-img"
+                                src="{{ url_for('static', filename='images/' + character.best_match.mbti.upper() + '.png') }}"
+                                alt="{{ character.best_match.class_name }}" class="match-img"
+                                onerror="this.src='/static/images/main-logo.png';">
                         </div>
                         <h4 class="match-name">{{ character.best_match.class_name }}</h4>
                         <span class="match-mbti">({{ character.best_match.mbti }})</span>
@@ -116,7 +119,10 @@
                     <div class="chemistry-card worst-match">
                         <div class="match-badge worst">💔 최악의 파티원</div>
                         <div class="match-img-wrapper">
-                            <div class="match-placeholder">⚔️</div>
+                            <img id="worst-match-img"
+                                src="{{ url_for('static', filename='images/' + character.worst_match.mbti.upper() + '.png') }}"
+                                alt="{{ character.worst_match.class_name }}" class="match-img"
+                                onerror="this.src='/static/images/main-logo.png';">
                         </div>
                         <h4 class="match-name">{{ character.worst_match.class_name }}</h4>
                         <span class="match-mbti">({{ character.worst_match.mbti }})</span>
