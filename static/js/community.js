@@ -627,7 +627,40 @@ if (document.querySelector('#comment-list')) {
     // TODO 15. 댓글 등록(#comment-submit-btn) 클릭 이벤트
     //   - #comment-input 값 trim, 비어있으면 alert 후 멈추기
     //   - POST /api/community/posts/{POST_ID}/comments 호출 (content)
-    //   - 성공하면 입력창 비우고 loadComments() 다시 호출 (전체 다시 그리기)
+    //   - 성공하면 입력창 비우고 loadComments() 다시 호출 (전체 다시 그리기)    
+    const commentSubmitBtn = document.querySelector('#comment-submit-btn');
+
+    if (commentSubmitBtn) {
+        commentSubmitBtn.addEventListener('click', async () => {
+            const commentInput = document.querySelector('#comment-input');
+
+            // 1. 입력된 값 가져오기 및 공백 제거 (trim)
+            const content = commentInput.value.trim();
+
+            // 2. [직접 작성] 값이 비어있는지 확인하는 유효성 검사
+            //    - 비어있으면 alert 띄우고 함수 종료(return)
+            if (content === null || content === '') {
+                alert("내용을 입력해 주세요!");
+                return;
+            }
+
+            try {
+                // 3. [직접 작성] apiFetch를 사용해 댓글 등록 API 호출
+                //    - URL: `/api/community/posts/${POST_ID}/comments`
+                //    - method: 'POST'
+                //    - body: JSON.stringify({ content })
+                await apiFetch(/* URL 및 옵션 작성 */);
+
+                // 4. [직접 작성] 성공 시 처리
+                //    - 입력창 비우기 (#comment-input의 value)
+                //    - loadComments() 호출하여 목록 새로고침
+
+            } catch (error) {
+                console.error('댓글 등록 중 오류 발생:', error);
+            }
+        });
+    }
+
 
     // TODO 16. 댓글 "수정" 클릭 시
     //   prompt() 등으로 새 내용 입력받아서
