@@ -15,9 +15,12 @@
 
     <!-- 헤더 바 (결과 보고서 / 로그아웃) -->
     <header class="top-nav">
-        <h1 class="nav-logo">RPG MBTI</h1>
-        <div class="nav-title">결과 보고서</div>
-        <button class="logout-btn" onclick="logout()">로그아웃</button>
+        <div class="result-nav-bar">
+            <a href="{{ url_for('hub') }}" class="result-back-link">
+                <span class="result-back-icon">‹</span> 돌아가기
+            </a>
+            <button class="result-logout-btn" onclick="logout()">로그아웃</button>
+        </div>
     </header>
 
     <main class="result-container">
@@ -187,13 +190,11 @@
                         datasets: [{
                             label: '능력치',
                             data: [statsData.STR, statsData.DEX, statsData.VIT, statsData.MAG, statsData.INT, statsData.CHA],
-                            backgroundColor: 'rgba(255, 215, 0, 0.25)',
-                            borderColor: '#ffd700',
+                            backgroundColor: 'rgba(143, 124, 255, 0.25)',
+                            borderColor: '#8F7CFF',
                             borderWidth: 2,
-                            pointBackgroundColor: '#00f2fe',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: '#00f2fe'
+                            pointBackgroundColor: '#8F7CFF',
+                            pointBorderColor: '#fff'
                         }]
                     },
                     options: {
@@ -201,9 +202,9 @@
                         maintainAspectRatio: false,
                         scales: {
                             r: {
-                                angleLines: { color: 'rgba(255, 255, 255, 0.15)' },
-                                grid: { color: 'rgba(255, 255, 255, 0.15)' },
-                                pointLabels: { color: '#cbd5e1', font: { size: 11 } },
+                                angleLines: { color: '#EAEAFF' },
+                                grid: { color: '#EAEAFF' },
+                                pointLabels: { color: '#6B6E85', font: { size: 11 } },
                                 ticks: { display: false, stepSize: 1 },
                                 min: 0,
                                 max: 5
