@@ -263,35 +263,40 @@ if (document.querySelector('#post-list')) {
     //   버튼 클릭 시: 상태의 page 갱신 후 목록 다시 불러오기
     function renderPagination(page, totalPages) {
         const paginationEl = document.querySelector('#pagination');
-        paginationEl.innerHTML = ''; // 1. #pagination 비우기
+        paginationEl.innerHTML = '';
 
-        // 만약 전체 페이지가 0이거나 1 미만이면 버튼을 그리지 않고 종료
         if (!totalPages || totalPages < 1) {
             return;
         }
 
-        // 2. 1부터 totalPages까지 순회하며 버튼 생성
-        for (let i = 1; i <= totalPages; i++) {
+        const WINDOW_SIZE = 5;
+
+        // 현재 페이지 - 2 부터 시작하되, 1페이지 밑으로는 안 내려가게
+        let start = Math.max(1, page - 2);
+        let end = start + WINDOW_SIZE - 1;
+
+        // 끝이 전체 페이지 수를 넘으면, 끝을 마지막에 맞추고 시작점을 다시 당김
+        if (end > totalPages) {
+            end = totalPages;
+            start = Math.max(1, end - WINDOW_SIZE + 1);
+        }
+
+        for (let i = start; i <= end; i++) {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = 'page-btn';
             btn.textContent = i;
 
-            // 3. 현재 page와 같으면 active 클래스 추가
             if (i === page) {
                 btn.classList.add('active');
             }
 
-            // 4. 버튼 클릭 시: 상태의 page 갱신 후 목록 다시 불러오기
             btn.addEventListener('click', function () {
-                // 이미 선택된 현재 페이지를 누른 경우 무시
                 if (communityStatus.page === i) return;
-
-                communityStatus.page = i; // 상태 page 갱신
-                loadPosts();              // 목록 다시 불러오기
+                communityStatus.page = i;
+                loadPosts();
             });
 
-            // 생성한 버튼을 #pagination에 추가
             paginationEl.appendChild(btn);
         }
     }

@@ -222,8 +222,15 @@ def api_community_list():
         target = 'all'
     query = (request.args.get('q') or '').strip()
 
-    if query and len(query) < MIN_QUERY_LEN:
+    try:
+        page = int(request.args.get('page', 1))
+    except (TypeError, ValueError):
+        page = 1
+    page = max(page, 1)   # 0 이하로 들어와도 1페이지로 보정
 
+    page_size = 15   # 한 페이지에 보여줄 게시글 수
+
+    if query and len(query) < MIN_QUERY_LEN:
         return jsonify({"result": "fail", "msg": "검색어는 2글자 이상 입력해주세요."}), 400
 
     all_posts = list(db.posts.find({}))
@@ -237,26 +244,31 @@ def api_community_list():
                 fields.append(post['content'])
             if target in ('nickname', 'all'):
                 fields.append(post['author_nickname'])
-            # '모두'는 여러 필드 중 가장 잘 맞는 것 하나를 대표값으로 쓴다
             return max(fuzz.partial_ratio(query, f) for f in fields)
 
         scored = [(score_of(p), p) for p in all_posts]
         scored = [(s, p) for s, p in scored if s >= SIMILARITY_THRESHOLD]
 
         if not scored:
-            # 예외 처리: 70% 이상인 게 하나도 없음
-            return jsonify({"result": "success", "posts": [], "no_results": True})
-        # 1) 먼저 날짜 기준으로 정렬 (2순위가 될 기준)
+            return jsonify({"result": "success", "posts": [], "no_results": True, "page": 1, "total_pages": 0})
+
         scored.sort(key=lambda sp: sp[1]['created_at'], reverse=(sort != 'oldest'))
-        # 2) 그다음 유사도 점수로 정렬 (1순위가 될 기준) — 안정 정렬이라 점수가 같은 것끼리는 위에서 정한 날짜순서가 유지됨
         scored.sort(key=lambda sp: sp[0], reverse=True)
         matched_posts = [p for _, p in scored]
     else:
         matched_posts = all_posts
         matched_posts.sort(key=lambda p: p['created_at'], reverse=(sort != 'oldest'))
 
+    # 전체 목록 중 이번 page에 해당하는 구간만 잘라내는 부분 (기존엔 없었음)
+    total_count = len(matched_posts)
+    total_pages = max((total_count + page_size - 1) // page_size, 1)   # 올림 나눗셈
+    page = min(page, total_pages)   # 존재하지 않는 뒷페이지 요청 방어
+
+    start = (page - 1) * page_size
+    page_posts = matched_posts[start:start + page_size]
+
     result = []
-    for p in matched_posts:
+    for p in page_posts:
         comment_count = db.comments.count_documents({"post_id": p["_id"]})
         result.append({
             "id": str(p["_id"]),
@@ -267,7 +279,7 @@ def api_community_list():
             "created_at": p["created_at"].isoformat(),
             "comment_count": comment_count,
         })
-    return jsonify({"result": "success", "posts": result, "no_results": False})
+    return jsonify({"result": "success", "posts": result, "no_results": False, "page": page, "total_pages": total_pages})
 
 @app.route('/api/community/posts', methods=['POST'])
 @jwt_required()
