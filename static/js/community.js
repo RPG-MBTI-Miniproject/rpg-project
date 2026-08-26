@@ -655,15 +655,9 @@ if (document.querySelector('#comment-list')) {
                 //    - 입력창 비우기 (#comment-input의 value)
                 //    - loadComments() 호출하여 목록 새로고침
                 if (data.result === "success") {
-<<<<<<< Updated upstream
-                    const inputvalue = document.querySelector('#comment-input');
-                    inputvalue.value = '';
-                    loadComments()
-=======
                     const inputValue = document.querySelector('#comment-input');
                     inputValue.value = '';                    
                     loadComments();
->>>>>>> Stashed changes
                 }
 
             } catch (error) {
