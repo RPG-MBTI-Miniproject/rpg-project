@@ -29,7 +29,8 @@
             <div class="illustration-wrapper">
                 <img id="main-char-img"
                     src="{{ url_for('static', filename='images/' + my_class.mbti.lower() + '.png') }}"
-                    alt="{{ my_class.class_name }}" class="char-img">
+                    alt="{{ my_class.class_name }}" class="char-img"
+                    onerror="this.src='{{ url_for('static', filename='images/' + my_class.mbti.upper() + '.png') }}'; this.onerror=function(){this.src='/static/images/main-logo.png';};">
             </div>
 
             <p class="char-title">“{{ my_class.title }}”</p>
@@ -47,8 +48,7 @@
             <div class="info-box">
                 <div class="info-item">
                     <span class="info-label">대표 스킬</span>
-                    <span class="info-value-title">{{ my_class.title.split(' ')[0] if my_class.title else '마법' }}
-                        (Signature)</span>
+                    <span class="info-value-title">{{ my_class.title.split(' ')[0] if my_class.title else '마법' }} (Signature)</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">전투 스타일</span>
@@ -69,12 +69,15 @@
                         <span class="status-emoji">💚</span>
                     </div>
                     <div class="match-img-wrapper">
-                        <div class="match-placeholder">🛡️</div>
+                        <img id="best-match-img" 
+                            src="{{ url_for('static', filename='images/' + best_match.mbti.lower() + '.png') }}" 
+                            alt="{{ best_match.class_name }}" 
+                            class="match-img"
+                            onerror="this.src='{{ url_for('static', filename='images/' + best_match.mbti.upper() + '.png') }}'; this.onerror=function(){this.src='/static/images/main-logo.png';};">
                     </div>
                     <div class="card-info-bottom">
                         <span class="synergy-tag duo">환상의 듀오</span>
-                        <h4 class="match-name">{{ best_match.class_name }} <span class="mbti-text">({{ best_match.mbti
-                                }})</span></h4>
+                        <h4 class="match-name">{{ best_match.class_name }} <span class="mbti-text">({{ best_match.mbti }})</span></h4>
                     </div>
                 </div>
 
@@ -85,12 +88,15 @@
                         <span class="status-emoji">💔</span>
                     </div>
                     <div class="match-img-wrapper">
-                        <div class="match-placeholder">⚔️</div>
+                        <img id="worst-match-img" 
+                            src="{{ url_for('static', filename='images/' + worst_match.mbti.lower() + '.png') }}" 
+                            alt="{{ worst_match.class_name }}" 
+                            class="match-img"
+                            onerror="this.src='{{ url_for('static', filename='images/' + worst_match.mbti.upper() + '.png') }}'; this.onerror=function(){this.src='/static/images/main-logo.png';};">
                     </div>
                     <div class="card-info-bottom">
                         <span class="synergy-tag danger">충돌 주의</span>
-                        <h4 class="match-name">{{ worst_match.class_name }} <span class="mbti-text">({{ worst_match.mbti
-                                }})</span></h4>
+                        <h4 class="match-name">{{ worst_match.class_name }} <span class="mbti-text">({{ worst_match.mbti }})</span></h4>
                     </div>
                 </div>
             </div>
@@ -116,7 +122,7 @@
 
         <!-- 친구와의 궁합 결과 카드 (JS에서 검색 성공 시 표시: #friend-synergy-section) -->
         <div class="friend-synergy-container" id="friend-synergy-section">
-            <div class=" chemistry-divider"></div>
+            <div class="chemistry-divider"></div>
             <h3 class="synergy-main-title">
                 나와 <span id="target-friend-name" class="highlight-name">[친구 닉네임]</span>님의 궁합
             </h3>
@@ -128,7 +134,7 @@
                         <span class="status-emoji" id="me-to-friend-emoji">💚</span>
                     </div>
                     <div class="match-img-wrapper" id="friend-char-img-box">
-                        <div class="match-placeholder" id="friend-char-icon">🛡️</div>
+                        <img id="friend-char-img" src="/static/images/main-logo.png" alt="친구 캐릭터" class="match-img">
                     </div>
                     <div class="card-info-bottom">
                         <span class="synergy-tag duo" id="me-to-friend-tag">환상의 듀오</span>
@@ -147,7 +153,7 @@
                         <span class="status-emoji" id="friend-to-me-emoji">🔮</span>
                     </div>
                     <div class="match-img-wrapper" id="my-char-img-box">
-                        <div class="match-placeholder" id="my-char-icon">🧙‍♂️</div>
+                        <img id="me-char-img" src="/static/images/main-logo.png" alt="내 캐릭터" class="match-img">
                     </div>
                     <div class="card-info-bottom">
                         <span class="synergy-tag duo" id="friend-to-me-tag">든든한 동료</span>
@@ -223,7 +229,8 @@
             const copyBtn = document.getElementById('copy-link-btn');
             if (copyBtn) {
                 copyBtn.addEventListener('click', () => {
-                    navigator.clipboard.writeText(window.location.href)
+                    const shareUrl = window.location.origin + '/result/' + encodeURIComponent("{{ nickname }}");
+                    navigator.clipboard.writeText(shareUrl)
                         .then(() => alert('결과 링크가 클립보드에 복사되었습니다!'))
                         .catch(() => alert('복사 실패!'));
                 });

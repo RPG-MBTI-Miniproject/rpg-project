@@ -1,17 +1,32 @@
-/* [최현욱] Frame 3 (result.html) 결과 및 궁합 페이지 스타일링 */
+/* [최현욱] Frame 3 (result.html) 결과 및 궁합 페이지 스타일링 — Aurora 테마 */
+
+:root {
+    --r-aurora-bg: linear-gradient(90deg, #F0EFFF 0%, #E6F0FF 50%, #EAFBF7 100%);
+    --r-accent: #8F7CFF;
+    --r-text-primary: #2C2C3E;
+    --r-text-secondary: #6B6E85;
+    --r-border: #EAEAFF;
+    --r-surface: rgba(255, 255, 255, 0.91);
+    --r-surface-solid: #FFFFFF;
+    --r-safe-bg: #E8F5E9;
+    --r-safe-text: #4CAF50;
+    --r-danger-bg: #FFEBEE;
+    --r-danger-text: #FF5252;
+}
 
 body {
-    /* Aurora 그라데이션 */
-    background: linear-gradient(90deg, #F0EFFF 0%, #E6F0FF 50%, #EAFBF7 100%);
+    background: var(--r-aurora-bg);
     font-family: 'Inter', var(--font-sans), 'Pretendard', sans-serif;
     min-height: 100vh;
     margin: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: #2C2C3E;
+    color: var(--r-text-primary);
     box-sizing: border-box;
 }
+
+.bg-particles { display: none; }
 
 /* Header Nav */
 .top-nav {
@@ -24,7 +39,8 @@ body {
     box-sizing: border-box;
 }
 
-.nav-back-link {
+.nav-back-link,
+.result-back-link {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -33,11 +49,13 @@ body {
     transition: transform 0.2s ease;
 }
 
-.nav-back-link:hover {
+.nav-back-link:hover,
+.result-back-link:hover {
     transform: translateX(-2px);
 }
 
-.nav-back-icon {
+.nav-back-icon,
+.result-back-icon {
     width: 32px;
     height: 32px;
     background: #FFFFFF;
@@ -59,7 +77,8 @@ body {
     color: #2C2C3E;
 }
 
-.logout-btn {
+.logout-btn,
+.result-logout-btn {
     background: transparent;
     border: none;
     color: #6B6E85;
@@ -71,7 +90,8 @@ body {
     padding: 6px 10px;
 }
 
-.logout-btn:hover {
+.logout-btn:hover,
+.result-logout-btn:hover {
     color: #ef4444;
 }
 
@@ -241,7 +261,8 @@ body {
     width: 100%;
 }
 
-.chemistry-card {
+.chemistry-card,
+.friend-match-card {
     background: #FFFFFF;
     border: 1px solid #EAEAFF;
     box-shadow: 0px 8px 24px rgba(111, 107, 153, 0.12);
@@ -254,7 +275,8 @@ body {
     transition: transform 0.2s ease;
 }
 
-.chemistry-card:hover {
+.chemistry-card:hover,
+.friend-match-card:hover {
     transform: translateY(-2px);
 }
 
@@ -275,7 +297,8 @@ body {
     font-size: 14px;
 }
 
-.match-img-wrapper {
+.match-img-wrapper,
+.match-img-box {
     width: 100%;
     height: 90px;
     background: #F5F3FF;
@@ -284,6 +307,14 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.match-img-wrapper img,
+.match-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .match-placeholder {
@@ -315,7 +346,8 @@ body {
     color: #FF5252;
 }
 
-.match-name {
+.match-name,
+.partner-title {
     font-size: 13px;
     font-weight: 800;
     color: #2C2C3E;
@@ -386,7 +418,7 @@ body {
     box-shadow: 0px 10px 28px rgba(143, 124, 255, 0.4);
 }
 
-/* 5. Search Friend */
+/* 5. Search Friend (3:1 비율) */
 .search-friend {
     width: 100%;
     display: flex;

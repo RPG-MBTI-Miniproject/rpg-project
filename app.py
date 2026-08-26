@@ -34,7 +34,7 @@ app.config['JWT_SECRET_KEY'] = JWT_SECRET_KEY
 
 # API는 헤더(Authorization)로, 주소창으로 여는 SSR 페이지(/test, /result)는 쿠키로 인증
 app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
-app.config['JWT_COOKIE_SECURE'] = False        # HTTPS 붙이면 True로
+app.config['JWT_COOKIE_SECURE'] = os.getenv('JWT_COOKIE_SECURE', 'False') == 'True'        # HTTPS 붙이면 True로
 app.config['JWT_COOKIE_CSRF_PROTECT'] = False  # 미니 프로젝트 범위에서는 비활성
 
 client = MongoClient(MONGO_URL)             # PyMongo로 MongoDB에 연결 객체 생성
@@ -188,6 +188,25 @@ def result():
         worst_match=MBTI_MAP.get(my_class['worst_match']),
     )
 
+@app.route('/result/<nickname>')
+def result_public(nickname):
+    user_info = db.users.find_one({"nickname": nickname})
+    if not user_info:
+        return redirect(url_for('home'))
+
+    user_mbti = user_info.get('mbti')
+    my_class = MBTI_MAP.get(user_mbti)
+    if not my_class:
+        return redirect(url_for('home'))   # 아직 테스트 안 한 유저면 그냥 로그인 화면으로
+
+    return render_template(
+        'result.html',
+        my_class=my_class,
+        nickname=user_info.get('nickname'),
+        best_match=MBTI_MAP.get(my_class['best_match']),
+        worst_match=MBTI_MAP.get(my_class['worst_match']),
+    )
+
 
 # ==========================================
 # API 라우터 (AJAX 통신용)
@@ -222,8 +241,15 @@ def api_community_list():
         target = 'all'
     query = (request.args.get('q') or '').strip()
 
-    if query and len(query) < MIN_QUERY_LEN:
+    try:
+        page = int(request.args.get('page', 1))
+    except (TypeError, ValueError):
+        page = 1
+    page = max(page, 1)   # 0 이하로 들어와도 1페이지로 보정
 
+    page_size = 15   # 한 페이지에 보여줄 게시글 수
+
+    if query and len(query) < MIN_QUERY_LEN:
         return jsonify({"result": "fail", "msg": "검색어는 2글자 이상 입력해주세요."}), 400
 
     all_posts = list(db.posts.find({}))
@@ -237,26 +263,31 @@ def api_community_list():
                 fields.append(post['content'])
             if target in ('nickname', 'all'):
                 fields.append(post['author_nickname'])
-            # '모두'는 여러 필드 중 가장 잘 맞는 것 하나를 대표값으로 쓴다
             return max(fuzz.partial_ratio(query, f) for f in fields)
 
         scored = [(score_of(p), p) for p in all_posts]
         scored = [(s, p) for s, p in scored if s >= SIMILARITY_THRESHOLD]
 
         if not scored:
-            # 예외 처리: 70% 이상인 게 하나도 없음
-            return jsonify({"result": "success", "posts": [], "no_results": True})
-        # 1) 먼저 날짜 기준으로 정렬 (2순위가 될 기준)
+            return jsonify({"result": "success", "posts": [], "no_results": True, "page": 1, "total_pages": 0})
+
         scored.sort(key=lambda sp: sp[1]['created_at'], reverse=(sort != 'oldest'))
-        # 2) 그다음 유사도 점수로 정렬 (1순위가 될 기준) — 안정 정렬이라 점수가 같은 것끼리는 위에서 정한 날짜순서가 유지됨
         scored.sort(key=lambda sp: sp[0], reverse=True)
         matched_posts = [p for _, p in scored]
     else:
         matched_posts = all_posts
         matched_posts.sort(key=lambda p: p['created_at'], reverse=(sort != 'oldest'))
 
+    # 전체 목록 중 이번 page에 해당하는 구간만 잘라내는 부분 (기존엔 없었음)
+    total_count = len(matched_posts)
+    total_pages = max((total_count + page_size - 1) // page_size, 1)   # 올림 나눗셈
+    page = min(page, total_pages)   # 존재하지 않는 뒷페이지 요청 방어
+
+    start = (page - 1) * page_size
+    page_posts = matched_posts[start:start + page_size]
+
     result = []
-    for p in matched_posts:
+    for p in page_posts:
         comment_count = db.comments.count_documents({"post_id": p["_id"]})
         result.append({
             "id": str(p["_id"]),
@@ -267,7 +298,7 @@ def api_community_list():
             "created_at": p["created_at"].isoformat(),
             "comment_count": comment_count,
         })
-    return jsonify({"result": "success", "posts": result, "no_results": False})
+    return jsonify({"result": "success", "posts": result, "no_results": False, "page": page, "total_pages": total_pages})
 
 @app.route('/api/community/posts', methods=['POST'])
 @jwt_required()
@@ -492,6 +523,54 @@ def api_submit():
     # db에 있는 유저 정보에 mbti 결과 업데이트
     db.users.update_one({"id": user_id}, {"$set": {"mbti": mbti_result}})
     return jsonify({"result": "success", "mbti": mbti_result})
+
+@app.route('/api/compatibility', methods=['GET'])
+@jwt_required()
+def api_compatibility():
+    friend_nickname = (request.args.get('nickname') or '').strip()
+    if not friend_nickname:
+        return jsonify({"result": "fail", "msg": "닉네임을 입력해주세요."}), 400
+
+    user_id = get_jwt_identity()
+    me_info = db.users.find_one({"id": user_id})
+    me_mbti = me_info.get('mbti') if me_info else None
+    if not me_mbti:
+        return jsonify({"result": "fail", "msg": "먼저 성향 테스트를 진행해주세요."}), 400
+
+    friend_info = db.users.find_one({"nickname": friend_nickname})
+    if not friend_info:
+        return jsonify({"result": "fail", "msg": "해당 닉네임의 모험가를 찾을 수 없습니다."}), 404
+
+    friend_mbti = friend_info.get('mbti')
+    if not friend_mbti:
+        return jsonify({"result": "fail", "msg": "그 모험가는 아직 테스트를 진행하지 않았습니다."}), 404
+
+    me_class = MBTI_MAP.get(me_mbti)
+    friend_class = MBTI_MAP.get(friend_mbti)
+
+    def relation_of(viewer_class, other_mbti, other_class_name):
+        if viewer_class.get('best_match') == other_mbti:
+            return {"emoji": "💚", "tag": "duo", "description": f"{other_class_name}와(과)는 환상의 듀오예요! 함께라면 어떤 던전도 든든합니다."}
+        if viewer_class.get('worst_match') == other_mbti:
+            return {"emoji": "💔", "tag": "brain", "description": f"{other_class_name}와(과)는 충돌 주의! 서로 다른 플레이 스타일을 이해하는 노력이 필요해요."}
+        return {"emoji": "🙂", "tag": "neutral", "description": f"{other_class_name}와(과)는 무난한 케미예요. 특별히 잘 맞거나 안 맞는 조합은 아니에요."}
+
+    return jsonify({
+        "result": "success",
+        "friend": {
+            "nickname": friend_info.get('nickname'),
+            "class_name": friend_class['class_name'],
+            "mbti": friend_class['mbti'],
+        },
+        "me": {
+            "class_name": me_class['class_name'],
+            "mbti": me_class['mbti'],
+        },
+        "compatibility": {
+            "me_to_friend": relation_of(me_class, friend_mbti, friend_class['class_name']),
+            "friend_to_me": relation_of(friend_class, me_mbti, me_class['class_name']),
+        },
+    })
 
 @app.route('/api/community/posts/<post_id>', methods=['DELETE'])
 @jwt_required()
