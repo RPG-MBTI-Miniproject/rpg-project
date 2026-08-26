@@ -45,25 +45,33 @@
 }
 
 .back-link {
-  background-color: rgb(255, 255, 255);
-  border: none;
-  border-radius: 50%;
-  padding: 0.6rem 0.95rem;
+  width: 66px;
+  height: 51px;
+  background-color: #ffffff;
+  border: 1.5px solid #EAEAFF;
+  border-radius: 15px;
   text-decoration: none;
-  color: black;
-  font-size: 1.3rem;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #2C2C3E;
+  font-size: 39px;
+  font-weight: 300;
+  line-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-bottom: 9px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+  box-shadow: 0 3px 12px rgba(111, 107, 153, 0.12);
 }
 
 .back-link:hover {
-  background-color: rgb(214, 214, 214);
-  color: #494949;
+  background-color: #F5F3FF;
+  border-color: #8F7CFF;
+  color: #8F7CFF;
   transform: scale(1.08);
 }
+
+
 
 /* Logout Button */
 .hub-nav-logout {
@@ -208,16 +216,15 @@
 
 /* 2. 커뮤니티 버튼 (Outlined Purple) */
 .community-btn {
-  background: #FFFFFF;
-  border: 2px solid #8F7CFF;
-  color: #8F7CFF;
+  background: #8F7CFF;
+  color: #FFFFFF;
   box-shadow: 0px 10px 28px rgba(111, 107, 153, 0.12);
 }
 
 .community-btn:hover {
-  background: #F5F3FF;
+  background: #7b65fa;
   transform: translateY(-2px);
-  box-shadow: 0px 14px 36px rgba(143, 124, 255, 0.25);
+  box-shadow: 0px 14px 36px rgba(143, 124, 255, 0.45);
 }
 
 /* 반응형 */
