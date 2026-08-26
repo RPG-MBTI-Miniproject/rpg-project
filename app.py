@@ -42,7 +42,9 @@ db = client['rpg_project']                  # 그 중에서 rpg_project DB 선�
 jwt = JWTManager(app)
 
 SIMILARITY_THRESHOLD = 70   # 이 밑으로는 검색 결과에서 제외(함수 community_list)
+
 MIN_QUERY_LEN = 2
+
 
 # ==========================================
 # 직업 데이터는 바뀌지 않는 고정 데이터라 시작할 때 한 번만 읽는다
@@ -221,6 +223,7 @@ def api_community_list():
     query = (request.args.get('q') or '').strip()
 
     if query and len(query) < MIN_QUERY_LEN:
+
         return jsonify({"result": "fail", "msg": "검색어는 2글자 이상 입력해주세요."}), 400
 
     all_posts = list(db.posts.find({}))
@@ -278,7 +281,9 @@ def api_community_create():
     content = (data.get('content') or '').strip()
     now = datetime.now(timezone.utc)
 
+
     if len(title) < MIN_QUERY_LEN or len(content) < MIN_QUERY_LEN :
+
         return jsonify({"result": "fail", "msg": "제목 및 본문을 2글자 이상 작성해주세요."}), 400
 
     db.posts.insert_one({
@@ -314,6 +319,7 @@ def api_community_update(post_id):
     content = (data.get('content') or '').strip()
 
     if len(title) < MIN_QUERY_LEN or len(content) < MIN_QUERY_LEN :
+
         return jsonify({"result": "fail", "msg": "제목 및 본문을 2글자 이상 작성해주세요."}), 400
 
     db.posts.update_one(
