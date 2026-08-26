@@ -1,10 +1,15 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from dotenv import load_dotenv
-import os
 from pymongo import MongoClient
 from flask_jwt_extended import (JWTManager, create_access_token, jwt_required, get_jwt_identity,
                                 set_access_cookies, unset_jwt_cookies)
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime, timezone
+from bson import ObjectId
+from bson.errors import InvalidId
+from rapidfuzz import fuzz 
+
+import os
 import json
 
 
@@ -35,6 +40,8 @@ app.config['JWT_COOKIE_CSRF_PROTECT'] = False  # 미니 프로젝트 범위에�
 client = MongoClient(MONGO_URL)             # PyMongo로 MongoDB에 연결 객체 생성
 db = client['rpg_project']                  # 그 중에서 rpg_project DB 선택
 jwt = JWTManager(app)
+
+SIMILARITY_THRESHOLD = 70   # 이 밑으로는 검색 결과에서 제외(함수 community_list)
 
 # ==========================================
 # 직업 데이터는 바뀌지 않는 고정 데이터라 시작할 때 한 번만 읽는다
@@ -134,6 +141,237 @@ def api_login():
     # 로그인 실패 처리 (아이디가 없는지 비밀번호가 틀렸는지는 알려주지 않는다)
     return jsonify({"result": "fail", "msg": "아이디 또는 비밀번호가 올바르지 않습니다."}), 401
 
+@app.route('/api/community/posts', methods=['GET'])
+@jwt_required()
+def api_community_list():
+    sort = request.args.get('sort', 'newest')
+    target = request.args.get('target', 'all')
+    if target not in ('all', 'title', 'content', 'nickname'):
+        target = 'all'
+    query = (request.args.get('q') or '').strip()
+
+    if query and len(query) < 2:
+        return jsonify({"result": "fail", "msg": "검색어는 2글자 이상 입력해주세요."}), 400
+
+    all_posts = list(db.posts.find({}))
+
+    if query:
+        def score_of(post):
+            fields = []
+            if target in ('title', 'all'):
+                fields.append(post['title'])
+            if target in ('content', 'all'):
+                fields.append(post['content'])
+            if target in ('nickname', 'all'):
+                fields.append(post['author_nickname'])
+            # '모두'는 여러 필드 중 가장 잘 맞는 것 하나를 대표값으로 쓴다
+            return max(fuzz.partial_ratio(query, f) for f in fields)
+
+        scored = [(score_of(p), p) for p in all_posts]
+        scored = [(s, p) for s, p in scored if s >= SIMILARITY_THRESHOLD]
+
+        if not scored:
+            # 예외 처리: 70% 이상인 게 하나도 없음
+            return jsonify({"result": "success", "posts": [], "no_results": True})
+        # 1) 먼저 날짜 기준으로 정렬 (2순위가 될 기준)
+        scored.sort(key=lambda sp: sp[1]['created_at'], reverse=(sort != 'oldest'))
+        # 2) 그다음 유사도 점수로 정렬 (1순위가 될 기준) — 안정 정렬이라 점수가 같은 것끼리는 위에서 정한 날짜순서가 유지됨
+        scored.sort(key=lambda sp: sp[0], reverse=True)
+        matched_posts = [p for _, p in scored]
+    else:
+        matched_posts = all_posts
+        matched_posts.sort(key=lambda p: p['created_at'], reverse=(sort != 'oldest'))
+
+    result = []
+    for p in matched_posts:
+        comment_count = db.comments.count_documents({"post_id": p["_id"]})
+        result.append({
+            "id": str(p["_id"]),
+            "title": p["title"],
+            "content": p["content"],
+            "author_id": p["author_id"],
+            "author_nickname": p["author_nickname"],
+            "created_at": p["created_at"].isoformat(),
+            "comment_count": comment_count,
+        })
+    return jsonify({"result": "success", "posts": result, "no_results": False})
+
+@app.route('/api/community/posts', methods=['POST'])
+@jwt_required()
+def api_community_create():
+    user_id = get_jwt_identity()
+    user_info = db.users.find_one({"id": user_id})
+    nickname = (user_info.get('nickname') if user_info else None) or user_id
+
+    data = request.get_json(silent=True) or {}
+    title = (data.get('title') or '').strip()
+    content = (data.get('content') or '').strip()
+    now = datetime.now(timezone.utc)
+
+    if len(title) < 2 or len(content) < 2 :
+        return jsonify({"result": "fail", "msg": "제목 및 본문을 2글자 이상 작성해주세요."}), 400
+
+    db.posts.insert_one({
+        "title": title,
+        "content": content,
+        "author_id": user_id,          # 권한 체크용 (고유값)
+        "author_nickname": nickname,   # 화면 표시용
+        "created_at": now,             # 정렬용
+    })
+    return jsonify({"result": "success", "msg": "게시물 등록이 완료되었습니다."})
+
+@app.route('/api/community/posts/<post_id>', methods=['PUT'])
+@jwt_required()
+def api_community_update(post_id):
+    try:
+        oid = ObjectId(post_id)
+    except InvalidId:
+        return jsonify({"result": "fail", "msg": "잘못된 게시글 id 입니다."}), 400
+
+    post = db.posts.find_one({"_id": oid})
+
+    if not post:
+        return jsonify({"result": "fail", "msg": "해당되는 게시물이 없습니다."}), 404
+
+    author_id = post['author_id']
+    user_id = get_jwt_identity()
+
+    if user_id != author_id:
+        return jsonify({"result": "fail", "msg": "해당 게시물의 작성자가 아닙니다."}), 403
+
+    data = request.get_json(silent=True) or {}
+    title = (data.get('title') or '').strip()
+    content = (data.get('content') or '').strip()
+
+    if len(title) < 2 or len(content) < 2 :
+        return jsonify({"result": "fail", "msg": "제목 및 본문을 2글자 이상 작성해주세요."}), 400
+
+    db.posts.update_one(
+        {"_id": oid},
+        {"$set":{
+        "title": title,
+        "content": content,
+        }}
+    )
+    return jsonify({"result": "success", "msg": "게시물 수정이 완료되었습니다."})
+
+# ------------------------------------------
+# 댓글 작성
+# ------------------------------------------
+@app.route('/api/community/posts/<post_id>/comments', methods=['POST'])
+@jwt_required()
+def api_comment_create(post_id):
+    try:
+        oid = ObjectId(post_id)
+    except InvalidId:
+        return jsonify({"result": "fail", "msg": "잘못된 게시글 id 입니다."}), 400
+
+    post = db.posts.find_one({"_id": oid})
+    if not post:
+        return jsonify({"result": "fail", "msg": "해당되는 게시물이 없습니다."}), 404
+
+    user_id = get_jwt_identity()
+    user_info = db.users.find_one({"id": user_id})
+    nickname = (user_info.get('nickname') if user_info else None) or user_id
+
+    data = request.get_json(silent=True) or {}
+    content = (data.get('content') or '').strip()
+
+    if not content:
+        return jsonify({"result": "fail", "msg": "댓글 내용을 입력해주세요."}), 400
+
+    db.comments.insert_one({
+        "post_id": oid,                # 어떤 글에 달린 댓글인지 (delete_many 정리할 때 이 필드로 찾았었죠)
+        "content": content,
+        "author_id": user_id,
+        "author_nickname": nickname,
+        "created_at": datetime.now(timezone.utc),
+    })
+    return jsonify({"result": "success", "msg": "댓글이 등록되었습니다."})
+
+
+# ------------------------------------------
+# 댓글 목록 조회
+# ------------------------------------------
+@app.route('/api/community/posts/<post_id>/comments', methods=['GET'])
+@jwt_required()
+def api_comment_list(post_id):
+    try:
+        oid = ObjectId(post_id)
+    except InvalidId:
+        return jsonify({"result": "fail", "msg": "잘못된 게시글 id 입니다."}), 400
+
+    comments = db.comments.find({"post_id": oid}).sort("created_at", 1)   # 오래된 순 = 대화 순서대로
+
+    result = []
+    for c in comments:
+        result.append({
+            "id": str(c["_id"]),          # ObjectId는 그대로 jsonify 못 하니 문자열로 변환
+            "author_id": c["author_id"],
+            "author_nickname": c["author_nickname"],
+            "content": c["content"],
+            "created_at": c["created_at"].isoformat(),
+        })
+
+    return jsonify({"result": "success", "comments": result})
+
+
+# ------------------------------------------
+# 댓글 수정 (댓글 작성자 본인만 — 글쓴이라도 남의 댓글은 수정 불가)
+# ------------------------------------------
+@app.route('/api/community/comments/<comment_id>', methods=['PUT'])
+@jwt_required()
+def api_comment_update(comment_id):
+    try:
+        oid = ObjectId(comment_id)
+    except InvalidId:
+        return jsonify({"result": "fail", "msg": "잘못된 댓글 id 입니다."}), 400
+
+    comment = db.comments.find_one({"_id": oid})
+    if not comment:
+        return jsonify({"result": "fail", "msg": "해당되는 댓글이 없습니다."}), 404
+
+    if comment['author_id'] != get_jwt_identity():
+        return jsonify({"result": "fail", "msg": "본인 댓글만 수정할 수 있습니다."}), 403
+
+    data = request.get_json(silent=True) or {}
+    content = (data.get('content') or '').strip()
+    if not content:
+        return jsonify({"result": "fail", "msg": "댓글 내용을 입력해주세요."}), 400
+
+    db.comments.update_one(
+        {"_id": oid},
+        {"$set": {"content": content}}
+    )
+    return jsonify({"result": "success", "msg": "댓글이 수정되었습니다."})
+
+
+# ------------------------------------------
+# 댓글 삭제 (댓글 작성자 본인 OR 그 글의 작성자 — 둘 중 하나면 가능)
+# ------------------------------------------
+@app.route('/api/community/comments/<comment_id>', methods=['DELETE'])
+@jwt_required()
+def api_comment_delete(comment_id):
+    try:
+        oid = ObjectId(comment_id)
+    except InvalidId:
+        return jsonify({"result": "fail", "msg": "잘못된 댓글 id 입니다."}), 400
+
+    comment = db.comments.find_one({"_id": oid})
+    if not comment:
+        return jsonify({"result": "fail", "msg": "해당되는 댓글이 없습니다."}), 404
+
+    user_id = get_jwt_identity()
+    post = db.posts.find_one({"_id": comment['post_id']})
+
+    is_comment_author = (comment['author_id'] == user_id)
+    is_post_author = bool(post and post['author_id'] == user_id)
+
+    if not (is_comment_author or is_post_author):
+        return jsonify({"result": "fail", "msg": "삭제 권한이 없습니다."}), 403
+
+    db.comments.delete_one({"_id": oid})
+    return jsonify({"result": "success", "msg": "댓글이 삭제되었습니다."})
 
 @app.route('/api/signup', methods=['POST'])
 def api_signup():
@@ -178,6 +416,29 @@ def api_submit():
     # db에 있는 유저 정보에 mbti 결과 업데이트
     db.users.update_one({"id": user_id}, {"$set": {"mbti": mbti_result}})
     return jsonify({"result": "success", "mbti": mbti_result})
+
+@app.route('/api/community/posts/<post_id>', methods=['DELETE'])
+@jwt_required()
+def api_community_delete(post_id):
+    try:
+        oid = ObjectId(post_id)
+    except InvalidId:
+        return jsonify({"result": "fail", "msg": "잘못된 게시글 id 입니다."}), 400
+
+    post = db.posts.find_one({"_id": oid})
+
+    if not post:
+        return jsonify({"result": "fail", "msg": "해당되는 게시물이 없습니다."}), 404
+
+    user_id = get_jwt_identity()
+
+    if post['author_id'] != user_id():
+        return jsonify({"result": "fail", "msg": "해당 게시물의 작성자가 아닙니다."}), 403
+
+    db.posts.delete_one({"_id": oid})
+    db.comments.delete_many({"post_id": oid})   # 글이 사라지면 딸린 댓글도 같이 정리 (안 하면 고아 댓글이 남음)
+
+    return jsonify({"result": "success", "msg": "게시물이 삭제되었습니다."})
 
 
 @app.route('/api/logout', methods=['POST'])

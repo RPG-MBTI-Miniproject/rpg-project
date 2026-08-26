@@ -1,6 +1,5 @@
 // -----------------------------------  아래 수정한부분 ----------------------------------------
 // TODO: [이정욱] 12개의 질문-답변 세트 Array 객체 구축 
-
 const questions = [
     // =========================
     // E / I
@@ -188,8 +187,13 @@ const TOKEN_KEY = 'JWT_TOKEN';   // auth.js 와 같은 키
 let currentQ = 0;
 let scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
 
+// 이전 버튼 구현을 위한 답변 기록: 몇 번째 문제에서 어떤 type을 골랐는지 순서대로 쌓아둔다.
+// prevQuestion()에서 이 기록을 되짚어 점수를 되돌리는 데 쓴다 (없으면 "뒤로 가기"만 되고
+// 점수는 이미 반영된 채로 남아 중복 집계되는 버그가 생긴다).
+let answerHistory = [];
+
 // ------------------------------------------
-// 화면에 현재 질문 그리기 (진행도 포함)
+// 화면에 현재 질문 그리기 (진행도 포함, 이전 버튼 활성/비활성 포함)
 // ------------------------------------------
 function renderQuestion() {
     const question = questions[currentQ];
@@ -201,26 +205,45 @@ function renderQuestion() {
     document.getElementById('q-num').textContent = currentQ + 1;
     const percent = ((currentQ + 1) / questions.length) * 100;
     document.getElementById('progress-bar-fill').style.width = percent.toFixed(2) + '%';
+
+    // 1번 문제에서는 더 되돌아갈 곳이 없으니 이전 버튼을 비활성화한다
+    const prevBtn = document.getElementById('prev-btn');
+    if (prevBtn) prevBtn.disabled = (currentQ === 0);
 }
 
 // ------------------------------------------
 // [이정욱] 버튼 클릭 시 점수 누적 및 다음 문제로 화면 갱신
 // ------------------------------------------
-
 function nextQuestion(selectedType) {
     // 1. 선택한 mbti type 점수 +1
     scores[selectedType]++;
 
-    // 2. currentQ + 1
+    // 2. 나중에 이전 버튼으로 되돌릴 수 있도록 이번 선택을 기록해둔다
+    answerHistory.push(selectedType);
+
+    // 3. currentQ + 1
     currentQ++;
 
-    // 3. 12문항을 다 풀었으면 서버로 전송
+    // 4. 12문항을 다 풀었으면 서버로 전송
     if (currentQ >= questions.length) {
         submitResult();
         return;
     }
 
-    // 4. 아니라면 다음 질문으로 화면 갱신
+    // 5. 아니라면 다음 질문으로 화면 갱신
+    renderQuestion();
+}
+
+// ------------------------------------------
+// [이정욱] 이전 버튼 클릭 시: 직전 답변의 점수를 되돌리고 한 문제 전으로 이동
+// ------------------------------------------
+function prevQuestion() {
+    if (currentQ === 0) return;   // 1번 문제에서는 더 갈 곳이 없다
+
+    const lastType = answerHistory.pop();   // 방금까지 답변으로 기록됐던 type
+    scores[lastType]--;                     // 그 점수를 되돌린다 (중복 집계 방지)
+    currentQ--;
+
     renderQuestion();
 }
 
@@ -301,6 +324,9 @@ document.addEventListener('DOMContentLoaded', () => {
         .addEventListener('click', () => nextQuestion(questions[currentQ].btnA.type));
     document.getElementById('btn-b')
         .addEventListener('click', () => nextQuestion(questions[currentQ].btnB.type));
+
+    document.getElementById('prev-btn')
+        ?.addEventListener('click', prevQuestion);
 
     renderQuestion();   // 1번 문제를 화면에 그린다
 });
