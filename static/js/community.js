@@ -153,7 +153,29 @@ if (document.querySelector('#post-list')) {
     //   - 클릭된 버튼에 active 클래스, 나머지는 제거
     //   - 상태의 sort 값 갱신, page를 1로 리셋
     //   - 목록 다시 불러오기
-    
+    function sortExecution() {
+        const sortButtons = document.querySelectorAll(.sort - btn);
+
+        sortButtons.forEach(button => {
+            button.addEventListener('click', function (e) {
+                // 1. 모든 버튼에서 active 클래스 제거
+                sortButtons.forEach(btn => btn.classList.remove('active'));
+
+                // 2. 클릭된 버튼에만 active 클래스 추가 (e.currentTarget 활용)
+                e.currentTarget.classList.add('active');
+
+                // 3. 클릭된 버튼의 data-sort 속성값 가져와서 상태 갱신
+                const selectedSort = e.currentTarget.dataset.sort;
+                communityStatus.sort = selectedSort;
+
+                // 4. 페이지 번호 1로 리셋
+                communityStatus.page = 1;
+
+                // 5. 게시글 목록 다시 불러오기
+                loadPosts();
+            });
+        });
+    }
 
     // TODO 5. 검색 버튼(#search-btn) 클릭 이벤트
     //   - #search-input 값을 trim
@@ -180,6 +202,9 @@ if (document.querySelector('#post-list')) {
     //     #empty-msg 의 hidden 클래스 제거
     //   - 아니면: #empty-msg에 hidden 클래스 추가하고, renderPosts + renderPagination 호출
     //   - 페이지 처음 로드될 때 한 번 자동으로 호출되어야 함 (스크립트 맨 아래에서 실행)
+    function loadPosts(){
+        
+    }
 
     // TODO 9. 모달 "등록/저장"(#modal-submit-btn) 클릭 이벤트
     //   - #post-title-input, #post-content-input 값을 trim
