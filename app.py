@@ -43,6 +43,9 @@ jwt = JWTManager(app)
 
 SIMILARITY_THRESHOLD = 70   # 이 밑으로는 검색 결과에서 제외(함수 community_list)
 
+MIN_QUERY_LEN = 2
+
+
 # ==========================================
 # 직업 데이터는 바뀌지 않는 고정 데이터라 시작할 때 한 번만 읽는다
 # (요청마다 파일을 여는 것은 낭비)
@@ -83,6 +86,75 @@ def _handle_expired_token(jwt_header, jwt_payload):
 @app.route('/')
 def home():
     return render_template('index.html')
+
+
+# ==========================================
+# 화면 렌더링 라우터 — 커뮤니티
+# ==========================================
+@app.route('/home')
+@jwt_required()
+def hub():
+    user_id = get_jwt_identity()
+    user_info = db.users.find_one({"id": user_id})
+    nickname = (user_info.get('nickname') if user_info else None) or user_id
+    test_done = bool(user_info and user_info.get('mbti'))
+    return render_template('hub.html', nickname=nickname, test_done=test_done)
+
+
+@app.route('/community')
+@jwt_required()
+def community():
+    user_id = get_jwt_identity()
+    user_info = db.users.find_one({"id": user_id})
+    nickname = (user_info.get('nickname') if user_info else None) or user_id
+    return render_template('community.html', nickname=nickname, current_user_id=user_id)
+
+
+@app.route('/community/<post_id>')
+@jwt_required()
+def community_detail(post_id):
+    viewer_id = get_jwt_identity()
+
+    try:
+        oid = ObjectId(post_id)
+    except InvalidId:
+        return redirect(url_for('community'))   # URL을 잘못 쳤으면 그냥 목록으로
+
+    post = db.posts.find_one({"_id": oid})
+    if not post:
+        return redirect(url_for('community'))   # 삭제된 글이면 그냥 목록으로
+
+    # 글쓴이의 result.html 캐릭터 카드를 여기서 보여줘야 하므로,
+    # "지금 보는 사람(viewer_id)"이 아니라 "글쓴이(post['author_id'])"의 MBTI를 조회한다
+    author_info = db.users.find_one({"id": post['author_id']})
+    author_mbti = author_info.get('mbti') if author_info else None
+    my_class = MBTI_MAP.get(author_mbti)
+
+    character = None
+    if my_class:
+        character = {
+            "my_class": my_class,
+            "best_match": MBTI_MAP.get(my_class.get('best_match')),
+            "worst_match": MBTI_MAP.get(my_class.get('worst_match')),
+        }
+    # character가 None이면 템플릿에서 "아직 테스트를 안 한 모험가입니다" 문구가 대신 뜬다
+
+    post_data = {
+        "id": str(post["_id"]),
+        "title": post["title"],
+        "content": post["content"],
+        "author_id": post["author_id"],
+        "author_nickname": post["author_nickname"],
+        "created_at": post["created_at"].isoformat(),
+    }
+
+    return render_template(
+        'community_detail.html',
+        post=post_data,
+        character=character,
+        viewer_id=viewer_id,
+        is_author=(viewer_id == post['author_id']),
+    )
 
 @app.route('/signup')
 def signup():
@@ -150,7 +222,8 @@ def api_community_list():
         target = 'all'
     query = (request.args.get('q') or '').strip()
 
-    if query and len(query) < 2:
+    if query and len(query) < MIN_QUERY_LEN:
+
         return jsonify({"result": "fail", "msg": "검색어는 2글자 이상 입력해주세요."}), 400
 
     all_posts = list(db.posts.find({}))
@@ -208,7 +281,9 @@ def api_community_create():
     content = (data.get('content') or '').strip()
     now = datetime.now(timezone.utc)
 
-    if len(title) < 2 or len(content) < 2 :
+
+    if len(title) < MIN_QUERY_LEN or len(content) < MIN_QUERY_LEN :
+
         return jsonify({"result": "fail", "msg": "제목 및 본문을 2글자 이상 작성해주세요."}), 400
 
     db.posts.insert_one({
@@ -243,7 +318,8 @@ def api_community_update(post_id):
     title = (data.get('title') or '').strip()
     content = (data.get('content') or '').strip()
 
-    if len(title) < 2 or len(content) < 2 :
+    if len(title) < MIN_QUERY_LEN or len(content) < MIN_QUERY_LEN :
+
         return jsonify({"result": "fail", "msg": "제목 및 본문을 2글자 이상 작성해주세요."}), 400
 
     db.posts.update_one(
