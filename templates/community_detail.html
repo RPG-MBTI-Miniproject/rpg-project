@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,8 +8,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/result.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/community.css') }}">
+
+    <!-- live server -->
+    <link rel="stylesheet" href="../static/css/community.css">
 </head>
-<body>
+
+<body class="community-detail-body">
     <!-- ==========================================
          [담당: HTML/CSS 동료] 게시글 상세 화면
 
@@ -24,12 +29,16 @@
     <header class="top-nav">
         <!-- TODO: [HTML/CSS] 로고 / "게시글" 타이틀 / [로그아웃] 버튼 -->
     </header>
-
+    <div class="top-nav-next">
+        <div class="detail-left">
+            <a href="{{ url_for('community') }}" class="back-link">◀</a>
+            <span class="community-detail-subtitle">커뮤니티 게시글</span>
+        </div>
+        <button class="community-detail-logout" onclick="logout()">로그아웃</button>
+    </div>
     <main class="result-container">
         <!-- TODO: [HTML/CSS] 목록으로 돌아가는 링크
              href="{ url_for('community') }" 는 유지, 텍스트/아이콘만 자유 -->
-        <a href="{{ url_for('community') }}" class="back-link">← 목록으로</a>
-
         <!-- TODO: [HTML/CSS] 게시글 본문 카드
              id는 절대 변경 금지 (community.js가 참조):
                - class="post-title" 요소 안에 {{ post.title }}
@@ -39,7 +48,18 @@
              is_author 조건부 블록 안에는:
                - button id="edit-post-btn"
                - button id="delete-post-btn" -->
+        <div class="post-title">
+            <h1>{{ post.title }}</h1>
+
+        </div>
+        <div class="post-meta">
+            <span>{{ post.author_nickname }} · </span>
+            <span id="post-date"></span>
+        </div>
         <section class="post-body-card">
+            <div class="post-content">
+                <p>{{ post.content }}</p>
+            </div>
         </section>
 
         <!-- ==========================================
@@ -54,7 +74,8 @@
                 </div>
             </div>
             <h3 class="char-title">"{{ character.my_class.title }}"</h3>
-            <h1 class="char-name-mbti">{{ character.my_class.class_name }} <span class="mbti-badge">({{ character.my_class.mbti }})</span></h1>
+            <h1 class="char-name-mbti">{{ character.my_class.class_name }} <span class="mbti-badge">({{
+                    character.my_class.mbti }})</span></h1>
         </section>
 
         <section class="stats-info-section">
@@ -81,18 +102,28 @@
             <div class="chemistry-box">
                 <div class="chemistry-card best-match">
                     <div class="match-badge best">💚 최고의 파티원</div>
-                    <div class="match-img-wrapper"><div class="match-placeholder">🛡️</div></div>
+                    <div class="match-img-wrapper">
+                        <div class="match-placeholder">🛡️</div>
+                    </div>
                     <h4 class="match-name">{{ character.best_match.class_name }}</h4>
                     <span class="match-mbti">({{ character.best_match.mbti }})</span>
                 </div>
                 <div class="chemistry-card worst-match">
                     <div class="match-badge worst">💔 최악의 파티원</div>
-                    <div class="match-img-wrapper"><div class="match-placeholder">⚔️</div></div>
+                    <div class="match-img-wrapper">
+                        <div class="match-placeholder">⚔️</div>
+                    </div>
                     <h4 class="match-name">{{ character.worst_match.class_name }}</h4>
                     <span class="match-mbti">({{ character.worst_match.mbti }})</span>
                 </div>
             </div>
         </section>
+        {% if is_author %}
+        <div class="post-actions">
+            <button type="button" id="edit-post-btn" class="post-btn edit-btn">수정</button>
+            <button type="button" id="delete-post-btn" class="post-btn delete-btn">삭제</button>
+        </div>
+        {% endif %}
 
         <script id="stats-data" type="application/json">
             {{ character.my_class.stats | tojson }}
@@ -131,4 +162,5 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ url_for('static', filename='js/community.js') }}"></script>
 </body>
+
 </html>
