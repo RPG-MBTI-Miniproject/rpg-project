@@ -18,7 +18,7 @@
               -> DB에서 글쓴이 MBTI를 조회해서 Jinja2로 렌더링하는 백엔드 로직과
                  1:1로 묶여있는 부분이라, 여기 마크업을 바꾸면 데이터가 안 뜹니다.
                  스타일(색/여백/폰트)은 community.css에서 자유롭게 조정하되,
-                 class 이름과 {{ }} 변수 자리는 유지해주세요.
+                 class 이름과 이중 중괄호 변수 자리는 유지해주세요.
          ========================================== -->
 
     <header class="top-nav">
@@ -27,7 +27,7 @@
 
     <main class="result-container">
         <!-- TODO: [HTML/CSS] 목록으로 돌아가는 링크
-             href="{{ url_for('community') }}" 는 유지, 텍스트/아이콘만 자유 -->
+             href="{ url_for('community') }" 는 유지, 텍스트/아이콘만 자유 -->
         <a href="{{ url_for('community') }}" class="back-link">← 목록으로</a>
 
         <!-- TODO: [HTML/CSS] 게시글 본문 카드
@@ -36,7 +36,7 @@
                - class="post-meta"  요소 안에 {{ post.author_nickname }} 와
                  span id="post-date" (날짜는 JS가 채워넣음, 비워두면 됨)
                - class="post-content" 요소 안에 {{ post.content }}
-             {% if is_author %} 블록 안에는:
+             is_author 조건부 블록 안에는:
                - button id="edit-post-btn"
                - button id="delete-post-btn" -->
         <section class="post-body-card">
