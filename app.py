@@ -34,7 +34,7 @@ app.config['JWT_SECRET_KEY'] = JWT_SECRET_KEY
 
 # API는 헤더(Authorization)로, 주소창으로 여는 SSR 페이지(/test, /result)는 쿠키로 인증
 app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
-app.config['JWT_COOKIE_SECURE'] = False        # HTTPS 붙이면 True로
+app.config['JWT_COOKIE_SECURE'] = os.getenv('JWT_COOKIE_SECURE', 'False') == 'True'        # HTTPS 붙이면 True로
 app.config['JWT_COOKIE_CSRF_PROTECT'] = False  # 미니 프로젝트 범위에서는 비활성
 
 client = MongoClient(MONGO_URL)             # PyMongo로 MongoDB에 연결 객체 생성
@@ -184,6 +184,25 @@ def result():
         'result.html',
         my_class=my_class,
         nickname=(user_info.get('nickname') or user_id),
+        best_match=MBTI_MAP.get(my_class['best_match']),
+        worst_match=MBTI_MAP.get(my_class['worst_match']),
+    )
+
+@app.route('/result/<nickname>')
+def result_public(nickname):
+    user_info = db.users.find_one({"nickname": nickname})
+    if not user_info:
+        return redirect(url_for('home'))
+
+    user_mbti = user_info.get('mbti')
+    my_class = MBTI_MAP.get(user_mbti)
+    if not my_class:
+        return redirect(url_for('home'))   # 아직 테스트 안 한 유저면 그냥 로그인 화면으로
+
+    return render_template(
+        'result.html',
+        my_class=my_class,
+        nickname=user_info.get('nickname'),
         best_match=MBTI_MAP.get(my_class['best_match']),
         worst_match=MBTI_MAP.get(my_class['worst_match']),
     )
@@ -504,6 +523,54 @@ def api_submit():
     # db에 있는 유저 정보에 mbti 결과 업데이트
     db.users.update_one({"id": user_id}, {"$set": {"mbti": mbti_result}})
     return jsonify({"result": "success", "mbti": mbti_result})
+
+@app.route('/api/compatibility', methods=['GET'])
+@jwt_required()
+def api_compatibility():
+    friend_nickname = (request.args.get('nickname') or '').strip()
+    if not friend_nickname:
+        return jsonify({"result": "fail", "msg": "닉네임을 입력해주세요."}), 400
+
+    user_id = get_jwt_identity()
+    me_info = db.users.find_one({"id": user_id})
+    me_mbti = me_info.get('mbti') if me_info else None
+    if not me_mbti:
+        return jsonify({"result": "fail", "msg": "먼저 성향 테스트를 진행해주세요."}), 400
+
+    friend_info = db.users.find_one({"nickname": friend_nickname})
+    if not friend_info:
+        return jsonify({"result": "fail", "msg": "해당 닉네임의 모험가를 찾을 수 없습니다."}), 404
+
+    friend_mbti = friend_info.get('mbti')
+    if not friend_mbti:
+        return jsonify({"result": "fail", "msg": "그 모험가는 아직 테스트를 진행하지 않았습니다."}), 404
+
+    me_class = MBTI_MAP.get(me_mbti)
+    friend_class = MBTI_MAP.get(friend_mbti)
+
+    def relation_of(viewer_class, other_mbti, other_class_name):
+        if viewer_class.get('best_match') == other_mbti:
+            return {"emoji": "💚", "tag": "duo", "description": f"{other_class_name}와(과)는 환상의 듀오예요! 함께라면 어떤 던전도 든든합니다."}
+        if viewer_class.get('worst_match') == other_mbti:
+            return {"emoji": "💔", "tag": "brain", "description": f"{other_class_name}와(과)는 충돌 주의! 서로 다른 플레이 스타일을 이해하는 노력이 필요해요."}
+        return {"emoji": "🙂", "tag": "neutral", "description": f"{other_class_name}와(과)는 무난한 케미예요. 특별히 잘 맞거나 안 맞는 조합은 아니에요."}
+
+    return jsonify({
+        "result": "success",
+        "friend": {
+            "nickname": friend_info.get('nickname'),
+            "class_name": friend_class['class_name'],
+            "mbti": friend_class['mbti'],
+        },
+        "me": {
+            "class_name": me_class['class_name'],
+            "mbti": me_class['mbti'],
+        },
+        "compatibility": {
+            "me_to_friend": relation_of(me_class, friend_mbti, friend_class['class_name']),
+            "friend_to_me": relation_of(friend_class, me_mbti, me_class['class_name']),
+        },
+    })
 
 @app.route('/api/community/posts/<post_id>', methods=['DELETE'])
 @jwt_required()
