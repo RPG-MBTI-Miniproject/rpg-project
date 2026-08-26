@@ -3,19 +3,19 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RPG MBTI - 신규 모험가 등록</title>
     <link rel="stylesheet" as="style" crossorigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}?v=3">
 </head>
 
 <body class="auth-body">
     <main>
         <section>
             <div class="auth-wrapper">
-                <form class="auth-card reveal is-visible" id="signup-form" method="POST">
+                <form class="auth-card reveal is-visible" id="signup-form">
                     <div class="auth-header">
                         <h2 class="auth-title">회원가입</h2>
                     </div>
@@ -38,7 +38,7 @@
                     </div>
 
                     <div class="auth-footer">
-                        <a href="/" class="auth-link">로그인으로 돌아가기</a>
+                        <a href="{{ url_for('home') }}" class="auth-link">로그인으로 돌아가기</a>
                     </div>
                 </form>
             </div>
@@ -46,7 +46,7 @@
     </main>
 
     <!-- TODO: [이정욱] 회원가입 AJAX 처리를 위한 JS 파일 연결 -->
-    <script src="/static/js/auth.js"></script>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
 </body>
 
 </html>

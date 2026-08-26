@@ -1,8 +1,8 @@
 venv/
 .env
-.env.example
 __pycache__/
 pyvenv.cfg
 CACHEDIR.TAG
 Lib
 Scripts
+docs/
