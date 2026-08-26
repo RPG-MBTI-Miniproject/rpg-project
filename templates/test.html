@@ -13,32 +13,49 @@
 
 <body>
     <!-- TODO: [최현욱] Frame 2 와이어프레임에 맞춘 UI/UX 퍼블리싱 (SPA 형태) -->
-    <div class="test-container">
-        <div class="header">
-            <div class="header-left">
-                <button id="prev-btn" class="prev-btn" title="이전으로">◀</button><!-- 이전 버튼 -->
+    <div class="test-wrapper">
+        <div class="test-container">
+            <!-- Header Nav -->
+            <div class="header">
+                <button id="prev-btn" class="prev-btn" title="이전으로">‹</button><!-- 이전 버튼 -->
                 <span class="welcome-msg">{{ nickname }}님, 환영합니다!</span>
+                <button class="logout-btn" onclick="logout()">로그아웃</button>
             </div>
-            <button class="logout-btn" onclick="logout()">[로그아웃]</button>
-        </div>
 
-        <div class="progress-bar">
-            <!-- TODO: [최현욱] 진행도 바 UI 컴포넌트 개발 -->
-            <div class="progress-text">
-                진행도: Q. <span id="q-num">1</span> / 12
+            <!-- Progress Area -->
+            <div class="progress-area">
+                <!-- TODO: [최현욱] 진행도 바 UI 컴포넌트 개발 -->
+                <div class="progress-badge">
+                    Q. <span id="q-num">1</span> / 12
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-track">
+                        <div class="progress-bar-fill" id="progress-bar-fill" style="width: 8.33%;"></div>
+                    </div>
+                </div>
             </div>
-            <div class="progress-bar-track">
-                <div class="progress-bar-fill" id="progress-bar-fill" style="width: 8.33%;"></div>
+
+            <!-- Character / Dungeon Area -->
+            <div class="character-area">
+                <img src="{{ url_for('static', filename='images/main-logo.png') }}" alt="던전 일러스트" class="character-img">
             </div>
-        </div>
 
-        <div class="question-area">
-            <h3 id="question-text">여기에 질문 텍스트가 JS로 들어옵니다.</h3>
-        </div>
+            <!-- Question Card -->
+            <div class="question-area">
+                <h3 id="question-text" class="question-text">여기에 질문 텍스트가 JS로 들어옵니다.</h3>
+            </div>
 
-        <div class="answer-buttons">
-            <button id="btn-a" class="answer-btn">(A) 첫 번째 선택지</button>
-            <button id="btn-b" class="answer-btn">(B) 두 번째 선택지</button>
+            <!-- Selection Options -->
+            <div class="answer-buttons">
+                <button id="btn-a" class="answer-btn">(A) 첫 번째 선택지</button>
+                <button id="btn-b" class="answer-btn">(B) 두 번째 선택지</button>
+            </div>
+
+            <!-- Footer Alert -->
+            <div class="footer-alert">
+                <span class="sparkle-icon">✨</span>
+                <span>답변은 마음에 더 끌리는 쪽을 바로 골라주세요!</span>
+            </div>
         </div>
     </div>
 
