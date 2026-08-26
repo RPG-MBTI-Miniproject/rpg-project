@@ -7,19 +7,75 @@
    ========================================== */
 
 .hidden {
-    display: none !important;   /* JS가 이 클래스를 붙였다 뗐다 하면서 보이기/숨기기를 제어합니다 */
+   display: none !important;
+   /* JS가 이 클래스를 붙였다 뗐다 하면서 보이기/숨기기를 제어합니다 */
 }
 
 .modal-backdrop {
-    position: fixed;   /* 모달은 화면 전체를 덮어야 하므로 fixed 유지 필수 */
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 50;
-    /* 배경 어둡게 깔아주는 색상(background)은 자유롭게 정해주세요 */
+   position: fixed;
+   /* 모달은 화면 전체를 덮어야 하므로 fixed 유지 필수 */
+   inset: 0;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   z-index: 50;
+   /* 배경 어둡게 깔아주는 색상(background)은 자유롭게 정해주세요 */
 }
 
+.community-body {
+   background-color: var(--bg-dark, #12101c);
+   font-family: var(--font-sans, 'Pretendard', sans-serif);
+   min-height: 100vh;
+   margin: 0;
+   display: flex;
+   flex-direction: column;
+   color: var(--text-main, #f8fafc);
+}
+
+/* 상단 바 */
+.top-nav {
+   width: 100%;
+   border-bottom: 8px solid rgba(255, 255, 255, 0.12);
+   background: rgba(18, 16, 28, 0.8);
+   backdrop-filter: blur(10px);
+}
+
+.community-nav-bar {
+   max-width: 1400px;
+   margin: 0 auto;
+   height: 140px;
+   padding: 0 2rem;
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+}
+
+.community-nav-left {
+   flex: 1;
+   display: flex;
+   align-items: center;
+}
+
+.community-nav-logo {
+   max-height: 100px;
+   width: auto;
+}
+
+.community-nav-title {
+   flex: 1;
+   text-align: center;
+   font-size: 2rem;
+   font-weight: 700;
+   color: #ffffff;
+   margin: 0;
+   letter-spacing: 0.5px;
+}
+
+.community-nav-right {
+   flex: 1;
+   display: flex;
+   justify-content: flex-end;
+}
 
 /* ==========================================
    TODO 체크리스트 — 아래 클래스/id들에 스타일을 입혀주세요
@@ -36,6 +92,180 @@
    .empty-msg                검색 결과 없음 안내
    .pagination, .pagination button, .pagination button.active
 */
+.community-container {
+   flex: 1;
+   max-width: 1000px;
+   width: 100%;
+   margin: 0 auto;
+   border-radius: 20px;
+   margin-top: 30px;
+   padding: 2rem 1.5rem 4rem 1.5rem;
+   display: flex;
+   flex-direction: column;
+   gap: 1.5rem;
+   background-color: rgb(108, 108, 108);
+}
+
+/* 툴바 (검색창 + 글쓰기 버튼) */
+.board-toolbar {
+   width: 100%;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   flex-wrap: wrap;
+   gap: 1rem;
+}
+
+.search-box {
+   display: flex;
+   align-items: center;
+   gap: 0.5rem;
+   flex: 1;
+   max-width: 800px;
+}
+
+.search-target {
+   padding: 1rem 1rem;
+   background: rgba(30, 27, 50, 0.9);
+   border: 1px solid rgba(255, 255, 255, 0.2);
+   border-radius: 8px;
+   color: #e2e8f0;
+   font-size: 1rem;
+   outline: none;
+}
+
+.search-input {
+   flex: 1;
+   padding: 1rem 1rem;
+   background: rgba(15, 14, 25, 0.8);
+   border: 1px solid rgba(255, 255, 255, 0.2);
+   border-radius: 8px;
+   color: #fff;
+   font-size: 0.9rem;
+   outline: none;
+}
+
+.search-input:focus {
+   border-color: #00f2fe;
+}
+
+.search-btn,
+.write-btn {
+   padding: 1rem 1.2rem;
+   border-radius: 8px;
+   font-size: 1rem;
+   font-weight: 600;
+   cursor: pointer;
+   transition: all 0.2s ease;
+   white-space: nowrap;
+}
+
+.search-btn {
+   background: rgba(45, 40, 75, 0.9);
+   border: 1px solid rgba(255, 255, 255, 0.2);
+   color: #e2e8f0;
+}
+
+.search-btn:hover {
+   border-color: #00f2fe;
+   color: #00f2fe;
+}
+
+.write-btn {
+   background-color: rgb(56, 56, 255);
+   border: none;
+   color: #fff;
+   box-shadow: 0 4px 12px rgba(118, 198, 255, 0.3);
+}
+
+.write-btn:hover {
+   transform: translateY(-2px);
+   background-color: rgb(3, 3, 201);
+   box-shadow: 0 6px 16px rgba(109, 125, 203, 0.5);
+}
+
+/* 정렬 탭 */
+.sort-tabs {
+   display: flex;
+   gap: 0.5rem;
+}
+
+.sort-btn {
+   background-color: rgb(121, 121, 121);
+   border: 1px solid rgba(112, 115, 249, 0.587);
+   border-radius: 6px;
+   color: #fdfdfd;
+   padding: 0.4rem 0.8rem;
+   font-size: 0.85rem;
+   cursor: pointer;
+   transition: all 0.2s ease;
+}
+
+.sort-btn.active,
+.sort-btn:hover {
+   background: rgb(212, 180, 0);
+   border-color: #ffd700;
+   color: #5939e7;
+   font-weight: 600;
+}
+
+/* 게시글 목록 */
+.post-list {
+   width: 100%;
+   display: flex;
+   flex-direction: column;
+   gap: 0.75rem;
+}
+
+.post-row {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: 1.2rem 1.5rem;
+   background: rgba(26, 24, 42, 0.85);
+   border: 1px solid rgba(255, 255, 255, 0.12);
+   border-radius: 12px;
+   text-decoration: none;
+   color: inherit;
+   transition: all 0.2s ease;
+}
+
+.post-row:hover {
+   transform: translateY(-2px);
+   border-color: rgba(0, 242, 254, 0.4);
+   background: rgba(35, 31, 55, 0.95);
+}
+
+.empty-msg {
+   text-align: center;
+   padding: 3rem;
+   color: #94a3b8;
+   font-size: 1rem;
+}
+
+/* 페이지네이션 */
+.pagination {
+   display: flex;
+   justify-content: center;
+   gap: 0.5rem;
+   margin-top: 1rem;
+}
+
+.pagination button {
+   padding: 0.5rem 0.8rem;
+   background: rgba(30, 27, 50, 0.8);
+   border: 1px solid rgba(255, 255, 255, 0.15);
+   border-radius: 6px;
+   color: #e2e8f0;
+   cursor: pointer;
+}
+
+.pagination button.active {
+   background: #2563eb;
+   border-color: #00f2fe;
+   color: #fff;
+   font-weight: 700;
+}
 
 /* [글쓰기/수정 모달 — 두 화면 공용]
    .modal-box                모달 박스 자체 (배경/모서리/그림자)
@@ -43,6 +273,96 @@
    .modal-error
    .modal-actions, .modal-actions button, .modal-actions button.primary
 */
+.modal-backdrop {
+   background: rgba(0, 0, 0, 0.7);
+   backdrop-filter: blur(5px);
+}
+
+.modal-box {
+   background: #1e1b33;
+   border: 1px solid rgba(255, 255, 255, 0.2);
+   border-radius: 16px;
+   width: 90%;
+   max-width: 550px;
+   padding: 2rem;
+   display: flex;
+   flex-direction: column;
+   gap: 1.2rem;
+   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+}
+
+.modal-title {
+   margin: 0;
+   font-size: 1.3rem;
+   color: #ffd700;
+}
+
+.modal-error {
+   color: #ef4444;
+   font-size: 0.85rem;
+   background: rgba(239, 68, 68, 0.1);
+   padding: 0.5rem 0.75rem;
+   border-radius: 6px;
+}
+
+.modal-form-group {
+   display: flex;
+   flex-direction: column;
+   gap: 0.8rem;
+}
+
+.modal-input,
+.modal-textarea {
+   width: 100%;
+   padding: 0.75rem 1rem;
+   background: rgba(15, 14, 25, 0.9);
+   border: 1px solid rgba(255, 255, 255, 0.2);
+   border-radius: 8px;
+   color: #fff;
+   font-family: inherit;
+   font-size: 0.95rem;
+   outline: none;
+   box-sizing: border-box;
+}
+
+.modal-input:focus,
+.modal-textarea:focus {
+   border-color: #00f2fe;
+}
+
+.modal-actions {
+   display: flex;
+   justify-content: flex-end;
+   gap: 0.75rem;
+}
+
+.modal-btn {
+   padding: 0.6rem 1.2rem;
+   border-radius: 8px;
+   font-size: 0.9rem;
+   font-weight: 600;
+   cursor: pointer;
+}
+
+.modal-btn.cancel-btn {
+   background: transparent;
+   border: 1px solid rgba(255, 255, 255, 0.2);
+   color: #94a3b8;
+}
+
+.modal-btn.submit-btn {
+   background-color: #2563eb;
+   border: none;
+   color: #ffffff;
+}
+
+.modal-btn.submit-btn:hover {
+   background-color: #193fa9;
+}
+
+.cancel-btn:hover {
+   background-color: rgba(173, 171, 171, 0.37);
+}
 
 /* [상세 화면 community_detail.html]
    .back-link
