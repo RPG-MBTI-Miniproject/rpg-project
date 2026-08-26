@@ -639,7 +639,7 @@ if (document.querySelector('#comment-list')) {
 
             // 2. [직접 작성] 값이 비어있는지 확인하는 유효성 검사
             //    - 비어있으면 alert 띄우고 함수 종료(return)
-            if (content === null || content === '') {
+            if (!content) {
                 alert("내용을 입력해 주세요!");
                 return;
             }
@@ -649,11 +649,16 @@ if (document.querySelector('#comment-list')) {
                 //    - URL: `/api/community/posts/${POST_ID}/comments`
                 //    - method: 'POST'
                 //    - body: JSON.stringify({ content })
-                await apiFetch(/* URL 및 옵션 작성 */);
+                const data = await apiFetch(`/api/community/posts/${POST_ID}/comments`, { method: 'POST', body: JSON.stringify({ content }) });
 
                 // 4. [직접 작성] 성공 시 처리
                 //    - 입력창 비우기 (#comment-input의 value)
                 //    - loadComments() 호출하여 목록 새로고침
+                if (data.result === "success") {
+                    const inputvalue = document.querySelector('#comment-input');
+                    inputvalue.value = '';
+                    loadComments()
+                }
 
             } catch (error) {
                 console.error('댓글 등록 중 오류 발생:', error);
