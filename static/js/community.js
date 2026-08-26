@@ -87,13 +87,23 @@ async function apiFetch(url, options = {}) {
         return;
     }
 
-    // 2-B. 응답 JSON 파싱
-    const data = await res.json();
+    // 2-B. 응답 JSON 파싱    
 
-    // 3. 에러 검사
-    if (data.result === 'fail' || res.ok === false) {
-        // data.msg가 없으면 오른쪽의 기본 메시지를 사용
-        const errorMessage = data.msg || ' 요청 처리 중 에러가 발생했습니다.';
+    let data;
+    try {
+        data = await res.json();
+    } catch (parseError) {
+        // / 1. HTTP 에러 상태(400, 500 등)인 경우
+        if (!res.ok) {
+            throw new Error(`서버 에러가 발생했습니다. (상태 코드: ${res.status})`);
+        }
+        // 2. HTTP 상태는 정상(200)이지만 JSON 파싱만 실패한 경우 (else 생략)
+        throw new Error(`응답 데이터(JSON) 파싱에 실패했습니다. (상태 코드: ${res.status})`);
+    }
+
+    // 3. 파싱 성공 후 에러 검사. data.msg가 없으면 기본 메시지를 사용
+    if (!res.ok || data?.result === 'fail') {
+        const errorMessage = data?.msg || ' 요청 처리 중 에러가 발생했습니다.';
         throw new Error(errorMessage);
     }
 
