@@ -7,54 +7,410 @@
    ========================================== */
 
 .hidden {
-    display: none !important;   /* JS가 이 클래스를 붙였다 뗐다 하면서 보이기/숨기기를 제어합니다 */
+   display: none !important;
+   /* JS가 이 클래스를 붙였다 뗐다 하면서 보이기/숨기기를 제어합니다 */
 }
 
 .modal-backdrop {
-    position: fixed;   /* 모달은 화면 전체를 덮어야 하므로 fixed 유지 필수 */
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 50;
-    /* 배경 어둡게 깔아주는 색상(background)은 자유롭게 정해주세요 */
+   position: fixed;
+   /* 모달은 화면 전체를 덮어야 하므로 fixed 유지 필수 */
+   inset: 0;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   z-index: 50;
+   /* 배경 어둡게 깔아주는 색상(background)은 자유롭게 정해주세요 */
 }
 
 
-/* ==========================================
-   TODO 체크리스트 — 아래 클래스/id들에 스타일을 입혀주세요
-   (어떤 화면에 쓰이는지는 옆에 적어뒀습니다. 와이어프레임 3장 참고)
-   ========================================== */
 
-/* [목록 화면 community.html]
-   .community-container   전체 폭/여백
-   .board-toolbar          검색창 + 글쓰기 버튼 한 줄 배치
-   .search-box              select + input + button 묶음
-   .sort-tabs, .sort-btn, .sort-btn.active   최신순/오래된순 토글
-   .post-list, .post-row    게시글 목록 한 줄 한 줄
-   .post-row-title, .post-row-sub, .post-row-date
-   .empty-msg                검색 결과 없음 안내
-   .pagination, .pagination button, .pagination button.active
-*/
+:root {
+    --aurora-bg: linear-gradient(90deg, #F0EFFF 0%, #E6F0FF 50%, #EAFBF7 100%);
+    --surface: rgba(255, 255, 255, 0.75);
+    --surface-solid: #ffffff;
+    --border-soft: rgba(124, 111, 242, 0.18);
+    --text-primary: #1e1b4b;
+    --text-secondary: #4b5563;
+    --text-muted: #6b7280;
+    --accent: #7c6ff2;
+    --accent-strong: #5939e7;
+    --danger: #ef4444;
+}
 
-/* [글쓰기/수정 모달 — 두 화면 공용]
-   .modal-box                모달 박스 자체 (배경/모서리/그림자)
-   .modal-box input, .modal-box textarea
-   .modal-error
-   .modal-actions, .modal-actions button, .modal-actions button.primary
-*/
+.community-body {
+    background: var(--aurora-bg);
+    font-family: var(--font-sans, 'Pretendard', sans-serif);
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    color: var(--text-primary);
+}
 
-/* [상세 화면 community_detail.html]
-   .back-link
-   .post-body-card, .post-title, .post-meta, .post-content
-   .post-owner-actions, .post-owner-actions button.danger
-   .no-character-msg
-   .comment-section, .comment-list, .comment-row
-   .comment-author, .comment-content
-   .comment-actions, .comment-actions span, .comment-actions span.disabled, .comment-actions span.danger
-   .comment-input-row
-*/
+/* 상단 바 */
+.top-nav {
+    width: 100%;
+    border-bottom: 1px solid var(--border-soft);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+}
+
+.community-nav-bar {
+    max-width: 1400px;
+    margin: 0 auto;
+    height: 100px;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.community-nav-left { flex: 1; display: flex; align-items: center; }
+.community-nav-logo { max-height: 64px; width: auto; }
+
+.community-nav-title {
+    flex: 1;
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.community-nav-right { flex: 1; display: flex; justify-content: flex-end; }
+
+.nav-actions { display: flex; gap: 12px; align-items: center; }
+.nav-link { color: var(--text-secondary); text-decoration: none; font-size: 13px; }
+.nav-link:hover { color: var(--accent-strong); }
+
+.hub-nav-logout,
+.community-nav-logout,
+.logout-btn {
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--accent);
+    background: transparent;
+    color: var(--accent-strong);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.hub-nav-logout:hover,
+.community-nav-logout:hover,
+.logout-btn:hover {
+    background: var(--accent);
+    color: #fff;
+}
+
+/* ================= 목록 화면 ================= */
+.community-container {
+    flex: 1;
+    max-width: 1000px;
+    width: 100%;
+    margin: 30px auto 0;
+    border-radius: 24px;
+    padding: 2rem 1.5rem 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.10);
+}
+
+.board-toolbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.search-box { display: flex; align-items: center; gap: 0.5rem; flex: 1; max-width: 800px; }
+
+.search-target,
+.search-input {
+    padding: 0.9rem 1rem;
+    background: var(--surface-solid);
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    outline: none;
+}
+.search-input { flex: 1; }
+.search-input:focus,
+.search-target:focus { border-color: var(--accent); }
+
+.search-btn,
+.write-btn {
+    padding: 0.9rem 1.2rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    border: none;
+}
+
+.search-btn {
+    background: var(--surface-solid);
+    border: 1px solid var(--border-soft);
+    color: var(--text-secondary);
+}
+.search-btn:hover { border-color: var(--accent); color: var(--accent-strong); }
+
+.write-btn {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(124, 111, 242, 0.35);
+}
+.write-btn:hover { background: var(--accent-strong); transform: translateY(-2px); }
+
+/* 정렬 탭 */
+.sort-tabs { display: flex; gap: 0.5rem; }
+
+.sort-btn {
+    background: var(--surface-solid);
+    border: 1px solid var(--border-soft);
+    border-radius: 999px;
+    color: var(--text-secondary);
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.sort-btn.active,
+.sort-btn:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+}
+
+/* 게시글 목록 (teammate JS가 실제로 그리는 클래스: post-item, post-title, post-author, post-comments, post-date) */
+.post-list { width: 100%; display: flex; flex-direction: column; gap: 0.75rem; }
+
+.post-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    padding: 1.1rem 1.4rem;
+    background: var(--surface-solid);
+    border: 1px solid var(--border-soft);
+    border-radius: 14px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+}
+.post-item:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    box-shadow: 0 6px 18px rgba(124, 111, 242, 0.15);
+}
+.post-item .post-title { font-size: 1rem; font-weight: 600; color: var(--text-primary); }
+.post-item .post-author { font-size: 0.85rem; color: var(--text-muted); }
+.post-item .post-comments { font-size: 0.85rem; color: var(--accent-strong); }
+.post-item .post-date { font-size: 0.8rem; color: var(--text-muted); margin-left: auto; }
+
+.empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); font-size: 1rem; }
+
+/* 페이지네이션 */
+.pagination { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1rem; }
+
+.pagination button,
+.page-btn {
+    padding: 0.5rem 0.9rem;
+    background: var(--surface-solid);
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+.pagination button.active,
+.page-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 700;
+}
+
+/* ================= 글쓰기/수정 모달 ================= */
+.modal-backdrop { background: rgba(30, 27, 75, 0.35); backdrop-filter: blur(6px); }
+
+.modal-box {
+    background: var(--surface-solid);
+    border: 1px solid var(--border-soft);
+    border-radius: 20px;
+    width: 90%;
+    max-width: 550px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    box-shadow: 0 20px 50px rgba(99, 102, 241, 0.25);
+}
+
+.modal-title,
+#modal-title { margin: 0; font-size: 1.3rem; color: var(--accent-strong); }
+
+.modal-error,
+#modal-error {
+    color: var(--danger);
+    font-size: 0.85rem;
+    background: rgba(239, 68, 68, 0.08);
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+}
+
+.modal-box input,
+.modal-box textarea,
+.modal-input,
+.modal-textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: #fbfbff;
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.95rem;
+    outline: none;
+    box-sizing: border-box;
+}
+.modal-box input:focus,
+.modal-box textarea:focus { border-color: var(--accent); }
+
+.modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; }
+
+.modal-actions button,
+.modal-btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid var(--border-soft);
+    background: transparent;
+    color: var(--text-secondary);
+}
+.modal-actions button.primary,
+.modal-btn.submit-btn {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+.modal-actions button.primary:hover,
+.modal-btn.submit-btn:hover { background: var(--accent-strong); }
+.modal-btn.cancel-btn:hover { background: rgba(124, 111, 242, 0.08); }
+
+/* ================= 상세 화면 ================= */
+.back-link {
+    display: inline-block;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 13px;
+    margin-bottom: 16px;
+}
+.back-link:hover { color: var(--accent-strong); }
+
+.post-body-card {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: 24px;
+    padding: 32px 28px;
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.12);
+    margin-bottom: 24px;
+}
+.post-body-card .post-title { font-size: 1.6rem; font-weight: 700; color: var(--text-primary); margin: 0 0 8px; }
+.post-body-card .post-meta { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 20px; }
+.post-body-card .post-content { font-size: 1rem; line-height: 1.75; color: var(--text-secondary); white-space: pre-wrap; }
+
+.post-owner-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+.post-owner-actions button {
+    padding: 0.5rem 1.2rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid var(--accent);
+    background: transparent;
+    color: var(--accent-strong);
+    transition: all 0.2s ease;
+}
+.post-owner-actions button:hover { background: rgba(124, 111, 242, 0.08); }
+.post-owner-actions button.danger { background: var(--accent); border-color: var(--accent); color: #fff; }
+.post-owner-actions button.danger:hover { background: var(--accent-strong); }
+
+.no-character-msg { text-align: center; color: var(--text-muted); font-size: 13px; padding: 24px 0; }
+
+/* 댓글 */
+.comment-section { margin-top: 24px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 24px; padding: 28px; }
+.comment-list { display: flex; flex-direction: column; }
+.comment-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-top: 1px solid var(--border-soft);
+    gap: 12px;
+}
+.comment-author { font-size: 13px; font-weight: 700; color: var(--text-primary); margin: 0; }
+.comment-content { font-size: 13px; color: var(--text-secondary); margin: 4px 0 0; white-space: pre-wrap; }
+
+.comment-actions { display: flex; gap: 8px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+.comment-actions span { cursor: pointer; color: var(--text-muted); }
+.comment-actions span:hover { color: var(--accent-strong); }
+.comment-actions span.disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+.comment-actions span.danger:hover { color: var(--danger); }
+
+.comment-input-row { display: flex; gap: 8px; margin-top: 16px; }
+.comment-input-row input {
+    flex: 1;
+    background: #fbfbff;
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    color: var(--text-primary);
+    padding: 10px 12px;
+    font-size: 13px;
+}
+.comment-input-row button {
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.comment-input-row button:hover { background: var(--accent-strong); }
+
+/* 상세 화면 전체 배경 (result-container를 community_detail.html이 재사용하지만,
+   result.html과 색 충돌을 피하려면 community_detail.html 쪽에서만 인라인으로
+   덮어쓰는 걸 권장합니다 — 아래 3번 참고) */
+
+
+.result-container {
+    background: linear-gradient(90deg, #F0EFFF 0%, #E6F0FF 50%, #EAFBF7 100%);
+    min-height: 100vh;
+    padding: 32px 24px 48px;
+}
+
+/* community.css에 추가 */
+.community-detail-bg {
+    background: var(--aurora-bg);
+    min-height: 100vh;
+    padding: 32px 24px 48px;
+}
 
 /* [공용 네비게이션]
    .nav-actions, .nav-link
 */
+
+
