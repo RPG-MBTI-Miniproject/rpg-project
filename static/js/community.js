@@ -727,3 +727,4 @@ if (document.querySelector('#comment-list')) {
         });
     }
 }
+
