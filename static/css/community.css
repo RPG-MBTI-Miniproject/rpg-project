@@ -14,6 +14,11 @@
 .modal-backdrop {
    position: fixed;
    /* 모달은 화면 전체를 덮어야 하므로 fixed 유지 필수 */
+   /* inset 은 Safari 14.1 부터라, 구형 iOS 를 위해 네 방향을 따로 적어둡니다 */
+   top: 0;
+   right: 0;
+   bottom: 0;
+   left: 0;
    inset: 0;
    display: flex;
    align-items: center;
@@ -38,32 +43,44 @@
 }
 
 .community-body {
-   background: var(--aurora-bg);
-   font-family: var(--font-sans, 'Pretendard', sans-serif);
-   min-height: 100vh;
-   margin: 0;
-   display: flex;
-   flex-direction: column;
-   color: var(--text-primary);
+    background: var(--aurora-bg);
+    font-family: var(--font-sans, 'Pretendard', sans-serif);
+    min-height: 100vh;
+    min-height: 100dvh;   /* iOS 주소창 높이 보정 (구형은 위 줄 사용) */
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    color: var(--text-primary);
 }
 
-/* 상단 바 */
+/* 상단 바
+   주의: 상세 화면(community_detail.html)은 result.css 를 함께 로드하는데,
+   거기 .top-nav 가 max-width: 689px / padding: 16px 20px 를 걸고 있습니다.
+   아래에서 그 두 속성을 다시 지정하지 않으면 상세 화면에서만 헤더가
+   좁은 흰 상자로 떠 보입니다(목록 화면은 result.css 를 안 불러서 멀쩡).
+   두 화면을 같게 보이도록 여기서 무효화합니다. */
 .top-nav {
-   display: flex;
-   justify-content: center;
-   width: 100%;
-   border-bottom: 1px solid var(--border-soft);
-   background: rgba(255, 255, 255, 0.6);
-   backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    border-bottom: 1px solid var(--border-soft);
+    background: rgba(255, 255, 255, 0.6);
+    -webkit-backdrop-filter: blur(10px);   /* Safari 는 18 이전까지 이 접두사가 있어야 흐림 효과가 먹습니다 */
+    backdrop-filter: blur(10px);
 }
 
-/* 헤더 — 돌아가기(좌) / 로그아웃(우) */
+/* 헤더 — 돌아가기(좌) / 로그아웃(우)
+   max-width 는 아래 본문 카드와 같은 값이어야 좌우가 맞습니다.
+     목록(.community-container) / 상세(.result-container) 모두 1000px
+   1400px 이었을 때 헤더만 400px 더 넓어서 삐져나와 보였습니다. */
 .community-nav-bar {
    width: 100%;
-   max-width: 1400px;
+   max-width: 1000px;
    box-sizing: border-box;
    margin: 0 auto;
-   padding: 20px 32px;
+   padding: 20px 32px;   /* 본문 카드의 좌우 안쪽 여백과 같은 값 -> 글자 줄이 맞습니다 */
    display: flex;
    align-items: center;
    justify-content: space-between;
@@ -273,25 +290,58 @@
    gap: 0.75rem;
 }
 
+<<<<<<< HEAD
+=======
+/* 게시글 목록 */
+.post-list {
+   width: 100%;
+   display: flex;
+   flex-direction: column;
+}
+
+/* community.js 의 renderPosts() 가 실제로 붙이는 클래스는 .post-item 입니다.
+   .post-row 만 적혀 있어서 목록이 밑줄 달린 기본 링크로 나오고 있었습니다.
+   둘 다 받아두면 JS 쪽 이름이 나중에 바뀌어도 깨지지 않습니다. */
+.post-row,
+>>>>>>> origin/main
 .post-item {
    display: flex;
    justify-content: space-between;
    align-items: center;
+<<<<<<< HEAD
    flex-wrap: wrap;
    gap: 4px 16px;
    padding: 1.1rem 1.4rem;
    background: var(--surface-solid);
    border: 1px solid var(--border-soft);
    border-radius: 14px;
+=======
+   gap: 4px 16px;
+   flex-wrap: wrap;
+   padding: 1.2rem 0.25rem;
+   border-bottom: 1px solid #f1f5f9;
+>>>>>>> origin/main
    text-decoration: none;
    color: inherit;
    transition: all 0.2s ease;
 }
 
+<<<<<<< HEAD
 .post-item:hover {
    transform: translateY(-2px);
    border-color: var(--accent);
    box-shadow: 0 6px 18px rgba(124, 111, 242, 0.15);
+=======
+.post-row:last-child,
+.post-item:last-child {
+   border-bottom: none;
+}
+
+.post-row:hover,
+.post-item:hover {
+   background-color: #faf5ff;
+   border-radius: 8px;
+>>>>>>> origin/main
 }
 
 .post-item .post-title {
@@ -378,8 +428,9 @@
 
 /* ================= 글쓰기/수정 모달 ================= */
 .modal-backdrop {
-   background: rgba(30, 27, 75, 0.35);
-   backdrop-filter: blur(6px);
+    background: rgba(30, 27, 75, 0.35);
+    -webkit-backdrop-filter: blur(6px);   /* Safari 18 이전 */
+    backdrop-filter: blur(6px);
 }
 
 .modal-box {
@@ -571,46 +622,65 @@
    gap: 12px;
 }
 
-.comment-author {
-   font-size: 13px;
-   font-weight: 700;
-   color: var(--text-primary);
-   margin: 0;
+/* ---- DM 버튼 ----
+   남의 글에서는 [수정][삭제] 자리에, 남의 댓글에서는 [삭제] 옆에 붙습니다. */
+.post-owner-actions .dm-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 8px 16px; border-radius: 10px; font-size: 14px; font-weight: 700;
+    text-decoration: none; cursor: pointer;
+    border: 1.5px solid var(--accent); background: transparent; color: var(--accent);
+    transition: all 0.2s ease;
 }
+.post-owner-actions .dm-btn:hover {
+    background: var(--accent); color: #fff; transform: translateY(-2px);
+}
+.comment-actions .dm-btn {
+    font-size: 12px; font-weight: 700;
+    text-decoration: none; cursor: pointer; color: var(--accent);
+}
+.comment-actions .dm-btn:hover { color: var(--accent-strong); }
 
-.comment-content {
-   font-size: 13px;
-   color: var(--text-secondary);
-   margin: 4px 0 0;
-   white-space: pre-wrap;
+/* ---- 댓글 ----
+   community.js 의 renderComments() 가 만드는 실제 구조에 맞춘 이름입니다.
+     .comment-item > .comment-header(.comment-author) + .comment-body + .comment-actions
+   (예전에는 .comment-content 로 적혀 있어서 규칙이 안 먹었습니다)
+
+   .comment-actions 가 DOM 상 .comment-body 다음에 오기 때문에 grid 영역으로 자리를 잡습니다.
+     닉네임 .................... [수정][삭제][DM]
+     댓글 내용                                     */
+.comment-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+        "header actions"
+        "body   body";
+    align-items: center;
+    column-gap: 12px;
+    padding: 12px 0;
+    border-top: 1px solid var(--border-soft);
 }
+.comment-header { grid-area: header; min-width: 0; }
+.comment-body {
+    grid-area: body;
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+.comment-author { font-size: 13px; font-weight: 700; color: var(--text-primary); margin: 0; }
 
 .comment-actions {
-   display: flex;
-   gap: 8px;
-   font-size: 12px;
-   white-space: nowrap;
-   flex-shrink: 0;
+    grid-area: actions;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; white-space: nowrap; flex-shrink: 0;
 }
-
-.comment-actions span {
-   cursor: pointer;
-   color: var(--text-muted);
-}
-
-.comment-actions span:hover {
-   color: var(--accent-strong);
-}
-
-.comment-actions span.disabled {
-   opacity: 0.35;
-   cursor: not-allowed;
-   pointer-events: none;
-}
-
-.comment-actions span.danger:hover {
-   color: var(--danger);
-}
+.comment-actions span { cursor: pointer; color: var(--text-muted); }
+.comment-actions span:hover { color: var(--accent-strong); }
+/* JS가 붙이는 클래스는 .danger 가 아니라 .delete-btn 입니다 */
+.comment-actions span.delete-btn { color: #FF383C; }
+.comment-actions span.delete-btn:hover { color: var(--danger); }
+.comment-actions span.disabled { color: #E6E6E6; opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 
 .comment-input-row {
    display: flex;
@@ -656,9 +726,10 @@
 
 /* community.css에 추가 */
 .community-detail-bg {
-   background: var(--aurora-bg);
-   min-height: 100vh;
-   padding: 32px 24px 48px;
+    background: var(--aurora-bg);
+    min-height: 100vh;
+    min-height: 100dvh;   /* iOS 주소창 높이 보정 (구형은 위 줄 사용) */
+    padding: 32px 24px 48px;
 }
 
 /* ============ 상세 화면: Figma 반영 ============ */
@@ -667,13 +738,14 @@
 /* ============ 상세 화면: Figma 반영 ============ */
 /* ============ 상세 화면: Figma 반영 ============ */
 .community-detail-bg {
-   background: var(--aurora-bg);
-   min-height: 100vh;
-   padding: 32px 24px 48px;
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   gap: 28px;
+    background: var(--aurora-bg);
+    min-height: 100vh;
+    min-height: 100dvh;   /* iOS 주소창 높이 보정 (구형은 위 줄 사용) */
+    padding: 32px 24px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
 }
 
 .community-detail-bg>* {
@@ -1037,3 +1109,112 @@
 /* [공용 네비게이션]
    .nav-actions, .nav-link
 */
+
+/* ==========================================
+   상세 화면(community_detail.html) 복구분 — 2026-08-27
+   d57d0e6 머지 충돌 해결 과정에서 상세 화면 규칙이 통째로 빠져,
+   댓글 카드 / 캐릭터 프로필 임베드가 스타일 없이 나오고 있었습니다.
+   yyj 브랜치에 남아있던 원본 규칙을 그대로 되돌린 것입니다.
+   ========================================== */
+
+.post-body-divider {
+    height: 0;
+    border-top: 1px solid var(--border-soft);
+}
+
+.no-character-msg {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    padding: 24px 0;
+}
+
+/* 글쓴이 캐릭터 프로필 임베드 */
+.character-embed {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 24px;
+    background: #FFFFFF;
+    border: 1px solid #EAEAFF;
+    border-radius: 20px;
+}
+
+.character-embed-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0;
+}
+
+.community-detail-bg .char-icon { font-size: 64px; }
+.community-detail-bg .mbti-badge { font-size: 16px; font-weight: 600; color: var(--accent-strong); }
+.community-detail-bg .info-value { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.community-detail-bg .match-mbti { font-size: 12px; color: var(--text-muted); }
+
+.community-detail-bg .match-badge {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+.community-detail-bg .match-badge.best { color: #4CAF50; }
+.community-detail-bg .match-badge.worst { color: #FF5252; }
+
+/* 댓글 카드 (.comment-item 등 줄 단위 규칙은 위쪽 "댓글" 절에 있습니다) */
+.comment-section {
+    box-sizing: border-box;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.91);
+    border: 1.5px solid #EAEAFF;
+    box-shadow: 0 8px 24px rgba(111, 107, 153, 0.12);
+    border-radius: 24px;
+}
+
+.comment-list { display: flex; flex-direction: column; }
+
+.comment-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+}
+
+/* 능력치 섹션 — result.html 과 같은 톤으로 맞춥니다.
+   result.css 의 .chart-box 는 140x140 고정 + 가운데정렬이라,
+   상세 화면에만 있는 h4 제목("능력치 레이더")이 들어가면 캔버스를 밀어냅니다.
+   그래서 여기서만 chart-box 를 세로로 세우고 h4 에 스타일을 줍니다.
+   (문구와 항목은 상세 화면 것을 그대로 씁니다) */
+.community-detail-bg .stats-info-section {
+    align-items: flex-start;
+}
+
+.community-detail-bg .chart-box {
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.community-detail-bg .canvas-wrapper {
+    width: 140px;
+    height: 140px;
+}
+
+.community-detail-bg .chart-box h4,
+.community-detail-bg .info-box h4 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.community-detail-bg .info-box h4 {
+    align-self: flex-start;
+    margin-bottom: 2px;
+}

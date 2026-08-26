@@ -1,16 +1,17 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, Response
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from flask_jwt_extended import (JWTManager, create_access_token, jwt_required, get_jwt_identity,
-                                set_access_cookies, unset_jwt_cookies)
+                                set_access_cookies, unset_jwt_cookies, verify_jwt_in_request)
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from bson import ObjectId
 from bson.errors import InvalidId
-from rapidfuzz import fuzz 
+from rapidfuzz import fuzz
 
 import os
 import json
+import time
 
 
 load_dotenv()
@@ -34,6 +35,9 @@ app.config['JWT_SECRET_KEY'] = JWT_SECRET_KEY
 
 # API는 헤더(Authorization)로, 주소창으로 여는 SSR 페이지(/test, /result)는 쿠키로 인증
 app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
+# 설정하지 않으면 flask-jwt-extended 기본값이 15분이라, 쪽지창을 잠깐 열어두기만 해도
+# 전송이 401로 실패하고 로그인 화면으로 튕긴다. 시연 도중 끊기지 않도록 1일로 늘린다.
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=1)
 app.config['JWT_COOKIE_SECURE'] = os.getenv('JWT_COOKIE_SECURE', 'False') == 'True'        # HTTPS 붙이면 True로
 app.config['JWT_COOKIE_CSRF_PROTECT'] = False  # 미니 프로젝트 범위에서는 비활성
 
@@ -44,6 +48,22 @@ jwt = JWTManager(app)
 SIMILARITY_THRESHOLD = 70   # 이 밑으로는 검색 결과에서 제외(함수 community_list)
 
 MIN_QUERY_LEN = 2
+
+# ==========================================
+# DM 설정
+# 웹소켓 라이브러리를 새로 깔지 않고 Flask 내장 기능(SSE)만으로 실시간을 만든다.
+#  - 서버는 아무 상태도 들고 있지 않는다. 메시지는 전부 MongoDB(dm_messages)에만 쌓인다.
+#  - 스트림은 "DB를 다시 확인해라"는 신호만 흘려보내는 역할이다.
+#  - 스레드를 영원히 붙잡지 않도록 일정 시간이 지나면 스스로 끊는다.
+#    (브라우저의 EventSource가 알아서 재연결하므로 사용자는 끊긴 걸 모른다)
+# ==========================================
+DM_STREAM_INTERVAL = 1      # 스트림이 DB를 다시 확인하는 주기(초)
+DM_STREAM_TICKS = 300       # 1초 x 300 = 약 5분 뒤 스스로 종료 -> 재연결
+DM_MAX_CONTENT_LEN = 1000   # 메시지 한 통 최대 길이
+PARTY_MEMBER_LIMIT = 50     # 파티원 찾기 팝업에 한 번에 보여줄 최대 인원
+
+# room_id + _id 조합으로 "이 대화방의 N번 이후 메시지"를 자주 조회하므로 인덱스를 걸어둔다
+db.dm_messages.create_index([("room_id", 1), ("_id", 1)])
 
 
 # ==========================================
@@ -98,7 +118,9 @@ def hub():
     user_info = db.users.find_one({"id": user_id})
     nickname = (user_info.get('nickname') if user_info else None) or user_id
     test_done = bool(user_info and user_info.get('mbti'))
-    return render_template('hub.html', nickname=nickname, test_done=test_done)
+    # 허브 DM 카드에 "안 읽은 쪽지 N" 배지를 띄우기 위한 값
+    dm_unread = db.dm_messages.count_documents({"receiver_id": user_id, "read": False})
+    return render_template('hub.html', nickname=nickname, test_done=test_done, dm_unread=dm_unread)
 
 
 @app.route('/community')
@@ -156,6 +178,83 @@ def community_detail(post_id):
         is_author=(viewer_id == post['author_id']),
     )
 
+# ==========================================
+# DM 공용 헬퍼
+# ==========================================
+def _dm_room_id(id_a, id_b):
+    """두 사람의 users.id를 정렬해서 붙인다.
+    A->B 와 B->A 가 같은 방을 가리키도록 만들기 위한 것이다.
+    (정렬을 안 하면 "aaa|bbb" 와 "bbb|aaa" 가 다른 방이 되어 대화가 둘로 쪼개진다)"""
+    return "|".join(sorted([id_a, id_b]))
+
+
+def _dm_to_dict(m):
+    """DM 문서를 화면에 넘길 형태로 변환. api_comment_list와 같은 규칙을 따른다."""
+    return {
+        "id": str(m["_id"]),                    # ObjectId는 그대로 jsonify 못 하니 문자열로
+        "sender_id": m["sender_id"],
+        "sender_nickname": m["sender_nickname"],
+        "content": m["content"],
+        "created_at": m["created_at"].isoformat(),
+    }
+
+
+def _find_partner(nickname):
+    """닉네임으로 상대를 찾는다. 없으면 None.
+    URL에는 닉네임을 쓰고 DB에는 users.id를 저장하는 것이
+    /result/<nickname>, /api/compatibility 와 동일한 이 프로젝트의 관습이다."""
+    if not nickname:
+        return None
+    return db.users.find_one({"nickname": nickname.strip()})
+
+
+def _viewer_id_or_none():
+    """로그인했으면 users.id를, 아니면 None을 돌려준다.
+    /result/<nickname> 처럼 비로그인도 볼 수 있는 화면에서
+    DM 버튼을 보여줄지 말지 판단하는 데 쓴다."""
+    try:
+        verify_jwt_in_request(optional=True)
+        return get_jwt_identity()
+    except Exception:
+        # 토큰이 만료됐거나 깨졌어도 공개 화면은 그냥 보여줘야 하므로 삼킨다
+        return None
+
+
+# ==========================================
+# 화면 렌더링 라우터 — DM
+# ==========================================
+@app.route('/dm')
+@jwt_required()
+def dm_list():
+    user_id = get_jwt_identity()
+    user_info = db.users.find_one({"id": user_id})
+    nickname = (user_info.get('nickname') if user_info else None) or user_id
+    return render_template('dm.html', nickname=nickname)
+
+
+@app.route('/dm/<nickname>')
+@jwt_required()
+def dm_room(nickname):
+    user_id = get_jwt_identity()
+
+    partner = _find_partner(nickname)
+    if not partner:
+        return redirect(url_for('dm_list'))         # 없는 닉네임이면 그냥 목록으로
+
+    if partner['id'] == user_id:
+        return redirect(url_for('dm_list'))         # 자기 자신과의 대화방은 만들지 않는다
+
+    partner_class = MBTI_MAP.get(partner.get('mbti'))   # 아직 테스트 안 했으면 None
+
+    return render_template(
+        'dm_room.html',
+        viewer_id=user_id,                          # 말풍선을 좌/우 어느 쪽에 그릴지 판단용
+        partner_nickname=partner.get('nickname'),
+        partner_class_name=(partner_class['class_name'] if partner_class else None),
+        partner_mbti=(partner_class['mbti'] if partner_class else None),
+    )
+
+
 @app.route('/signup')
 def signup():
     return render_template('signup.html')
@@ -186,6 +285,7 @@ def result():
         nickname=(user_info.get('nickname') or user_id),
         best_match=MBTI_MAP.get(my_class['best_match']),
         worst_match=MBTI_MAP.get(my_class['worst_match']),
+        can_dm=True,                # 로그인한 본인 화면이므로 DM 버튼을 보여준다
     )
 
 @app.route('/result/<nickname>')
@@ -199,12 +299,17 @@ def result_public(nickname):
     if not my_class:
         return redirect(url_for('home'))   # 아직 테스트 안 한 유저면 그냥 로그인 화면으로
 
+    # 이 라우트는 공유 링크라 로그인 없이도 열린다.
+    # 비로그인 방문자에게 DM 버튼을 보여주면 눌러도 로그인 화면으로 튕기므로 아예 숨긴다.
+    viewer_id = _viewer_id_or_none()
+
     return render_template(
         'result.html',
         my_class=my_class,
         nickname=user_info.get('nickname'),
         best_match=MBTI_MAP.get(my_class['best_match']),
         worst_match=MBTI_MAP.get(my_class['worst_match']),
+        can_dm=bool(viewer_id),
     )
 
 
@@ -594,6 +699,208 @@ def api_community_delete(post_id):
     db.comments.delete_many({"post_id": oid})   # 글이 사라지면 딸린 댓글도 같이 정리 (안 하면 고아 댓글이 남음)
 
     return jsonify({"result": "success", "msg": "게시물이 삭제되었습니다."})
+
+
+# ==========================================
+# API 라우터 — DM
+# 메시지는 전부 dm_messages 컬렉션에만 쌓인다. 서버 메모리에 들고 있는 것은 없다.
+# ==========================================
+
+# ------------------------------------------
+# 대화 목록 (내가 주고받은 상대들)
+# ------------------------------------------
+@app.route('/api/dm/rooms', methods=['GET'])
+@jwt_required()
+def api_dm_rooms():
+    user_id = get_jwt_identity()
+
+    # 최신순으로 훑으면서 방마다 "처음 만난 것 = 마지막 메시지"로 잡는다.
+    # 게시글 목록(api_community_list)도 파이썬에서 집계하는 방식이라 스타일을 맞췄다.
+    messages = db.dm_messages.find(
+        {"$or": [{"sender_id": user_id}, {"receiver_id": user_id}]}
+    ).sort("_id", -1)
+
+    rooms = {}
+    for m in messages:
+        room_id = m["room_id"]
+
+        if room_id not in rooms:
+            # 상대가 누구인지: 내가 보낸 쪽이면 receiver, 받은 쪽이면 sender
+            if m["sender_id"] == user_id:
+                partner_id, partner_nickname = m["receiver_id"], m["receiver_nickname"]
+            else:
+                partner_id, partner_nickname = m["sender_id"], m["sender_nickname"]
+
+            partner_info = db.users.find_one({"id": partner_id})
+            partner_class = MBTI_MAP.get(partner_info.get('mbti')) if partner_info else None
+
+            rooms[room_id] = {
+                "partner_nickname": partner_nickname,
+                "partner_class_name": (partner_class['class_name'] if partner_class else None),
+                "partner_mbti": (partner_class['mbti'] if partner_class else None),
+                "last_content": m["content"],
+                "last_created_at": m["created_at"].isoformat(),
+                "unread": 0,
+            }
+
+        # 안 읽은 것은 "내가 받은 것" 중 read가 False인 것만 센다
+        if m["receiver_id"] == user_id and not m.get("read"):
+            rooms[room_id]["unread"] += 1
+
+    return jsonify({"result": "success", "rooms": list(rooms.values())})
+
+
+# ------------------------------------------
+# 메시지 조회 (대화창 첫 로딩 + 스트림이 막혔을 때의 폴백 폴링)
+#   after 를 주면 그 이후에 생긴 것만 돌려준다
+# ------------------------------------------
+@app.route('/api/dm/messages', methods=['GET'])
+@jwt_required()
+def api_dm_message_list():
+    user_id = get_jwt_identity()
+
+    partner = _find_partner(request.args.get('with'))
+    if not partner:
+        return jsonify({"result": "fail", "msg": "해당 닉네임의 모험가를 찾을 수 없습니다."}), 404
+    if partner['id'] == user_id:
+        return jsonify({"result": "fail", "msg": "자기 자신에게는 쪽지를 보낼 수 없습니다."}), 400
+
+    query = {"room_id": _dm_room_id(user_id, partner['id'])}
+
+    after = request.args.get('after')
+    if after:
+        try:
+            query["_id"] = {"$gt": ObjectId(after)}
+        except InvalidId:
+            return jsonify({"result": "fail", "msg": "잘못된 메시지 id 입니다."}), 400
+
+    messages = list(db.dm_messages.find(query).sort("_id", 1))
+
+    # 화면에 띄운 순간 "읽음"으로 처리한다 (내가 받은 것만)
+    db.dm_messages.update_many(
+        {"room_id": query["room_id"], "receiver_id": user_id, "read": False},
+        {"$set": {"read": True}}
+    )
+
+    return jsonify({"result": "success", "messages": [_dm_to_dict(m) for m in messages]})
+
+
+# ------------------------------------------
+# 메시지 전송
+# ------------------------------------------
+@app.route('/api/dm/messages', methods=['POST'])
+@jwt_required()
+def api_dm_message_create():
+    user_id = get_jwt_identity()
+    user_info = db.users.find_one({"id": user_id})
+    nickname = (user_info.get('nickname') if user_info else None) or user_id
+
+    data = request.get_json(silent=True) or {}
+    content = (data.get('content') or '').strip()
+
+    partner = _find_partner(data.get('to'))
+    if not partner:
+        return jsonify({"result": "fail", "msg": "해당 닉네임의 모험가를 찾을 수 없습니다."}), 404
+    if partner['id'] == user_id:
+        return jsonify({"result": "fail", "msg": "자기 자신에게는 쪽지를 보낼 수 없습니다."}), 400
+
+    if not content:
+        return jsonify({"result": "fail", "msg": "내용을 입력해주세요."}), 400
+    if len(content) > DM_MAX_CONTENT_LEN:
+        return jsonify({"result": "fail", "msg": f"쪽지는 {DM_MAX_CONTENT_LEN}자까지 보낼 수 있습니다."}), 400
+
+    db.dm_messages.insert_one({
+        "room_id": _dm_room_id(user_id, partner['id']),   # 양방향이 같은 방을 보도록
+        "sender_id": user_id,                             # 권한 체크용 (고유값)
+        "sender_nickname": nickname,                      # 화면 표시용
+        "receiver_id": partner['id'],
+        "receiver_nickname": partner.get('nickname'),
+        "content": content,
+        "created_at": datetime.now(timezone.utc),         # 정렬용
+        "read": False,
+    })
+    return jsonify({"result": "success", "msg": "쪽지를 보냈습니다."})
+
+
+# ------------------------------------------
+# 실시간 스트림 (SSE)
+#   웹소켓 라이브러리 없이 Flask 내장 Response 만으로 서버->브라우저 push를 만든다.
+#   EventSource는 헤더를 못 붙이지만 같은 주소면 쿠키를 자동으로 보내고,
+#   JWT_TOKEN_LOCATION에 'cookies'가 있어서 @jwt_required()가 그대로 통한다.
+# ------------------------------------------
+@app.route('/api/dm/stream', methods=['GET'])
+@jwt_required()
+def api_dm_stream():
+    user_id = get_jwt_identity()
+
+    partner = _find_partner(request.args.get('with'))
+    if not partner:
+        return jsonify({"result": "fail", "msg": "해당 닉네임의 모험가를 찾을 수 없습니다."}), 404
+    if partner['id'] == user_id:
+        return jsonify({"result": "fail", "msg": "자기 자신에게는 쪽지를 보낼 수 없습니다."}), 400
+
+    room_id = _dm_room_id(user_id, partner['id'])
+
+    after = request.args.get('after')
+    if after:
+        try:
+            after = ObjectId(after)
+        except InvalidId:
+            return jsonify({"result": "fail", "msg": "잘못된 메시지 id 입니다."}), 400
+
+    def event_stream(last_id):
+        # 정해진 횟수만 돌고 스스로 끝낸다. 안 그러면 이 연결이 스레드를 영원히 붙잡는다.
+        # 끊겨도 브라우저의 EventSource가 알아서 다시 연결하므로 사용자는 모른다.
+        for _ in range(DM_STREAM_TICKS):
+            query = {"room_id": room_id}
+            if last_id:
+                query["_id"] = {"$gt": last_id}
+
+            new_messages = list(db.dm_messages.find(query).sort("_id", 1))
+
+            if new_messages:
+                for m in new_messages:
+                    last_id = m["_id"]
+                    yield "data: " + json.dumps(_dm_to_dict(m), ensure_ascii=False) + "\n\n"
+            else:
+                # 주석 줄. 끊긴 연결을 감지하고 중간 프록시가 타임아웃으로 끊는 것도 막아준다
+                yield ": keep-alive\n\n"
+
+            time.sleep(DM_STREAM_INTERVAL)
+
+    return Response(
+        event_stream(after),
+        mimetype='text/event-stream',
+        headers={
+            'Cache-Control': 'no-cache',
+            'X-Accel-Buffering': 'no',   # nginx가 이 응답만 버퍼링하지 않게 한다 (EC2 설정 불필요)
+        },
+    )
+
+
+# ------------------------------------------
+# 파티원 찾기 — 같은 MBTI(직업)를 가진 유저 목록
+# ------------------------------------------
+@app.route('/api/party/members', methods=['GET'])
+@jwt_required()
+def api_party_members():
+    user_id = get_jwt_identity()
+
+    mbti = (request.args.get('mbti') or '').strip().upper()
+    if mbti not in MBTI_MAP:
+        return jsonify({"result": "fail", "msg": "알 수 없는 유형입니다: " + mbti}), 400
+
+    # 나 자신은 목록에서 뺀다 (자기 자신에게 DM 보낼 일은 없으므로)
+    users = db.users.find({"mbti": mbti, "id": {"$ne": user_id}}).limit(PARTY_MEMBER_LIMIT)
+
+    members = [{"nickname": u.get('nickname')} for u in users if u.get('nickname')]
+
+    return jsonify({
+        "result": "success",
+        "mbti": mbti,
+        "class_name": MBTI_MAP[mbti]['class_name'],
+        "members": members,
+    })
 
 
 @app.route('/api/logout', methods=['POST'])

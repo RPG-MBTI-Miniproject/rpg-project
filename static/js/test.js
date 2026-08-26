@@ -420,6 +420,17 @@ async function searchFriendCompatibility() {
             data.compatibility.friend_to_me.description;
 
 
+        // 0827 DM: 궁합 카드의 DM 버튼이 "검색한 친구"를 가리키도록 주소를 채운다
+        const friendDmBtn = document.getElementById('friend-dm-btn');
+
+        if (friendDmBtn) {
+            friendDmBtn.href =
+                '/dm/' + encodeURIComponent(data.friend.nickname);
+
+            friendDmBtn.title =
+                `${data.friend.nickname}님에게 쪽지 보내기`;
+        }
+
         // 5. 숨겨져 있던 궁합 결과 화면 표시
         const resultSection =
             document.getElementById('friend-synergy-section');
@@ -433,6 +444,96 @@ async function searchFriendCompatibility() {
 
         alert(`궁합 조회 실패: ${error.message}`);
     }
+}
+
+
+// ------------------------------------------
+// 0827 DM: 파티원 찾기 팝업
+//   같은 직업(MBTI)을 가진 유저 목록을 띄우고, 각 줄에서 바로 쪽지를 보낼 수 있다.
+//   [나가기] 는 팝업만 닫고 결과 화면에 그대로 머무른다.
+// ------------------------------------------
+function initPartyFinder() {
+
+    const openBtn = document.getElementById('party-find-btn');
+    const modal = document.getElementById('party-modal');
+
+    // 결과 화면이 아니거나 비로그인 방문자면 팝업 자체가 없다
+    if (!openBtn || !modal) return;
+
+    const listEl = document.getElementById('party-member-list');
+    const subEl = document.getElementById('party-modal-sub');
+    const closeBtn = document.getElementById('party-modal-close-btn');
+
+    // 태그 문자를 그대로 넣지 않도록 무력화한다
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text ?? '';
+        return div.innerHTML;
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden');
+    }
+
+    openBtn.addEventListener('click', async () => {
+
+        const mbti = openBtn.dataset.mbti;
+
+        modal.classList.remove('hidden');
+        subEl.textContent = '';
+        listEl.innerHTML = '<div class="party-modal-empty">불러오는 중...</div>';
+
+        try {
+            const res = await fetch(
+                `/api/party/members?mbti=${encodeURIComponent(mbti)}`
+            );
+
+            if (res.status === 401) {
+                alert("401 Error. 로그인 페이지로 이동합니다.");
+                window.location.href = '/';
+                return;
+            }
+
+            const data = await res.json().catch(() => ({}));
+
+            if (data.result !== 'success') {
+                throw new Error(data.msg || '파티원을 불러오지 못했습니다.');
+            }
+
+            subEl.textContent =
+                `${data.class_name} (${data.mbti}) 직업을 가진 모험가들입니다.`;
+
+            if (!data.members || data.members.length === 0) {
+                listEl.innerHTML =
+                    '<div class="party-modal-empty">아직 이 직업을 가진 다른 모험가가 없습니다.<br>친구에게 테스트를 추천해보세요!</div>';
+                return;
+            }
+
+            listEl.innerHTML = data.members.map(member => `
+                <div class="party-member-row">
+                    <span class="party-member-name">${escapeHtml(member.nickname)}</span>
+                    <a class="party-dm-btn" href="/dm/${encodeURIComponent(member.nickname)}">✈ DM</a>
+                </div>
+            `).join('');
+
+        } catch (error) {
+            console.error('파티원 목록 조회 실패:', error);
+
+            listEl.innerHTML =
+                `<div class="party-modal-empty">${escapeHtml(error.message)}</div>`;
+        }
+    });
+
+    closeBtn?.addEventListener('click', closeModal);
+
+    // 바깥 여백을 눌러도 닫히게 (팝업 안쪽 클릭은 무시)
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
+    });
 }
 
 // ------------------------------------------
@@ -483,6 +584,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         );
     }
+
+    // 0827 DM: 결과 화면일 때만 동작 (그 외 화면에서는 조용히 빠짐)
+    initPartyFinder();
 });
 // 0827 00:39 ljw 주석 처리 : 결과 화면에는 a,b 버튼이 없으므로 이벤트 연결 수정
 // document.addEventListener('DOMContentLoaded', () => {

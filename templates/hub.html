@@ -68,6 +68,32 @@
                 </div>
             </div>
         </div>
+
+        <!-- 3. 쪽지함 카드
+             .hub-menu 는 2칸 그리드라 안에 넣으면 왼쪽으로 붙습니다.
+             .hub-container 가 align-items:center 인 flex 라서
+             그리드 바깥에 두면 자동으로 가운데 정렬됩니다. -->
+        <div class="hub-card dm-card">
+            <div class="hub-icon-wrapper">
+                <span class="hub-icon hub-icon-emoji">✉️</span>
+            </div>
+            <h3 class="hub-card-title">
+                쪽지함
+                {% if dm_unread %}
+                <span class="hub-unread-badge">{{ dm_unread }}</span>
+                {% endif %}
+            </h3>
+            <p class="hub-card-desc">
+                {% if dm_unread %}
+                읽지 않은 쪽지가 {{ dm_unread }}통 있습니다.
+                {% else %}
+                모험가들과 나눈 쪽지
+                {% endif %}
+            </p>
+            <div class="hub-card-action">
+                <a href="{{ url_for('dm_list') }}" class="hub-btn dm-btn">쪽지함 가기</a>
+            </div>
+        </div>
     </main>
 
     <script>
