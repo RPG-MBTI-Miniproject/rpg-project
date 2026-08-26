@@ -179,7 +179,7 @@ if (document.querySelector('#post-list')) {
     // 3. 각 버튼에 클릭 이벤트 등록
     sortButtons.forEach(button => {
         button.addEventListener('click', handleSort);
-    });    
+    });
 
     // TODO 5. 검색 버튼(#search-btn) 클릭 이벤트
     //   - #search-input 값을 trim
@@ -399,50 +399,82 @@ if (document.querySelector('#post-list')) {
     loadPosts();
 }
 
-if (document.querySelector('#comment-list')) {
+
 // ==========================================
 // [상세 화면] community_detail.html 에서만 실행되는 부분
 // 이 화면엔 아래 전역 변수가 이미 선언되어 있음 (community_detail.html 참고):
 //   POST_ID, POST_AUTHOR_ID, VIEWER_ID, POST_TITLE, POST_CONTENT, POST_CREATED_AT
 // #comment-list 요소가 있을 때만 이 블록이 실행되게 감싸주세요.
 // ==========================================
+if (document.querySelector('#comment-list')) {
 
-// TODO 11. "수정"(#edit-post-btn) 버튼 — is_author일 때만 화면에 존재함
-//   클릭 시 #write-modal 열고, 입력창에 POST_TITLE / POST_CONTENT 로 미리 채워넣기
-//   "저장" 눌렀을 때는 (목록 화면과 다르게) POST가 아니라
-//   PUT /api/community/posts/{POST_ID} 로 보내야 함 — 여기서 모드 구분이 필요함
-//   (힌트: "지금 모달이 새글쓰기 모드인지 수정 모드인지"를 기억하는 변수 하나 두면 편함)
+    // 1. 모드 관리 변수 (false: 새글 쓰기 / true: 수정)
+    let isEditMode = false;
 
-// TODO 12. "삭제"(#delete-post-btn) 버튼
-//   confirm()으로 한 번 물어보고, 확인되면 DELETE /api/community/posts/{POST_ID}
-//   성공하면 location.href = '/community' 로 목록으로 돌려보내기
+    // TODO 11. "수정"(#edit-post-btn) 버튼 — is_author일 때만 화면에 존재함
+    //   클릭 시 #write-modal 열고, 입력창에 POST_TITLE / POST_CONTENT 로 미리 채워넣기
+    //   "저장" 눌렀을 때는 (목록 화면과 다르게) POST가 아니라
+    //   PUT /api/community/posts/{POST_ID} 로 보내야 함 — 여기서 모드 구분이 필요함
+    //   (힌트: "지금 모달이 새글쓰기 모드인지 수정 모드인지"를 기억하는 변수 하나 두면 편함)
+    const editPostBtn = document.querySelector('#edit-post-btn');
 
-// TODO 13. 댓글 목록 그리는 함수 만들기 (예: renderComments(comments))
-//   #comment-count 에 comments.length 넣기
-//   #comment-list 비우고 각 댓글마다 한 줄씩 그리기: 작성자 닉네임 + 내용 + [수정][삭제]
-//
-//   *** 권한 규칙 (반드시 이 조건대로) ***
-//     - "수정" 버튼: comment.author_id === VIEWER_ID 일 때만 클릭 가능
-//                    (글쓴이라도 남의 댓글은 수정 못 함 — 버튼을 비활성 스타일로 표시)
-//     - "삭제" 버튼: comment.author_id === VIEWER_ID
-//                    OR POST_AUTHOR_ID === VIEWER_ID  일 때 클릭 가능
-//   권한 없는 버튼은 클릭이 안 되게 이벤트 자체를 안 붙이거나 disabled 클래스 처리할 것
-//   (CSS의 .comment-actions span.disabled 참고 — 흐리게 표시)
+    if (editPostBtn) {
+        editPostBtn.addEventListener('click', () => {
+            // 1. 수정 모드로 전환
+            isEditMode = true;
 
-// TODO 14. 댓글 불러오는 함수 (예: loadComments())
-//   GET /api/community/posts/{POST_ID}/comments 호출 → renderComments 호출
-//   페이지 로드 시 자동 실행되어야 함
+            // 2. #write-modal 열기 (hidden 클래스 제거)
+            document.querySelector('#write-modal').classList.remove('hidden');
 
-// TODO 15. 댓글 등록(#comment-submit-btn) 클릭 이벤트
-//   - #comment-input 값 trim, 비어있으면 alert 후 멈추기
-//   - POST /api/community/posts/{POST_ID}/comments 호출 (content)
-//   - 성공하면 입력창 비우고 loadComments() 다시 호출 (전체 다시 그리기)
+            // 3. 입력창에 POST_TITLE, POST_CONTENT 값 채우기
+            let titleInput = document.querySelector('#post-title-input');
+            let contentInput = document.querySelector('#post-content-input');
+            titleInput.value = POST_TITLE;
+            contentInput.value = POST_CONTENT;            
 
-// TODO 16. 댓글 "수정" 클릭 시
-//   prompt() 등으로 새 내용 입력받아서
-//   PUT /api/community/comments/{comment.id} 호출 → 성공하면 loadComments() 재호출
+            let url = '';
+            let method = '';
+            
+            if (isEditMode) {
 
-// TODO 17. 댓글 "삭제" 클릭 시
-//   confirm() 확인 후 DELETE /api/community/comments/{comment.id}
-//   → 성공하면 loadComments() 재호출
+
+            }
+        });
+    } else {
+
+    }
+
+
+    // TODO 12. "삭제"(#delete-post-btn) 버튼
+    //   confirm()으로 한 번 물어보고, 확인되면 DELETE /api/community/posts/{POST_ID}
+    //   성공하면 location.href = '/community' 로 목록으로 돌려보내기
+
+    // TODO 13. 댓글 목록 그리는 함수 만들기 (예: renderComments(comments))
+    //   #comment-count 에 comments.length 넣기
+    //   #comment-list 비우고 각 댓글마다 한 줄씩 그리기: 작성자 닉네임 + 내용 + [수정][삭제]
+    //
+    //   *** 권한 규칙 (반드시 이 조건대로) ***
+    //     - "수정" 버튼: comment.author_id === VIEWER_ID 일 때만 클릭 가능
+    //                    (글쓴이라도 남의 댓글은 수정 못 함 — 버튼을 비활성 스타일로 표시)
+    //     - "삭제" 버튼: comment.author_id === VIEWER_ID
+    //                    OR POST_AUTHOR_ID === VIEWER_ID  일 때 클릭 가능
+    //   권한 없는 버튼은 클릭이 안 되게 이벤트 자체를 안 붙이거나 disabled 클래스 처리할 것
+    //   (CSS의 .comment-actions span.disabled 참고 — 흐리게 표시)
+
+    // TODO 14. 댓글 불러오는 함수 (예: loadComments())
+    //   GET /api/community/posts/{POST_ID}/comments 호출 → renderComments 호출
+    //   페이지 로드 시 자동 실행되어야 함
+
+    // TODO 15. 댓글 등록(#comment-submit-btn) 클릭 이벤트
+    //   - #comment-input 값 trim, 비어있으면 alert 후 멈추기
+    //   - POST /api/community/posts/{POST_ID}/comments 호출 (content)
+    //   - 성공하면 입력창 비우고 loadComments() 다시 호출 (전체 다시 그리기)
+
+    // TODO 16. 댓글 "수정" 클릭 시
+    //   prompt() 등으로 새 내용 입력받아서
+    //   PUT /api/community/comments/{comment.id} 호출 → 성공하면 loadComments() 재호출
+
+    // TODO 17. 댓글 "삭제" 클릭 시
+    //   confirm() 확인 후 DELETE /api/community/comments/{comment.id}
+    //   → 성공하면 loadComments() 재호출
 }
