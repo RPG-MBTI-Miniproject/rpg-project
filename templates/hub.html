@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG MBTI - 메뉴</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/hub.css') }}">
+</head>
+<body>
+    <!-- ==========================================
+         [담당: HTML/CSS 동료] 로그인 직후 허브(메뉴) 화면
+         3분기: 로그아웃 / 성향 테스트 / 커뮤니티
+
+         이 파일은 로직이 거의 없어서 자유도가 높습니다.
+         아래 두 값만 Jinja2에서 그대로 써주세요:
+           - {{ nickname }}          : 유저 닉네임
+           - {% if test_done %}...{% endif %} : 테스트 완료 여부에 따라 문구 분기
+         ========================================== -->
+
+    <header class="top-nav">
+        <!-- TODO: [HTML/CSS] 로고 / "메뉴" 타이틀 / [로그아웃] 버튼 -->
+    </header>
+
+    <main class="hub-container">
+        <!-- TODO: [HTML/CSS] 환영 문구 + 서브타이틀
+             예: "{{ nickname }}님, 어서오세요." -->
+
+        <!-- TODO: [HTML/CSS] 카드 2개
+             - href="{{ url_for('test') }}" : 성향 테스트로 이동
+               {% if test_done %} 완료 문구 {% else %} 미완료 문구 {% endif %}
+             - href="{{ url_for('community') }}" : 커뮤니티로 이동 -->
+        <div class="hub-menu">
+        </div>
+    </main>
+
+    <script>
+        // 로그아웃 로직은 test.html / community.html 에서도 동일하게 쓰는 코드라
+        // 그대로 재사용하시면 됩니다 (자유롭게 옮겨써도 OK)
+        async function logout() {
+            localStorage.removeItem('JWT_TOKEN');
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+            } catch (e) {
+                console.error('로그아웃 요청 실패:', e);
+            }
+            location.href = '/';
+        }
+    </script>
+</body>
+</html>

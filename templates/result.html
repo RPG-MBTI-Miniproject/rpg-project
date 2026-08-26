@@ -1,30 +1,186 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RPG MBTI - 결과 보고서</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="/static/css/result.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/result.css') }}">
+    <!-- Chart.js for hexagon/radar chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-    <!-- TODO: [최현욱] Frame 3 와이어프레임 UI/UX 및 Jinja2 서버사이드 렌더링 연결 -->
-    <div class="result-container">
-        <h2>당신의 영혼에 깃든 RPG 직업은...</h2>
-        
-        <div class="character-card">
-            <!-- Jinja2 문법({{ }})을 사용하여 app.py에서 넘어온 데이터를 바인딩하세요 -->
-            <h3>"{{ my_class.title }}"</h3>
-            <h1>{{ my_class.name }} ({{ my_class.mbti }})</h1>
-            <!-- 일러스트 이미지, 육각 그래프 UI 등 추가 -->
-        </div>
+    <div class="bg-particles"></div>
 
-        <div class="chemistry-area">
-            <!-- 파티원 궁합 UI -->
-        </div>
+    <!-- 헤더 바 (결과 보고서 / 로그아웃) -->
+    <header class="top-nav">
+        <h1 class="nav-logo">RPG MBTI</h1>
+        <div class="nav-title">결과 보고서</div>
+        <button class="logout-btn" onclick="logout()">로그아웃</button>
+    </header>
 
-        <button onclick="location.href='/test'">테스트 다시하기</button>
-        <!-- TODO: [이정욱] 결과 링크 복사하는 기능(URL 클립보드 복사) JS 함수로 간단히 구현 -->
-        <button id="copy-link-btn">결과 링크 복사하기</button>
-    </div>
+    <main class="result-container">
+        <h2 class="sub-heading">{{ nickname }}님의 영혼에 깃든 RPG 직업은...</h2>
+
+        <!-- [ 최현욱 ] Frame 3 와이어프레임 UI/UX 및 Jinja2 서버사이드 렌더링 연결 -->
+        <!-- 직업 카드 (일러스트, 칭호, 직업명, MBTI) -->
+        <section class="character-card">
+            <div class="illustration-wrapper">
+                <div class="illustration-placeholder">
+                    <span class="char-icon">🔮</span>
+                </div>
+            </div>
+
+            <h3 class="char-title">"{{ my_class.title }}"</h3>
+            <h1 class="char-name-mbti">{{ my_class.class_name }} <span class="mbti-badge">({{ my_class.mbti }})</span>
+            </h1>
+        </section>
+
+        <!-- 능력치 육각 그래프 및 주요 스킬 / 특징 -->
+        <section class="stats-info-section">
+            <div class="chart-box">
+                <h4>[ 능력치 분석 ]</h4>
+                <div class="canvas-wrapper">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-item">
+                    <span class="info-label">▶ 전투 유형</span>
+                    <span class="info-value">{{ my_class.mbti }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">▶ 특징</span>
+                    <span class="info-value">{{ my_class.title }}</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 🤝 파티원 궁합 -->
+        <section class="chemistry-area">
+            <h3 class="section-title">🤝 파티원 궁합</h3>
+            <div class="chemistry-box">
+                <!-- 최고의 파티원 -->
+                <div class="chemistry-card best-match">
+                    <div class="match-badge best">💚 최고의 파티원</div>
+                    <div class="match-img-wrapper">
+                        <div class="match-placeholder">🛡️</div>
+                    </div>
+                    <h4 class="match-name">{{ best_match.class_name }}</h4>
+                    <span class="match-mbti">({{ best_match.mbti }})</span>
+                </div>
+
+                <!-- 최악의 파티원 -->
+                <div class="chemistry-card worst-match">
+                    <div class="match-badge worst">💔 최악의 파티원</div>
+                    <div class="match-img-wrapper">
+                        <div class="match-placeholder">⚔️</div>
+                    </div>
+                    <h4 class="match-name">{{ worst_match.class_name }}</h4>
+                    <span class="match-mbti">({{ worst_match.mbti }})</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 하단 액션 버튼 -->
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="location.href='/test'">🔄 테스트 다시하기</button>
+            <!-- TODO: [이정욱] 결과 링크 복사하는 기능(URL 클립보드 복사) JS 함수로 간단히 구현 -->
+            <button class="btn btn-primary" id="copy-link-btn">🔗 결과 링크 복사하기</button>
+        </div>
+        <div class="search-friend">
+            <label for="search-friend-result">🙍‍♂️ 친구의 궁합 보러가기 (<span>닉네임</span>)</label>
+            <form class="search-form" type="submit">
+                <input type="text" name="search-friend-result" id="search-friend-result" placeholder="친구의 닉네임을 입력하세요">
+                <button class="btn btn-primary" id="search-friend-btn">궁합 보기</button>
+            </form>
+        </div>
+        <div class="friend-card">
+            <div class="friend-mbti">
+                <p></p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Jinja2 Safe Stats JSON Data Transfer -->
+    <script id="stats-data" type="application/json">
+        {{ my_class.stats | tojson }}
+    </script>
+
+    <!-- Radar Chart Initialization Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('radarChart');
+            if (ctx) {
+                // mbti_data.json 의 stats 키: STR, DEX, VIT, MAG, INT, CHA (각 1~5점)
+                let statsData = { STR: 0, DEX: 0, VIT: 0, MAG: 0, INT: 0, CHA: 0 };
+                try {
+                    const jsonElem = document.getElementById('stats-data');
+                    if (jsonElem) {
+                        statsData = Object.assign(statsData, JSON.parse(jsonElem.textContent));
+                    }
+                } catch (e) {
+                    console.error("Stats JSON parse error:", e);
+                }
+
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['힘', '민첩', '체력', '마력', '지능', '매력'],
+                        datasets: [{
+                            label: '능력치',
+                            data: [statsData.STR, statsData.DEX, statsData.VIT, statsData.MAG, statsData.INT, statsData.CHA],
+                            backgroundColor: 'rgba(255, 215, 0, 0.25)',
+                            borderColor: '#ffd700',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#00f2fe',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#00f2fe'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                angleLines: { color: 'rgba(255, 255, 255, 0.15)' },
+                                grid: { color: 'rgba(255, 255, 255, 0.15)' },
+                                pointLabels: { color: '#cbd5e1', font: { size: 11 } },
+                                ticks: { display: false, stepSize: 1 },
+                                min: 0,
+                                max: 5
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+
+            const copyBtn = document.getElementById('copy-link-btn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(window.location.href)
+                        .then(() => alert('결과 링크가 클립보드에 복사되었습니다!'))
+                        .catch(() => alert('복사 실패!'));
+                });
+            }
+        });
+
+        async function logout() {
+            localStorage.removeItem('JWT_TOKEN');   // auth.js / test.js 와 같은 키
+            try {
+                await fetch('/api/logout', { method: 'POST' });   // 서버가 심은 쿠키 제거
+            } catch (e) {
+                console.error('로그아웃 요청 실패:', e);
+            }
+            location.href = '/';
+        }
+    </script>
 </body>
+
 </html>
