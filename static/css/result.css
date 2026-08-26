@@ -18,6 +18,7 @@ body {
     background: var(--r-aurora-bg);
     font-family: 'Inter', var(--font-sans), 'Pretendard', sans-serif;
     min-height: 100vh;
+    min-height: 100dvh;   /* iOS 주소창 높이 보정 (구형은 위 줄 사용) */
     margin: 0;
     display: flex;
     flex-direction: column;
@@ -31,21 +32,7 @@ body {
 /* Header Nav */
 .top-nav {
     width: 100%;
-    border-bottom: 1px solid var(--r-border);
-    background: rgba(255, 255, 255, 0.6);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    position: -webkit-sticky;   /* 구형 Safari */
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.result-nav-bar {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 16px 20px;
-    box-sizing: border-box;
+    max-width: 689px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -472,13 +459,45 @@ body {
     transition: all 0.2s ease;
 }
 
-/* ---- 친구와의 궁합 결과 ---- */
-.friend-synergy-container { margin-top: 24px; }
-.synergy-main-title {
-    font-size: 1.05rem;
-    font-weight: 800;
-    color: var(--r-text-primary);
-    margin-bottom: 12px;
+.search-friend input:focus {
+    border-color: #8F7CFF;
+    box-shadow: 0 0 0 3px rgba(143, 124, 255, 0.15);
+}
+
+.search-friend button {
+    flex: 1;
+    height: 53px;
+    padding: 0 16px;
+    background: #8F7CFF;
+    border: none;
+    border-radius: 10px;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.search-friend button:hover {
+    background: #7b65fa;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(143, 124, 255, 0.35);
+}
+
+@media (max-width: 580px) {
+    .chemistry-box,
+    .friend-card-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
 }
 
 /* ==========================================
@@ -518,16 +537,13 @@ body {
     box-shadow: 0 8px 24px rgba(111, 107, 153, 0.12);
 }
 
-/* ---- 2) 궁합 카드 안의 DM 버튼 (우상단) ---- */
-.card-info-bottom {
-    position: relative;
-    padding-right: 54px;   /* DM 버튼이 시너지 태그 위에 겹치지 않도록 자리를 비워둔다 */
-}
-
+/* ---- 2) 궁합 카드 안의 DM 버튼 (우상단) ----
+   .card-info-bottom 은 최고/최악 파티원 카드에서도 같이 쓰는 공용 클래스라
+   거기에 position/padding 을 걸면 다른 카드까지 밀립니다.
+   이 클래스는 이미 flex column 이므로 align-self 만으로 우상단에 붙습니다. */
 .friend-dm-btn {
-    position: absolute;
-    top: 0;
-    right: 0;
+    align-self: flex-end;
+    margin-bottom: 2px;
     padding: 4px 10px;
     border-radius: 999px;
     border: 1.5px solid var(--r-accent);

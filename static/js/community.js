@@ -113,6 +113,24 @@ async function apiFetch(url, options = {}) {
 // ------------------------------------------
 
 
+// ------------------------------------------
+// 로그아웃
+// community.html / community_detail.html 의 헤더 버튼이 onclick="logout()" 으로
+// 이 함수를 부르는데, 두 화면은 community.js 만 로드합니다.
+// 여기에 없으면 ReferenceError 가 나서 버튼이 아무 반응도 하지 않습니다.
+// (hub.html / result.html / test.js 에 있는 것과 동작이 같습니다)
+// ------------------------------------------
+async function logout() {
+    localStorage.removeItem('JWT_TOKEN');
+    try {
+        await fetch('/api/logout', { method: 'POST' });
+    } catch (e) {
+        console.error('로그아웃 요청 실패:', e);
+    }
+    location.href = '/';
+}
+
+
 // ==========================================
 // [목록 화면] community.html 에서만 실행되는 부분
 // 상세 화면(community_detail.html)에는 #post-list 요소가 없으므로

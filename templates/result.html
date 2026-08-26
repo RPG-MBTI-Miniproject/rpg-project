@@ -80,8 +80,6 @@
                         <h4 class="match-name">{{ best_match.class_name }} <span class="mbti-text">({{ best_match.mbti
                                 }})</span></h4>
                     </div>
-                    <h4 class="match-name">{{ best_match.class_name }}</h4>
-                    <span class="match-mbti">({{ best_match.mbti }})</span>
                     {% if can_dm %}
                     <!-- 같은 직업(MBTI)을 가진 유저 목록 팝업을 엽니다 -->
                     <div class="card-action-row">
@@ -173,10 +171,10 @@
                         <!-- 검색한 친구에게 쪽지 보내기. href 는 test.js 가 검색 성공 시 채웁니다 -->
                         <a href="#" class="friend-dm-btn" id="friend-dm-btn" title="쪽지 보내기">✈ DM</a>
                         {% endif %}
-                        <span class="synergy-tag brain" id="friend-to-me-tag">[시너지 태그]</span>
-                        <h4 class="partner-title">
-                            <span id="my-class-name">[내 직업명]</span>
-                            <span class="mbti-text" id="my-mbti-text">([내 MBTI])</span>
+                        <span class="synergy-tag duo" id="friend-to-me-tag">든든한 동료</span>
+                        <h4 class="match-name">
+                            <span id="my-class-name"></span>
+                            <span class="mbti-text" id="my-mbti-text"></span>
                         </h4>
                         <p class="partner-desc" id="friend-to-me-desc"></p>
                     </div>

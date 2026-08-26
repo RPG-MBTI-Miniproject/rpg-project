@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,21 +8,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/result.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/community.css') }}">
 </head>
-
-<body class="community-detail-body">
-    <!-- ==========================================
-         [담당: HTML/CSS 동료] 게시글 상세 화면
-
-         이 파일은 두 구역으로 나뉩니다:
-           1) 위/아래 여백 구역 = 동료가 채울 TODO
-           2) 가운데 "캐릭터 카드" 구역 = David가 이미 채워둠 (건드리지 마세요)
-              -> DB에서 글쓴이 MBTI를 조회해서 Jinja2로 렌더링하는 백엔드 로직과
-                 1:1로 묶여있는 부분이라, 여기 마크업을 바꾸면 데이터가 안 뜹니다.
-                 스타일(색/여백/폰트)은 community.css에서 자유롭게 조정하되,
-                 class 이름과 이중 중괄호 변수 자리는 유지해주세요.
-         ========================================== -->
+<body class="community-body">
     <header class="top-nav">
-        <!-- TODO: [HTML/CSS] 로고 / "게시글" 타이틀 / [로그아웃] 버튼 -->
         <div class="community-nav-bar">
             <a href="{{ url_for('community') }}" class="community-back-link">
                 <span class="community-back-icon">‹</span> 돌아가기
@@ -32,30 +18,96 @@
         </div>
     </header>
 
-    <main class="result-container community-detail-container">
-        <!-- TODO: [HTML/CSS] 목록으로 돌아가는 링크
-             href="{{ url_for('community') }}" 는 유지, 텍스트/아이콘만 자유 -->
-        <!-- TODO: [HTML/CSS] 게시글 본문 카드
-             id는 절대 변경 금지 (community.js가 참조):
-               - class="post-title" 요소 안에 {{ post.title }}
-               - class="post-meta"  요소 안에 {{ post.author_nickname }} 와
-                 span id="post-date" (날짜는 JS가 채워넣음, 비워두면 됨)
-               - class="post-content" 요소 안에 {{ post.content }}
-             is_author 조건부 블록 안에는:
-               - button id="edit-post-btn"
-               - button id="delete-post-btn" -->
-        <section class="post-body-card">
-            <h1 class="post-title">{{ post.title }}</h1>
-            <p class="post-meta">{{ post.author_nickname }} · <span id="post-date"></span></p>
-            <div class="post-body-divider"></div>
-            <div class="post-content">
-                <p>{{ post.content }}</p>
+    <main class="result-container community-detail-bg">
+
+        <div class="post-content-card">
+
+            <section class="post-body-card">
+                <h2 class="post-title">{{ post.title }}</h2>
+                <p class="post-meta">{{ post.author_nickname }} · <span id="post-date"></span></p>
+                <div class="post-body-divider"></div>
+                <p class="post-content">{{ post.content }}</p>
+            </section>
+
+            <!-- ==========================================
+                 ↓↓↓ 캐릭터 카드 (result.html 재사용, 백엔드가 값 채워줌) — 내용은 안 건드림 ↓↓↓
+                 ========================================== -->
+            {% if character %}
+            <div class="character-embed">
+                <p class="character-embed-label">🛡️ 글쓴이의 성향 프로필</p>
+
+                <section class="character-card">
+                    <div class="illustration-wrapper">
+                        <img id="author-char-img"
+                            src="{{ url_for('static', filename='images/' + character.my_class.mbti.upper() + '.png') }}"
+                            alt="{{ character.my_class.class_name }}" class="char-img"
+                            onerror="this.src='/static/images/main-logo.png';">
+                    </div>
+                    <h3 class="char-title">"{{ character.my_class.title }}"</h3>
+                    <h2 class="char-name-mbti">{{ character.my_class.class_name }} <span class="mbti-badge">({{ character.my_class.mbti }})</span></h2>
+                </section>
+
+                <section class="stats-info-section">
+                    <div class="chart-box">
+                        <h4>능력치 레이더</h4>
+                        <div class="canvas-wrapper">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <h4>전투 유형/특징</h4>
+                        <div class="info-item">
+                            <span class="info-label">▶ 전투 유형</span>
+                            <span class="info-value">{{ character.my_class.mbti }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">▶ 특징</span>
+                            <span class="info-value">{{ character.my_class.title }}</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="chemistry-area">
+                    <h3 class="section-title">🤝 파티원 궁합</h3>
+                    <div class="chemistry-box">
+                        <div class="chemistry-card best-match">
+                            <div class="match-badge best">💚 최고의 파티원</div>
+                            <div class="match-img-wrapper">
+                                <img id="best-match-img"
+                                    src="{{ url_for('static', filename='images/' + character.best_match.mbti.upper() + '.png') }}"
+                                    alt="{{ character.best_match.class_name }}" class="match-img"
+                                    onerror="this.src='/static/images/main-logo.png';">
+                            </div>
+                            <h4 class="match-name">{{ character.best_match.class_name }}</h4>
+                            <span class="match-mbti">({{ character.best_match.mbti }})</span>
+                        </div>
+                        <div class="chemistry-card worst-match">
+                            <div class="match-badge worst">💔 최악의 파티원</div>
+                            <div class="match-img-wrapper">
+                                <img id="worst-match-img"
+                                    src="{{ url_for('static', filename='images/' + character.worst_match.mbti.upper() + '.png') }}"
+                                    alt="{{ character.worst_match.class_name }}" class="match-img"
+                                    onerror="this.src='/static/images/main-logo.png';">
+                            </div>
+                            <h4 class="match-name">{{ character.worst_match.class_name }}</h4>
+                            <span class="match-mbti">({{ character.worst_match.mbti }})</span>
+                        </div>
+                    </div>
+                </section>
+
+                <script id="stats-data" type="application/json">
+                    {{ character.my_class.stats | tojson }}
+                </script>
             </div>
+            {% else %}
+            <p class="no-character-msg">아직 성향 테스트를 진행하지 않은 모험가입니다.</p>
+            {% endif %}
+            <!-- ↑↑↑ 캐릭터 카드 끝 ↑↑↑ -->
 
             {% if is_author %}
             <div class="post-owner-actions">
-                <button type="button" id="edit-post-btn" class="post-btn edit-btn">수정</button>
-                <button type="button" id="delete-post-btn" class="post-btn delete-btn">삭제</button>
+                <button id="edit-post-btn">수정</button>
+                <button id="delete-post-btn" class="danger">삭제</button>
             </div>
             {% else %}
             <!-- 남의 글에서는 [수정][삭제] 자리에 글쓴이에게 쪽지를 보내는 버튼이 뜹니다.
@@ -64,83 +116,9 @@
                 <a href="{{ url_for('dm_room', nickname=post.author_nickname) }}" class="dm-btn">✈ DM</a>
             </div>
             {% endif %}
-        </section>
 
-        <!-- ==========================================
-             ↓↓↓ 여기서부터 "David 담당" — 그대로 유지 ↓↓↓
-             글쓴이의 캐릭터 카드 (result.html 섹션 재사용, 백엔드가 값 채워줌)
-             ========================================== -->
-        {% if character %}
-        <div class="character-embed">
-            <p class="character-embed-label">🛡️ 글쓴이의 성향 프로필</p>
-
-            <section class="character-card">
-                <div class="illustration-wrapper">
-                    <div class="illustration-placeholder">
-                        <span class="char-icon">🔮</span>
-                    </div>
-                </div>
-                <h3 class="char-title">"{{ character.my_class.title }}"</h3>
-                <h2 class="char-name-mbti">{{ character.my_class.class_name }} <span class="mbti-badge">({{ character.my_class.mbti }})</span></h2>
-            </section>
-
-            <section class="stats-info-section">
-                <div class="chart-box">
-                    <h4>능력치 레이더</h4>
-                    <div class="canvas-wrapper">
-                        <canvas id="radarChart"></canvas>
-                    </div>
-                </div>
-                <div class="info-box">
-                    <h4>전투 유형/특징</h4>
-                    <div class="info-item">
-                        <span class="info-label">▶ 전투 유형</span>
-                        <span class="info-value">{{ character.my_class.mbti }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">▶ 특징</span>
-                        <span class="info-value">{{ character.my_class.title }}</span>
-                    </div>
-                </div>
-            </section>
-
-            <section class="chemistry-area">
-                <h3 class="section-title">🤝 파티원 궁합</h3>
-                <div class="chemistry-box">
-                    <div class="chemistry-card best-match">
-                        <div class="match-badge best">💚 최고의 파티원</div>
-                        <div class="match-img-wrapper">
-                            <div class="match-placeholder">🛡️</div>
-                        </div>
-                        <h4 class="match-name">{{ character.best_match.class_name }}</h4>
-                        <span class="match-mbti">({{ character.best_match.mbti }})</span>
-                    </div>
-                    <div class="chemistry-card worst-match">
-                        <div class="match-badge worst">💔 최악의 파티원</div>
-                        <div class="match-img-wrapper">
-                            <div class="match-placeholder">⚔️</div>
-                        </div>
-                        <h4 class="match-name">{{ character.worst_match.class_name }}</h4>
-                        <span class="match-mbti">({{ character.worst_match.mbti }})</span>
-                    </div>
-                </div>
-            </section>
-
-            <script id="stats-data" type="application/json">
-                {{ character.my_class.stats | tojson }}
-            </script>
         </div>
-        {% else %}
-        <p class="no-character-msg">아직 성향 테스트를 진행하지 않은 모험가입니다.</p>
-        {% endif %}
-        <!-- ↑↑↑ David 담당 구역 끝 ↑↑↑ -->
 
-        <!-- TODO: [HTML/CSS] 댓글 영역
-             id는 절대 변경 금지 (community.js가 참조):
-               - span id="comment-count" (JS가 숫자를 채움, 처음엔 0 표시)
-               - div id="comment-list" (JS가 댓글 목록을 그림, 비워둘 것)
-               - input id="comment-input"
-               - button id="comment-submit-btn" -->
         <section class="comment-section">
             <h3 class="comment-title">댓글 <span id="comment-count">0</span></h3>
             <div id="comment-list" class="comment-list"></div>
@@ -149,20 +127,16 @@
                 <button type="button" id="comment-submit-btn">등록</button>
             </div>
         </section>
+
     </main>
 
-    <!-- TODO: [HTML/CSS] 글 수정 모달
-         community.html 의 write-modal과 완전히 동일한 구조로 만들면 됩니다
-         (id="write-modal", "modal-title", "post-title-input", "post-content-input",
-          "modal-error", "modal-cancel-btn", "modal-submit-btn") -->
-    <div id="write-modal" class="modal-backdrop">
+    <div id="write-modal" class="modal-backdrop hidden">
         <div class="modal-box">
             <h3 id="modal-title" class="modal-title">글 수정</h3>
-            <div id="modal-error" class="modal-error"></div>
+            <div id="modal-error" class="modal-error hidden"></div>
             <div class="modal-form-group">
                 <input type="text" id="post-title-input" class="modal-input" placeholder="제목 (2글자 이상)">
-                <textarea id="post-content-input" class="modal-textarea" rows="6"
-                    placeholder="내용을 입력하세요 (2글자 이상)"></textarea>
+                <textarea id="post-content-input" class="modal-textarea" rows="6" placeholder="내용을 입력하세요 (2글자 이상)"></textarea>
             </div>
             <div class="modal-actions">
                 <button type="button" id="modal-cancel-btn" class="modal-btn cancel-btn">취소</button>
@@ -173,18 +147,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // David가 서버에서 내려주는 값 (건드리지 않아도 됨) — JS 로직 담당 동료가 사용
         const POST_ID = "{{ post.id }}";
         const POST_AUTHOR_ID = "{{ post.author_id }}";
         const VIEWER_ID = "{{ viewer_id }}";
         const POST_TITLE = {{ post.title | tojson }};
         const POST_CONTENT = {{ post.content | tojson }};
         const POST_CREATED_AT = "{{ post.created_at }}";
-
-        const dateElem = document.getElementById('post-date');
-        if (dateElem && POST_CREATED_AT) {
-            dateElem.textContent = new Date(POST_CREATED_AT).toLocaleDateString('ko-KR');
-        }
+        document.getElementById('post-date').textContent = new Date(POST_CREATED_AT).toLocaleDateString('ko-KR');
 
         {% if character %}
         document.addEventListener('DOMContentLoaded', () => {
@@ -233,5 +202,4 @@
 
     <script src="{{ url_for('static', filename='js/community.js') }}"></script>    
 </body>
-
 </html>
