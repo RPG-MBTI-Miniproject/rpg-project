@@ -1,0 +1,60 @@
+/* ==========================================
+   [담당: HTML/CSS 동료] 커뮤니티 스타일
+
+   아래 두 블록은 "기능"에 필요해서 미리 채워뒀습니다 (지우지 마세요).
+   나머지는 전부 자유 디자인 — 기존 style.css의 다크 판타지 톤(남색 배경,
+   골드 포인트)과 어울리게만 맞춰주시면 됩니다.
+   ========================================== */
+
+.hidden {
+    display: none !important;   /* JS가 이 클래스를 붙였다 뗐다 하면서 보이기/숨기기를 제어합니다 */
+}
+
+.modal-backdrop {
+    position: fixed;   /* 모달은 화면 전체를 덮어야 하므로 fixed 유지 필수 */
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    /* 배경 어둡게 깔아주는 색상(background)은 자유롭게 정해주세요 */
+}
+
+
+/* ==========================================
+   TODO 체크리스트 — 아래 클래스/id들에 스타일을 입혀주세요
+   (어떤 화면에 쓰이는지는 옆에 적어뒀습니다. 와이어프레임 3장 참고)
+   ========================================== */
+
+/* [목록 화면 community.html]
+   .community-container   전체 폭/여백
+   .board-toolbar          검색창 + 글쓰기 버튼 한 줄 배치
+   .search-box              select + input + button 묶음
+   .sort-tabs, .sort-btn, .sort-btn.active   최신순/오래된순 토글
+   .post-list, .post-row    게시글 목록 한 줄 한 줄
+   .post-row-title, .post-row-sub, .post-row-date
+   .empty-msg                검색 결과 없음 안내
+   .pagination, .pagination button, .pagination button.active
+*/
+
+/* [글쓰기/수정 모달 — 두 화면 공용]
+   .modal-box                모달 박스 자체 (배경/모서리/그림자)
+   .modal-box input, .modal-box textarea
+   .modal-error
+   .modal-actions, .modal-actions button, .modal-actions button.primary
+*/
+
+/* [상세 화면 community_detail.html]
+   .back-link
+   .post-body-card, .post-title, .post-meta, .post-content
+   .post-owner-actions, .post-owner-actions button.danger
+   .no-character-msg
+   .comment-section, .comment-list, .comment-row
+   .comment-author, .comment-content
+   .comment-actions, .comment-actions span, .comment-actions span.disabled, .comment-actions span.danger
+   .comment-input-row
+*/
+
+/* [공용 네비게이션]
+   .nav-actions, .nav-link
+*/
