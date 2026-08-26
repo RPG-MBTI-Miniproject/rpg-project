@@ -153,29 +153,53 @@ if (document.querySelector('#post-list')) {
     //   - 클릭된 버튼에 active 클래스, 나머지는 제거
     //   - 상태의 sort 값 갱신, page를 1로 리셋
     //   - 목록 다시 불러오기
-    function sortExecution() {
-        const sortButtons = document.querySelectorAll('.sort-btn');
 
-        sortButtons.forEach(button => {
-            button.addEventListener('click', function (e) {
-                // 1. 모든 버튼에서 active 클래스 제거
-                sortButtons.forEach(btn => btn.classList.remove('active'));
+    // 1. 정렬 버튼을 눌렀을 때 '실행될 동작만' 정의하는 함수 
+    function handleSort(e) {
+        // 모든 정렬 버튼에서 active 클래스 제거
+        sortButtons.forEach(btn => btn.classList.remove('active'));
 
-                // 2. 클릭된 버튼에만 active 클래스 추가 (e.currentTarget 활용)
-                e.currentTarget.classList.add('active');
+        // 현재 클릭된 버튼에만 active 클래스 추가
+        e.currentTarget.classList.add('active');
 
-                // 3. 클릭된 버튼의 data-sort 속성값 가져와서 상태 갱신
-                const selectedSort = e.currentTarget.dataset.sort;
-                communityStatus.sort = selectedSort;
+        // 클릭된 버튼의 data-sort 속성값으로 상태 갱신
+        communityStatus.sort = e.currentTarget.dataset.sort;
+        communityStatus.page = 1;
 
-                // 4. 페이지 번호 1로 리셋
-                communityStatus.page = 1;
-
-                // 5. 게시글 목록 다시 불러오기
-                loadPosts();
-            });
-        });
+        // 목록 새로 불러오기
+        loadPosts();
     }
+
+    // 2. 모든 정렬 버튼 요소 찾기 
+    const sortButtons = document.querySelectorAll('.sort-btn');
+
+    // 3. 각 버튼에 클릭 이벤트 등록
+    sortButtons.forEach(button => {
+        button.addEventListener('click', handleSort);
+    });
+    // function handelSort() {
+    //     const sortButtons = document.querySelectorAll('.sort-btn');
+
+    //     sortButtons.forEach(button => {
+    //         button.addEventListener('click', function (e) {
+    //             // 1. 모든 버튼에서 active 클래스 제거
+    //             sortButtons.forEach(btn => btn.classList.remove('active'));
+
+    //             // 2. 클릭된 버튼에만 active 클래스 추가 (e.currentTarget 활용)
+    //             e.currentTarget.classList.add('active');
+
+    //             // 3. 클릭된 버튼의 data-sort 속성값 가져와서 상태 갱신
+    //             const selectedSort = e.currentTarget.dataset.sort;
+    //             communityStatus.sort = selectedSort;
+
+    //             // 4. 페이지 번호 1로 리셋
+    //             communityStatus.page = 1;
+
+    //             // 5. 게시글 목록 다시 불러오기
+    //             loadPosts();
+    //         });
+    //     });
+    // }    
 
     // TODO 5. 검색 버튼(#search-btn) 클릭 이벤트
     //   - #search-input 값을 trim
@@ -183,13 +207,75 @@ if (document.querySelector('#post-list')) {
     //   - #search-target 의 선택값도 같이 상태에 저장
     //   - page를 1로 리셋하고 목록 다시 불러오기
     //   (선택) input에서 Enter 키 눌러도 검색되게 하면 UX 좋음
+    function handleSearch() {
+        // 입력 값 및 검색 카테고리 가져오기
+        const searchInput = document.querySelector('#search-input').value.trim();
+        const searchTarget = document.querySelector('#search-target').value;
 
+        // 글자 수 검사
+        if (searchInput.length < MIN_LEN) {
+            alert(`"${MIN_LEN} 글자 이상 입력해 주세요."`);
+            return;
+        }
+
+        // 상태 변수 저장
+        communityStatus.target = searchTarget;
+        communityStatus.q = searchInput;
+        communityStatus.page = 1;
+
+        // 목록 불러오기
+        loadPosts();
+
+    }
+
+    /// 검색 버튼 연결 
+    document.querySelector('#search-btn').addEventListener('click', handleSearch);
+
+    /// 검색어 입력창 요소 선택
+    const searchInput = document.querySelector('#search-input');
+
+    // 검색창에서 키보드가 눌렸을 때 이벤트 감지
+    searchInput.addEventListener('keyup', function (e) {
+        // 눌린 키가 'Enter'인지 확인
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    });
 
     // TODO 6. 게시글 목록 그리는 함수 만들기 (예: renderPosts(posts))
     //   #post-list 를 비우고, posts 배열을 순회하며 한 줄씩 요소를 만들어 추가
     //   각 줄은 클릭하면 `/community/{post.id}` 로 이동해야 함
-    //     (a 태그로 만들어서 href="/community/" + post.id 하는 게 제일 간단)
+    //   (a 태그로 만들어서 href="/community/" + post.id 하는 게 제일 간단)
     //   보여줄 정보: title, author_nickname, comment_count, created_at(날짜만 보기 좋게 포맷)
+    //  목록 조회 함수(loadPosts) 내부, 게시글 목록 상태가 변경되어 화면을 다시 그려야 할 때 호출
+    function renderPosts(posts) {
+        const postList = document.querySelector('#post-list');
+
+        // 1. posts 배열이 비어있거나 유효하지 않은 경우 예외 처리
+        if (!posts || posts.length === 0) {
+            postList.innerHTML = '';
+            return;
+        }
+
+        // 2. map을 활용해 각 게시글 HTML 문자열 배열을 만들고 join('')으로 하나로 합치기
+        const postsHtml = posts.map(post => {
+            const dateOnly = post.created_at ? post.created_at.slice(0, 10) : '';
+            const author = post.author_nickname || '익명';
+            const commentCount = post.comment_count ?? 0;
+
+            return `
+            <a href="/community/${post.id}" class="post-item">
+                <span class="post-title">${post.title}</span>
+                <span class="post-author">${author}</span>
+                <span class="post-comments">💬 ${commentCount}</span>
+                <span class="post-date">${dateOnly}</span>
+            </a>
+        `;
+        }).join('');
+
+        // 3. 한 번에 DOM에 반영 (성능 최적화)
+        postList.innerHTML = postsHtml;
+    }
 
     // TODO 7. 페이지네이션 그리는 함수 만들기 (예: renderPagination(page, totalPages))
     //   #pagination 을 비우고, 1부터 totalPages까지 버튼 생성
@@ -203,7 +289,7 @@ if (document.querySelector('#post-list')) {
     //     #empty-msg 의 hidden 클래스 제거
     //   - 아니면: #empty-msg에 hidden 클래스 추가하고, renderPosts + renderPagination 호출
     //   - 페이지 처음 로드될 때 한 번 자동으로 호출되어야 함 (스크립트 맨 아래에서 실행)
-    function loadPosts(){
+    function loadPosts() {
 
     }
 
