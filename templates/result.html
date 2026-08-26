@@ -33,7 +33,8 @@
             </div>
 
             <h3 class="char-title">"{{ my_class.title }}"</h3>
-            <h1 class="char-name-mbti">{{ my_class.class_name }} <span class="mbti-badge">({{ my_class.mbti }})</span></h1>
+            <h1 class="char-name-mbti">{{ my_class.class_name }} <span class="mbti-badge">({{ my_class.mbti }})</span>
+            </h1>
         </section>
 
         <!-- 능력치 육각 그래프 및 주요 스킬 / 특징 -->
@@ -88,6 +89,18 @@
             <button class="btn btn-secondary" onclick="location.href='/test'">🔄 테스트 다시하기</button>
             <!-- TODO: [이정욱] 결과 링크 복사하는 기능(URL 클립보드 복사) JS 함수로 간단히 구현 -->
             <button class="btn btn-primary" id="copy-link-btn">🔗 결과 링크 복사하기</button>
+        </div>
+        <div class="search-friend">
+            <label for="search-friend-result">🙍‍♂️ 친구의 궁합 보러가기 (<span>닉네임</span>)</label>
+            <form class="search-form" type="submit">
+                <input type="text" name="search-friend-result" id="search-friend-result" placeholder="친구의 닉네임을 입력하세요">
+                <button class="btn btn-primary" id="search-friend-btn">궁합 보기</button>
+            </form>
+        </div>
+        <div class="friend-card">
+            <div class="friend-mbti">
+                <p></p>
+            </div>
         </div>
     </main>
 

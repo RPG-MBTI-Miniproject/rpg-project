@@ -314,3 +314,59 @@
     background: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
 }
+
+/* 친구의 궁합 보러가기 */
+.search-friend {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(26, 24, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.search-friend label {
+    width: 100%;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.25rem;
+}
+
+.search-friend span {
+    color: var(--accent-cyan);
+}
+
+.search-form {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.search-friend input {
+    flex: 3;
+    min-width: 200px;
+    padding: 0.75rem 1rem;
+    background: rgba(15, 14, 25, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.search-friend input:focus {
+    border-color: #00f2fe;
+    box-shadow: 0 0 8px rgba(0, 242, 254, 0.3);
+}
+
+.search-friend button {
+    flex: 1;
+    padding: 0.75rem 1.25rem;
+    white-space: nowrap;
+}
