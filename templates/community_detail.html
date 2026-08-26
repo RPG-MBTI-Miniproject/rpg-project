@@ -71,7 +71,10 @@
             <section class="character-card">
                 <div class="illustration-wrapper">
                     <div class="illustration-placeholder">
-                        <span class="char-icon">🔮</span>
+                        <img id="main-char-img"
+                            src="{{ url_for('static', filename='images/' + character.my_class.mbti.upper() + '.png') }}"
+                            alt="{{ character.my_class.class_name }}" class="char-img"
+                            onerror="this.src='/static/images/main-logo.png';">
                     </div>
                 </div>
                 <h3 class="char-title">"{{ character.my_class.title }}"</h3>
