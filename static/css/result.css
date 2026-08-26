@@ -1,500 +1,468 @@
-/* [최현욱] Frame 3 (result.html) 카드, 육각 그래프, 상성 박스 스타일링 */
+/* [최현욱] Frame 3 (result.html) 결과 및 궁합 페이지 스타일링 */
 
+body {
+    /* Aurora 그라데이션 */
+    background: linear-gradient(90deg, #F0EFFF 0%, #E6F0FF 50%, #EAFBF7 100%);
+    font-family: 'Inter', var(--font-sans), 'Pretendard', sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #2C2C3E;
+    box-sizing: border-box;
+}
+
+/* Header Nav */
 .top-nav {
+    width: 100%;
+    max-width: 689px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 32px;
-    background: rgba(18, 16, 28, 0.85);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    padding: 16px 20px;
+    box-sizing: border-box;
 }
 
-.nav-logo {
-    font-family: var(--font-heading), serif;
-    color: var(--primary-gold);
-    font-size: 1.4rem;
+.nav-back-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease;
 }
 
-.nav-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-main);
+.nav-back-link:hover {
+    transform: translateX(-2px);
+}
+
+.nav-back-icon {
+    width: 32px;
+    height: 32px;
+    background: #FFFFFF;
+    box-shadow: 0px 8px 24px rgba(111, 107, 153, 0.12);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #2C2C3E;
+    line-height: 0;
+    padding-bottom: 2px;
+    box-sizing: border-box;
+}
+
+.nav-back-text {
+    font-size: 18px;
+    font-weight: 800;
+    color: #2C2C3E;
 }
 
 .logout-btn {
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    color: var(--text-sub);
-    padding: 6px 14px;
-    border-radius: var(--radius-sm);
+    border: none;
+    color: #6B6E85;
+    font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
-    transition: var(--ease-fast);
+    transition: color 0.2s ease;
+    outline: none;
+    padding: 6px 10px;
 }
 
 .logout-btn:hover {
-    background: rgba(239, 68, 68, 0.2);
-    color: var(--danger);
-    border-color: var(--danger);
+    color: #ef4444;
 }
 
+/* 메인 컨테이너 */
 .result-container {
-    max-width: 720px;
-    margin: 32px auto;
-    padding: 0 20px 48px;
-    position: relative;
-    z-index: 1;
+    width: 100%;
+    max-width: 689px;
+    padding: 8px 16px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-sizing: border-box;
 }
 
 .sub-heading {
     text-align: center;
-    font-size: 1.25rem;
-    color: var(--text-sub);
-    margin-bottom: 24px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #8F7CFF;
+    margin: 4px 0 10px 0;
+    letter-spacing: -0.5px;
 }
 
+/* 1. Main Result Card */
 .character-card {
-    background: var(--bg-card);
-    border: 1px solid rgba(255, 215, 0, 0.3);
-    box-shadow: var(--shadow-card);
-    border-radius: var(--radius-xl);
-    padding: 32px 24px;
+    background: rgba(255, 255, 255, 0.91);
+    border: 1.5px solid #EAEAFF;
+    box-shadow: 0px 8px 24px rgba(111, 107, 153, 0.12);
+    border-radius: 28px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    margin-bottom: 24px;
-    position: relative;
-    overflow: hidden;
+    gap: 12px;
+    box-sizing: border-box;
 }
 
 .illustration-wrapper {
-    width: 140px;
-    height: 140px;
-    margin: 0 auto 16px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(0, 242, 254, 0.2) 0%, rgba(30, 27, 75, 0.8) 100%);
-    border: 2px solid var(--primary-gold);
+    width: 100%;
+    height: 200px;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #F5F3FF;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
 }
 
 .char-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 50%;
-}
-
-.illustration-placeholder {
-    font-size: 4rem;
+    display: block;
 }
 
 .char-title {
-    font-size: 1.1rem;
-    color: var(--accent-cyan);
-    margin-bottom: 8px;
-    font-weight: 500;
+    font-size: 15px;
+    font-weight: 600;
+    color: #6B6E85;
+    margin: 4px 0 0 0;
 }
 
 .char-name-mbti {
-    font-size: 2rem;
-    color: var(--primary-gold);
+    font-size: 26px;
     font-weight: 700;
+    color: #2C2C3E;
+    margin: 0;
+    letter-spacing: -0.5px;
 }
 
-.mbti-badge {
-    color: var(--text-main);
-    font-size: 1.5rem;
-}
-
+/* 2. Stats & Skills Card */
 .stats-info-section {
-    background: var(--bg-card);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-xl);
-    padding: 24px;
-    margin-bottom: 24px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    background: rgba(255, 255, 255, 0.91);
+    border: 1px solid #EAEAFF;
+    box-shadow: 0px 8px 24px rgba(111, 107, 153, 0.12);
+    border-radius: 24px;
+    padding: 20px 24px;
+    display: flex;
     align-items: center;
+    gap: 20px;
+    box-sizing: border-box;
 }
 
-@media (max-width: 600px) {
-    .stats-info-section {
-        grid-template-columns: 1fr;
-    }
-}
-
-.chart-box h4 {
-    text-align: center;
-    font-size: 1rem;
-    color: var(--text-sub);
-    margin-bottom: 12px;
+.chart-box {
+    width: 140px;
+    height: 140px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .canvas-wrapper {
-    width: 100%;
-    height: 220px;
+    width: 140px;
+    height: 140px;
     position: relative;
 }
 
 .info-box {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    justify-content: center;
-    padding-left: 16px;
-    border-left: 1px dashed rgba(255, 255, 255, 0.15);
-}
-
-@media (max-width: 600px) {
-    .info-box {
-        padding-left: 0;
-        border-left: none;
-        border-top: 1px dashed rgba(255, 255, 255, 0.15);
-        padding-top: 16px;
-    }
+    gap: 12px;
 }
 
 .info-item {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 2px;
 }
 
 .info-label {
-    font-weight: 600;
-    color: var(--primary-gold);
-    font-size: 0.95rem;
-}
-
-.info-value {
-    color: var(--text-main);
-    font-size: 0.95rem;
-    line-height: 1.4;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 10px 14px;
-    border-radius: var(--radius-sm);
-}
-
-.chemistry-area {
-    background: var(--bg-card);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-xl);
-    padding: 24px;
-    margin-bottom: 32px;
-}
-
-.section-title {
-    font-size: 1.2rem;
-    color: var(--text-main);
-    margin-bottom: 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 8px;
-}
-
-.chemistry-box {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-}
-
-@media (max-width: 500px) {
-    .chemistry-box {
-        grid-template-columns: 1fr;
-    }
-}
-
-.chemistry-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: var(--radius-lg);
-    padding: 16px;
-    text-align: center;
-}
-
-.match-badge {
-    display: inline-block;
-    font-size: 0.85rem;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: var(--radius-full);
-    margin-bottom: 12px;
-}
-
-.match-badge.best {
-    background: rgba(16, 185, 129, 0.2);
-    color: var(--safe);
-    border: 1px solid rgba(16, 185, 129, 0.4);
-}
-
-.match-badge.worst {
-    background: rgba(239, 68, 68, 0.2);
-    color: var(--danger);
-    border: 1px solid rgba(239, 68, 68, 0.4);
-}
-
-.match-img-wrapper {
-    width: 64px;
-    height: 64px;
-    margin: 0 auto 8px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    overflow: hidden;
-}
-
-.match-img-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.match-name {
-    font-size: 1rem;
-    color: var(--text-main);
-    margin-bottom: 2px;
-}
-
-.match-mbti {
-    font-size: 0.85rem;
-    color: var(--text-sub);
-}
-
-.action-buttons {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-}
-
-@media (max-width: 500px) {
-    .action-buttons {
-        flex-direction: column;
-    }
-}
-
-.btn {
-    flex: 1;
-    padding: 14px 20px;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: var(--radius-lg);
-    cursor: pointer;
-    transition: var(--ease-normal);
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-dark) 100%);
-    color: var(--bg-dark);
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-}
-
-.btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-main);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-}
-
-/* 친구의 궁합 보러가기 */
-.search-friend {
-    margin-top: 1.5rem;
-    padding: 1.5rem;
-    background: rgba(26, 24, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.search-friend label {
-    width: 100%;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: white;
-    margin-bottom: 0.25rem;
-}
-
-.search-friend span {
-    color: var(--accent-cyan);
-}
-
-.search-form {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.search-friend input {
-    flex: 3;
-    min-width: 200px;
-    padding: 0.75rem 1rem;
-    background: rgba(15, 14, 25, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    color: #fff;
-    font-size: 0.95rem;
-    outline: none;
-    transition: border-color 0.2s ease;
-}
-
-.search-friend input:focus {
-    border-color: #00f2fe;
-    box-shadow: 0 0 8px rgba(0, 242, 254, 0.3);
-}
-
-.search-friend button {
-    flex: 1;
-    padding: 0.75rem 1.25rem;
-    white-space: nowrap;
-}
-
-/* 친구와의 궁합 컨테이너 */
-.friend-synergy-container {
-    margin-top: 2rem;
-    width: 100%;
-}
-
-.synergy-main-title {
-    font-size: 1.25rem;
+    font-size: 11px;
     font-weight: 700;
-    color: #f8fafc;
-    margin-bottom: 1rem;
+    color: #8F7CFF;
+    text-transform: uppercase;
+}
+
+.info-value-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #2C2C3E;
+}
+
+.info-value-desc {
+    font-size: 14px;
+    font-weight: 600;
+    color: #6B6E85;
+    line-height: 1.4;
+}
+
+/* 3. Compatibility Section */
+.chemistry-area,
+.friend-synergy-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.chemistry-divider {
+    width: 100%;
+    height: 1.5px;
+    background: #EAEAFF;
+    margin: 8px 0;
+}
+
+.section-title,
+.synergy-main-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #2C2C3E;
+    margin: 0;
     text-align: left;
 }
 
-/* 2열 가로 그리드 */
+.highlight-name {
+    color: #8F7CFF;
+}
+
+.chemistry-box,
 .friend-card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.25rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
 }
 
-/* 개별 카드 (이미지 스타일 적용) */
-.friend-match-card {
-    background: rgba(26, 24, 42, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+.chemistry-card {
+    background: #FFFFFF;
+    border: 1px solid #EAEAFF;
+    box-shadow: 0px 8px 24px rgba(111, 107, 153, 0.12);
     border-radius: 16px;
-    padding: 1.25rem;
+    padding: 12px;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    transition: transform 0.2s ease, border-color 0.2s ease;
+    gap: 8px;
+    box-sizing: border-box;
+    transition: transform 0.2s ease;
 }
 
-.friend-match-card:hover {
-    transform: translateY(-3px);
-    border-color: rgba(255, 255, 255, 0.3);
+.chemistry-card:hover {
+    transform: translateY(-2px);
 }
 
-/* 카드 상단 헤더 (라벨 + 하트/이모지) */
 .card-top-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.75rem;
+    width: 100%;
 }
 
 .card-label-title {
-    font-size: 1.05rem;
+    font-size: 13px;
     font-weight: 700;
-    color: #e2e8f0;
+    color: #6B6E85;
 }
 
 .status-emoji {
-    font-size: 1.1rem;
+    font-size: 14px;
 }
 
-/* 일러스트 이미지 박스 */
-.match-img-box {
+.match-img-wrapper {
     width: 100%;
-    height: 160px;
-    background: rgba(15, 14, 25, 0.8);
-    border-radius: 12px;
+    height: 90px;
+    background: #F5F3FF;
+    border-radius: 8px;
     overflow: hidden;
     display: flex;
-    justify-content: center;
     align-items: center;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 1rem;
-}
-
-.match-img-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    justify-content: center;
 }
 
 .match-placeholder {
-    font-size: 3rem;
+    font-size: 32px;
 }
 
 .card-info-bottom {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 2px;
 }
 
 .synergy-tag {
     align-self: flex-start;
-    padding: 0.25rem 0.6rem;
-    font-size: 0.8rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
     font-weight: 700;
-    border-radius: 6px;
+    margin-bottom: 2px;
 }
 
 .synergy-tag.duo {
-    background: rgba(34, 197, 94, 0.2);
-    color: #4ade80;
-    border: 1px solid rgba(74, 222, 128, 0.3);
+    background: #E8F5E9;
+    color: #4CAF50;
 }
 
-.synergy-tag.brain {
-    background: rgba(59, 130, 246, 0.2);
-    color: #60a5fa;
-    border: 1px solid rgba(96, 165, 250, 0.3);
+.synergy-tag.danger {
+    background: #FFEBEE;
+    color: #FF5252;
 }
 
-.partner-title {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #fff;
-    margin: 0.2rem 0;
+.match-name {
+    font-size: 13px;
+    font-weight: 800;
+    color: #2C2C3E;
+    margin: 0;
+    line-height: 1.3;
 }
 
 .mbti-text {
-    font-size: 0.95rem;
-    color: #94a3b8;
+    font-size: 12px;
     font-weight: 600;
+    color: #6B6E85;
 }
 
 .partner-desc {
-    font-size: 0.88rem;
-    color: #cbd5e1;
-    line-height: 1.5;
-    margin: 0;
-    word-break: keep-all;
+    font-size: 12px;
+    color: #6B6E85;
+    line-height: 1.4;
+    margin: 2px 0 0 0;
+}
+
+/* 4. Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    margin-top: 6px;
+}
+
+.btn {
+    flex: 1;
+    height: 51px;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.btn-secondary {
+    background: #FFFFFF;
+    border: 1.5px solid #8F7CFF;
+    color: #8F7CFF;
+    box-shadow: 0px 8px 24px rgba(111, 107, 153, 0.12);
+}
+
+.btn-secondary:hover {
+    background: #F5F3FF;
+    transform: translateY(-2px);
+    box-shadow: 0px 10px 28px rgba(143, 124, 255, 0.25);
+}
+
+.btn-primary {
+    background: #8F7CFF;
+    border: none;
+    color: #FFFFFF;
+    box-shadow: 0px 8px 24px rgba(111, 107, 153, 0.12);
+}
+
+.btn-primary:hover {
+    background: #7b65fa;
+    transform: translateY(-2px);
+    box-shadow: 0px 10px 28px rgba(143, 124, 255, 0.4);
+}
+
+/* 5. Search Friend */
+.search-friend {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.search-friend label {
+    font-size: 18px;
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.85);
+}
+
+.search-friend span {
+    color: #8F7CFF;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.search-friend input {
+    flex: 3;
+    height: 53px;
+    padding: 0 16px;
+    background: #FFFFFF;
+    border: 1px solid #4E1F6E;
+    border-radius: 15px;
+    font-size: 15px;
+    color: #2C2C3E;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.search-friend input:focus {
+    border-color: #8F7CFF;
+    box-shadow: 0 0 0 3px rgba(143, 124, 255, 0.15);
+}
+
+.search-friend button {
+    flex: 1;
+    height: 53px;
+    padding: 0 16px;
+    background: #8F7CFF;
+    border: none;
+    border-radius: 10px;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.search-friend button:hover {
+    background: #7b65fa;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(143, 124, 255, 0.35);
+}
+
+@media (max-width: 580px) {
+    .chemistry-box,
+    .friend-card-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
 }
