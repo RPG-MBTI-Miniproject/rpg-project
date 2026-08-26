@@ -59,12 +59,49 @@
     box-sizing: border-box;
 }
 
+html {
+    /* iOS Safari 는 가로로 눕히면 글자 크기를 제멋대로 키웁니다. 그걸 막습니다 */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
 body {
     background-color: var(--bg-dark);
     color: var(--text-main);
     font-family: var(--font-sans);
     min-height: 100vh;
+    min-height: 100dvh;   /* iOS 주소창 높이 보정 (구형은 위 줄 사용) */
     -webkit-font-smoothing: antialiased;
+}
+
+
+/* ==========================================
+   Safari / iOS 호환 레이어
+   여기 있는 규칙은 다른 브라우저의 모양을 바꾸지 않습니다.
+   Safari 에서만 어긋나던 것을 다른 브라우저와 똑같이 맞춰주는 용도입니다.
+   ========================================== */
+
+/* 1) iOS Safari 는 input 안쪽에 회색 그림자를 넣고, button 모서리를 제멋대로 둥글립니다.
+      그래서 우리가 준 border-radius / 배경색이 무시된 것처럼 보입니다.
+      select 는 화살표가 사라지므로 일부러 제외했습니다. */
+input[type="text"],
+input[type="password"],
+input[type="search"],
+input[type="email"],
+textarea,
+button {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 0;   /* 각 화면 CSS가 다시 지정합니다 */
+}
+
+/* 2) iOS Safari 는 폼 요소에만 시스템 폰트를 씁니다. 본문 폰트를 물려받게 합니다. */
+input,
+textarea,
+button,
+select {
+    font-family: inherit;
+    font-size: 100%;
 }
 
 /* Common Background Particles & Containers */

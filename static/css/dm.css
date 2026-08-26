@@ -1,0 +1,404 @@
+/* ==========================================
+   DM (쪽지) 화면 스타일
+   색/그림자/반경은 result.css, community.css 와 같은 값을 씁니다.
+   (style.css 의 :root 는 다크 테마 잔재라 여기서 라이트 테마 토큰을 다시 정의합니다)
+   ========================================== */
+
+:root {
+    --dm-aurora-bg: linear-gradient(90deg, #F0EFFF 0%, #E6F0FF 50%, #EAFBF7 100%);
+    --dm-accent: #8F7CFF;
+    --dm-accent-strong: #7c6ff2;
+    --dm-text-primary: #2C2C3E;
+    --dm-text-secondary: #6B6E85;
+    --dm-border: #EAEAFF;
+    --dm-surface: rgba(255, 255, 255, 0.91);
+    --dm-surface-solid: #FFFFFF;
+    --dm-shadow: 0 8px 24px rgba(111, 107, 153, 0.12);
+    --dm-danger: #ef4444;
+}
+
+.dm-body {
+    background: var(--dm-aurora-bg);
+    color: var(--dm-text-primary);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    min-height: 100dvh;   /* iOS 주소창 높이 보정 (구형은 위 줄 사용) */
+    word-break: keep-all;
+}
+
+/* ---- 상단 바 (돌아가기 / 나가기) ---- */
+.dm-nav-bar {
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px 24px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-sizing: border-box;
+}
+
+.dm-back-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--dm-text-secondary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.dm-back-link:hover {
+    color: var(--dm-accent);
+}
+
+.dm-back-icon {
+    font-size: 1.3rem;
+    line-height: 1;
+}
+
+/* 나가기 = 허브로. 기존 로그아웃 버튼들과 같은 알약 모양 */
+.dm-exit-btn {
+    padding: 8px 20px;
+    border-radius: 999px;
+    border: 1.5px solid var(--dm-accent);
+    background: var(--dm-surface-solid);
+    color: var(--dm-accent);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.dm-exit-btn:hover {
+    background: var(--dm-accent);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* ---- 공통 컨테이너 ---- */
+.dm-container {
+    max-width: 720px;
+    width: 100%;
+    margin: 24px auto 40px;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+
+.dm-page-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--dm-text-primary);
+    margin-bottom: 4px;
+}
+
+.dm-page-sub {
+    font-size: 0.9rem;
+    color: var(--dm-text-secondary);
+    margin-bottom: 20px;
+}
+
+/* ==========================================
+   1) 대화 목록 (dm.html)
+   ========================================== */
+.dm-room-list {
+    background: var(--dm-surface);
+    border: 1px solid var(--dm-border);
+    border-radius: 24px;
+    box-shadow: var(--dm-shadow);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dm-room-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--dm-surface-solid);
+    border: 1px solid var(--dm-border);
+    border-radius: 16px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+}
+
+.dm-room-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--dm-shadow);
+}
+
+.dm-room-avatar {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #eef1ff, #f5f3ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.dm-room-main {
+    flex: 1;
+    min-width: 0;   /* 긴 메시지가 넘칠 때 말줄임이 먹도록 */
+}
+
+.dm-room-top {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 2px;
+}
+
+.dm-room-nickname {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--dm-text-primary);
+}
+
+.dm-room-class {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--dm-text-secondary);
+}
+
+.dm-room-preview {
+    font-size: 0.85rem;
+    color: var(--dm-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dm-room-side {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.dm-room-time {
+    font-size: 0.75rem;
+    color: var(--dm-text-secondary);
+}
+
+.dm-unread-badge {
+    min-width: 20px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--dm-danger);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* 대화가 하나도 없을 때 */
+.dm-empty {
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--dm-text-secondary);
+}
+
+.dm-empty-icon {
+    font-size: 2.4rem;
+    margin-bottom: 12px;
+}
+
+.dm-empty-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* ==========================================
+   2) 대화창 (dm_room.html)
+   ========================================== */
+.dm-chat-card {
+    background: var(--dm-surface);
+    border: 1px solid var(--dm-border);
+    border-radius: 24px;
+    box-shadow: var(--dm-shadow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.dm-chat-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px;
+    border-bottom: 1.5px solid var(--dm-border);
+    background: var(--dm-surface-solid);
+}
+
+.dm-chat-partner {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--dm-text-primary);
+}
+
+.dm-chat-partner-class {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--dm-text-secondary);
+}
+
+/* 실시간 연결 상태 표시 (스트림/폴백 전환이 눈에 보이게) */
+.dm-chat-status {
+    margin-left: auto;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #E8F5E9;
+    color: #4CAF50;
+}
+
+.dm-chat-status.offline {
+    background: #FFEBEE;
+    color: #FF5252;
+}
+
+.dm-message-list {
+    height: 52vh;
+    height: 52dvh;   /* iOS 주소창 높이 보정 (구형은 위 줄 사용) */
+    min-height: 320px;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dm-message-row {
+    display: flex;
+    flex-direction: column;
+    max-width: 76%;
+}
+
+.dm-message-row.mine {
+    align-self: flex-end;
+    align-items: flex-end;
+}
+
+.dm-message-row.theirs {
+    align-self: flex-start;
+    align-items: flex-start;
+}
+
+.dm-bubble {
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    white-space: pre-wrap;         /* 줄바꿈 유지 */
+    /* anywhere 는 Safari 15.4 부터라 구형에서 그냥 무시됩니다.
+       break-word 는 훨씬 예전부터 되고 결과도 거의 같아서 이쪽을 씁니다 */
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.dm-message-row.mine .dm-bubble {
+    background: var(--dm-accent);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+}
+
+.dm-message-row.theirs .dm-bubble {
+    background: var(--dm-surface-solid);
+    border: 1px solid var(--dm-border);
+    color: var(--dm-text-primary);
+    border-bottom-left-radius: 4px;
+}
+
+.dm-message-time {
+    margin-top: 3px;
+    font-size: 0.7rem;
+    color: var(--dm-text-secondary);
+}
+
+/* 날짜 구분선 */
+.dm-date-divider {
+    align-self: center;
+    padding: 3px 12px;
+    margin: 6px 0;
+    border-radius: 999px;
+    background: rgba(143, 124, 255, 0.10);
+    color: var(--dm-text-secondary);
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+/* ---- 입력 줄 ---- */
+.dm-input-row {
+    display: flex;
+    gap: 10px;
+    padding: 16px 20px;
+    border-top: 1.5px solid var(--dm-border);
+    background: var(--dm-surface-solid);
+}
+
+.dm-input {
+    flex: 1;
+    padding: 12px 16px;
+    background: #fbfbff;
+    border: 1px solid var(--dm-border);
+    border-radius: 12px;
+    color: var(--dm-text-primary);
+    font-family: inherit;
+    font-size: 0.95rem;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.dm-input:focus {
+    border-color: var(--dm-accent);
+}
+
+.dm-send-btn {
+    padding: 12px 22px;
+    border: none;
+    border-radius: 12px;
+    background: var(--dm-accent);
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--dm-shadow);
+    transition: all 0.2s ease;
+}
+
+.dm-send-btn:hover:not(:disabled) {
+    background: var(--dm-accent-strong);
+    transform: translateY(-2px);
+}
+
+.dm-send-btn:disabled {
+    background: #E6E6E6;
+    color: #b0b8c1;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+@media (max-width: 500px) {
+    .dm-container,
+    .dm-nav-bar {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .dm-message-row {
+        max-width: 88%;
+    }
+}

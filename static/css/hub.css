@@ -15,6 +15,7 @@
   background: linear-gradient(90deg, #F0EFFF 0%, #E6F0FF 50%, #EAFBF7 100%);
   font-family: 'Inter', var(--font-sans), sans-serif;
   min-height: 100vh;
+  min-height: 100dvh;   /* iOS 주소창 높이 보정 (구형은 위 줄 사용) */
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -223,6 +224,71 @@
 
 .community-btn:hover {
   background: #7b65fa;
+  transform: translateY(-2px);
+  box-shadow: 0px 14px 36px rgba(143, 124, 255, 0.45);
+}
+
+/* 3. 쪽지함 카드 (그리드 바깥, 하단 가운데)
+   위 카드 2개보다 폭을 좁게 잡아 보조 메뉴처럼 보이게 합니다. */
+.dm-card {
+  margin-top: 36px;
+  width: 100%;
+  max-width: 420px;
+  padding: 36px 32px 32px 32px;
+  gap: 16px;
+}
+
+.dm-card .hub-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 0;
+}
+
+.hub-icon-emoji {
+  font-size: 52px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 12px rgba(111, 107, 153, 0.2));
+}
+
+.dm-card .hub-card-title {
+  font-size: 26px;
+}
+
+.dm-card .hub-card-desc {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.dm-card .hub-btn {
+  height: 56px;
+  font-size: 18px;
+}
+
+/* 안 읽은 쪽지 수 */
+.hub-unread-badge {
+  display: inline-block;
+  vertical-align: middle;
+  min-width: 24px;
+  margin-left: 8px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* 3. 쪽지함 버튼 (Outlined Purple — 위 두 개와 위계를 구분) */
+.dm-btn {
+  background: #FFFFFF;
+  color: #8F7CFF;
+  border: 2px solid #8F7CFF;
+  box-shadow: 0px 10px 28px rgba(111, 107, 153, 0.12);
+}
+
+.dm-btn:hover {
+  background: #8F7CFF;
+  color: #FFFFFF;
   transform: translateY(-2px);
   box-shadow: 0px 14px 36px rgba(143, 124, 255, 0.45);
 }
