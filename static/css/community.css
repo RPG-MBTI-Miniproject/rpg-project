@@ -55,49 +55,61 @@
     backdrop-filter: blur(10px);
 }
 
+/* 헤더 — 돌아가기(좌) / 로그아웃(우) */
 .community-nav-bar {
     max-width: 1400px;
     margin: 0 auto;
-    height: 100px;
-    padding: 0 2rem;
+    padding: 20px 32px;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.community-nav-left { flex: 1; display: flex; align-items: center; }
-.community-nav-logo { max-height: 64px; width: auto; }
-
-.community-nav-title {
-    flex: 1;
-    text-align: center;
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 0;
-    letter-spacing: 0.5px;
-}
-
-.community-nav-right { flex: 1; display: flex; justify-content: flex-end; }
 
 .nav-actions { display: flex; gap: 12px; align-items: center; }
 .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 13px; }
 .nav-link:hover { color: var(--accent-strong); }
 
+.community-back-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--text-primary);
+    font-weight: 800;
+    font-size: 1.05rem;
+}
+
+.community-back-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--surface-solid);
+    box-shadow: 0 8px 24px rgba(111, 107, 153, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--text-primary);
+}
+.community-back-link:hover .community-back-icon { box-shadow: 0 8px 24px rgba(124, 111, 242, 0.3); }
+
+
 .hub-nav-logout,
-.community-nav-logout,
-.logout-btn {
-    padding: 0.5rem 1.1rem;
-    border-radius: 999px;
-    border: 1.5px solid var(--accent);
-    background: transparent;
+.community-nav-logout {
+    padding: 8px 20px;
+    border-radius: var(--radius-full, 999px);
+    border: 1px solid var(--accent);
+    background: var(--surface-solid);
     color: var(--accent-strong);
     font-weight: 600;
+    font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.2s ease;
 }
+
 .hub-nav-logout:hover,
-.community-nav-logout:hover,
+.community-nav-logout:hover { background: var(--accent); color: #fff; }
 .logout-btn:hover {
     background: var(--accent);
     color: #fff;
@@ -105,12 +117,11 @@
 
 /* ================= 목록 화면 ================= */
 .community-container {
-    flex: 1;
     max-width: 1000px;
     width: 100%;
-    margin: 30px auto 0;
+    margin: 40px auto;       /* 위·아래 동일, 좌우는 auto로 중앙정렬 그대로 */
     border-radius: 24px;
-    padding: 2rem 1.5rem 4rem;
+    padding: 2rem 1.5rem 3rem;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -128,7 +139,17 @@
     gap: 1rem;
 }
 
-.search-box { display: flex; align-items: center; gap: 0.5rem; flex: 1; max-width: 800px; }
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    max-width: 800px;
+}
+
+.select-wrapper {
+    flex-shrink: 0;   /* 드롭다운은 안 눌리게 고정 */
+}
 
 .search-target,
 .search-input {
@@ -140,7 +161,18 @@
     font-size: 0.95rem;
     outline: none;
 }
-.search-input { flex: 1; }
+
+.search-input-wrapper {
+    flex: 1;           /* search-box 안에서 남는 공간 다 차지 */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.search-input {
+    flex: 1;
+    width: 100%;      /* wrapper 안에서도 꽉 채우기 */
+}
 .search-input:focus,
 .search-target:focus { border-color: var(--accent); }
 
@@ -220,10 +252,34 @@
 
 .empty-msg { text-align: center; padding: 3rem; color: var(--text-muted); font-size: 1rem; }
 
-/* 페이지네이션 */
-.pagination { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1rem; }
+/* 글쓰기 버튼 줄 (우측 정렬) */
+.list-actions-row {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: 1rem;
+}
 
-.pagination button,
+/* 페이지네이션 (중앙, 별도 줄) — active 상태에 figma 그림자 반영 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.pagination button {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: var(--surface-solid);
+    border: 1.5px solid var(--border-soft);
+    border-radius: var(--radius-lg, 10px);
+    color: var(--text-secondary);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
 .page-btn {
     padding: 0.5rem 0.9rem;
     background: var(--surface-solid);
@@ -232,7 +288,13 @@
     color: var(--text-secondary);
     cursor: pointer;
 }
-.pagination button.active,
+.pagination button.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 4px 8px rgba(111, 107, 153, 0.2);
+}
 .page-btn.active {
     background: var(--accent);
     border-color: var(--accent);

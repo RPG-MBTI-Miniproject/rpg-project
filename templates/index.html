@@ -18,23 +18,26 @@
     <main>
         <section>
             <div class="auth-wrapper">
-                <div class="auth-main-logo">
-                    <img src="{{ url_for('static', filename='images/main-logo.png') }}" alt="게임 로고">
-                </div>
                 <div class="auth-top-header">
                     <p class="auth-subtitle">당신의 영혼에 깃든 RPG 직업은?</p>
                 </div>
+                <div class="auth-main-logo">
+                    <img src="{{ url_for('static', filename='images/main-logo.png') }}" alt="게임 로고">
+                </div>
                 <form class="auth-card reveal is-visible" id="login-form">
                     <div class="auth-header">
-                        <h2 class="auth-title">로그인</h2>
+                        <h2 class="auth-title">모험을 시작하기 위해<br>당신의 신분을 증명하세요.</h2>
                     </div>
                     <input type="text" name="username" placeholder="RPG@mbti.com" autofocus="" class="auth-input"
                         value="">
                     <input type="password" name="password" placeholder="Password" class="auth-input" value="">
-                    <button type="submit" class="auth-submit">여관 입장하기</button>
+                    <button type="submit" class="auth-submit">
+                        여관&nbsp;<span class="another-color">입장하기</span>
+                    </button>
                     <div class="auth-footer">
-                        <p>길드에 가입하지 않으셨나요?</p>
-                        <a href="{{ url_for('signup') }}" class="auth-link"> [신규 모험가 등록]</a>
+                        <span>아직 길드에 가입하지 않으셨나요?</span>
+                        <span class="auth-divider">|</span>
+                        <a href="{{ url_for('signup') }}" class="auth-link">신규 모험가 등록</a>
                     </div>
                 </form>
             </div>
