@@ -290,8 +290,7 @@
    gap: 0.75rem;
 }
 
-<<<<<<< HEAD
-=======
+
 /* 게시글 목록 */
 .post-list {
    width: 100%;
@@ -303,35 +302,23 @@
    .post-row 만 적혀 있어서 목록이 밑줄 달린 기본 링크로 나오고 있었습니다.
    둘 다 받아두면 JS 쪽 이름이 나중에 바뀌어도 깨지지 않습니다. */
 .post-row,
->>>>>>> origin/main
+
 .post-item {
    display: flex;
    justify-content: space-between;
    align-items: center;
-<<<<<<< HEAD
-   flex-wrap: wrap;
-   gap: 4px 16px;
-   padding: 1.1rem 1.4rem;
-   background: var(--surface-solid);
-   border: 1px solid var(--border-soft);
-   border-radius: 14px;
-=======
+
    gap: 4px 16px;
    flex-wrap: wrap;
    padding: 1.2rem 0.25rem;
    border-bottom: 1px solid #f1f5f9;
->>>>>>> origin/main
+
    text-decoration: none;
    color: inherit;
    transition: all 0.2s ease;
 }
 
-<<<<<<< HEAD
-.post-item:hover {
-   transform: translateY(-2px);
-   border-color: var(--accent);
-   box-shadow: 0 6px 18px rgba(124, 111, 242, 0.15);
-=======
+
 .post-row:last-child,
 .post-item:last-child {
    border-bottom: none;
@@ -341,7 +328,7 @@
 .post-item:hover {
    background-color: #faf5ff;
    border-radius: 8px;
->>>>>>> origin/main
+
 }
 
 .post-item .post-title {

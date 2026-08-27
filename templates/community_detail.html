@@ -117,82 +117,6 @@
             </div>
             {% endif %}
 
-<<<<<<< HEAD
-        <!-- ==========================================
-             ↓↓↓ 여기서부터 "David 담당" — 그대로 유지 ↓↓↓
-             글쓴이의 캐릭터 카드 (result.html 섹션 재사용, 백엔드가 값 채워줌)
-             ========================================== -->
-        {% if character %}
-        <div class="character-embed">
-            <p class="character-embed-label">🛡️ 글쓴이의 성향 프로필</p>
-
-            <section class="character-card">
-                <div class="illustration-wrapper">
-                    <div class="illustration-placeholder">
-                        <img id="main-char-img"
-                            src="{{ url_for('static', filename='images/' + character.my_class.mbti.upper() + '.png') }}"
-                            alt="{{ character.my_class.class_name }}" class="char-img"
-                            onerror="this.src='/static/images/main-logo.png';">
-                    </div>
-                </div>
-                <h3 class="char-title">"{{ character.my_class.title }}"</h3>
-                <h2 class="char-name-mbti">{{ character.my_class.class_name }} <span class="mbti-badge">({{
-                        character.my_class.mbti }})</span></h2>
-            </section>
-
-            <section class="stats-info-section">
-                <div class="chart-box">
-                    <h4>능력치 레이더</h4>
-                    <div class="canvas-wrapper">
-                        <canvas id="radarChart"></canvas>
-                    </div>
-                </div>
-                <div class="info-box">
-                    <h4>전투 유형/특징</h4>
-                    <div class="info-item">
-                        <span class="info-label">▶ 전투 유형</span>
-                        <span class="info-value">{{ character.my_class.mbti }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">▶ 특징</span>
-                        <span class="info-value">{{ character.my_class.title }}</span>
-                    </div>
-                </div>
-            </section>
-
-            <section class="chemistry-area">
-                <h3 class="section-title">🤝 파티원 궁합</h3>
-                <div class="chemistry-box">
-                    <div class="chemistry-card best-match">
-                        <div class="match-badge best">💚 최고의 파티원</div>
-                        <div class="match-img-wrapper">
-                            <img id="best-match-img"
-                                src="{{ url_for('static', filename='images/' + character.best_match.mbti.upper() + '.png') }}"
-                                alt="{{ character.best_match.class_name }}" class="match-img"
-                                onerror="this.src='/static/images/main-logo.png';">
-                        </div>
-                        <h4 class="match-name">{{ character.best_match.class_name }}</h4>
-                        <span class="match-mbti">({{ character.best_match.mbti }})</span>
-                    </div>
-                    <div class="chemistry-card worst-match">
-                        <div class="match-badge worst">💔 최악의 파티원</div>
-                        <div class="match-img-wrapper">
-                            <img id="worst-match-img"
-                                src="{{ url_for('static', filename='images/' + character.worst_match.mbti.upper() + '.png') }}"
-                                alt="{{ character.worst_match.class_name }}" class="match-img"
-                                onerror="this.src='/static/images/main-logo.png';">
-                        </div>
-                        <h4 class="match-name">{{ character.worst_match.class_name }}</h4>
-                        <span class="match-mbti">({{ character.worst_match.mbti }})</span>
-                    </div>
-                </div>
-            </section>
-
-            <script id="stats-data" type="application/json">
-                {{ character.my_class.stats | tojson }}
-            </script>
-=======
->>>>>>> origin/main
         </div>
 
         <section class="comment-section">
@@ -206,13 +130,6 @@
 
     </main>
 
-<<<<<<< HEAD
-    <!-- TODO: [HTML/CSS] 글 수정 모달
-         community.html 의 write-modal과 완전히 동일한 구조로 만들면 됩니다
-         (id="write-modal", "modal-title", "post-title-input", "post-content-input",
-          "modal-error", "modal-cancel-btn", "modal-submit-btn") -->
-=======
->>>>>>> origin/main
     <div id="write-modal" class="modal-backdrop hidden">
         <div class="modal-box">
             <h3 id="modal-title" class="modal-title">글 수정</h3>
